@@ -18,7 +18,7 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body);
-    const model = body.model || 'gemini-2.0-flash';
+    const model = body.model || 'gemini-2.5-flash-preview-04-17';
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
