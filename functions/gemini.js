@@ -18,7 +18,7 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body);
-    const model = body.model || 'gemini-1.5-flash';
+    const model = body.model || 'gemini-2.0-flash-lite';
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -31,7 +31,7 @@ exports.handler = async function(event) {
     });
 
     const result = await new Promise((resolve, reject) => {
-      const urlPath = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const urlPath = `/v1/models/${model}:generateContent?key=${apiKey}`;
       const options = {
         hostname: 'generativelanguage.googleapis.com',
         path: urlPath,
