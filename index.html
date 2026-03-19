@@ -1238,7 +1238,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 // GEMINI 설정 (작동 확정)
 // ══════════════════════════════════════════════
 const GEMINI_API_KEY = '';
-const GEMINI_MODEL   = 'gemini-2.5-flash';
+const GEMINI_MODEL   = 'gemini-2.0-flash';
 const GEMINI_URL = '/.netlify/functions/gemini';
 const HALF_DAILY_MAX = 10;
 const FULL_COIN_COST = 0; // Phase 2에서 실제 예약 시 사용
@@ -1830,7 +1830,7 @@ async function sendMsg(){
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
   var styleCtx=style?((lang==='ko'?'여행 스타일: ':'Travel style: ')+style.name+(travelSubStyle?' > '+travelSubStyle:'')+'\n'):'';
   var sysPrompt=lang==='ko'
-    ?styleCtx+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. 현지 이벤트 파악해서 최저가 날짜 먼저 제안.\n3. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공사 편명 직항여부 좌석등급 수화물kg\n   - 호텔명 등급 룸타입 조식 아동정책\n   - Day별 동선 맛집 각 3곳(꼭 먹어야 할 메뉴 명시)\n   - 카드할인 적용 최종금액'
+    ?styleCtx+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. 현지 이벤트 파악해서 최저가 날짜 먼저 제안.\n3. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공사 편명 직항여부 좌석등급 수화물kg\n   - 호텔명 등급 룸타입 조식 아동정책\n   - Day별 동선 맛집 각 3곳(꼭 먹어야 할 메뉴 명시)\n   - 카드할인 적용 최종금액\\n\\n답변 맨 끝에 아래 형식 JSON을 반드시 추가(---JSON_DATA--- 마커 포함):---JSON_DATA---\\n{\\"route\\":\\"ICN→목적지\\",\\"dates\\":\\"출발~귀국\\",\\"nights\\":5,\\"pax\\":1,\\"A\\":{\\"name\\":\\"옵션명\\",\\"price\\":1500000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1요약\\",\\"Day2요약\\",\\"Day3요약\\"]},\\"B\\":{\\"name\\":\\"옵션명\\",\\"price\\":1200000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1\\",\\"Day2\\",\\"Day3\\"]},\\"C\\":{\\"name\\":\\"옵션명\\",\\"price\\":900000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1\\",\\"Day2\\",\\"Day3\\"]}}'
     :styleCtx+'You are DAL AI Travel Planner. Reply in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Check local events, suggest cheapest dates first.\n3. Compare Option A(Premium) B(Smart Recommended) C(Value):\n   - Airline flight direct/stop class baggage\n   - Hotel stars room breakfast kids policy\n   - Day-by-day itinerary 3 restaurants per day\n   - Final price with card discounts';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1849,10 +1849,23 @@ async function sendMsg(){
     var reply=parts.map(function(p){return p.text||'';}).join('').trim()||(lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.');
     if(!reply) reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
     // JSON 블록 파싱 후 제거 (채팅에는 표시 안 함)
-    window._lastTripText=reply;
+    // ---JSON_DATA--- 마커로 텍스트와 JSON 분리
+    var jsonMarker='---JSON_DATA---';
+    var markerIdx=reply.indexOf(jsonMarker);
+    var displayText=reply;
+    var parsedJson=null;
+    if(markerIdx>=0){
+      displayText=reply.substring(0,markerIdx).trim();
+      var jsonStr=reply.substring(markerIdx+jsonMarker.length).trim();
+      // ```json ... ``` 블록 제거
+      jsonStr=jsonStr.replace(/```json/gi,'').replace(/```/g,'').trim();
+      var s=jsonStr.indexOf('{'),e=jsonStr.lastIndexOf('}');
+      if(s>=0&&e>s){try{parsedJson=JSON.parse(jsonStr.substring(s,e+1));}catch(ex){parsedJson=null;}}
+    }
+    window._lastTripText=displayText;
     window._lastTripQuery=text;
-    window._lastTripJson=null;
-    addMsgFull(reply); earnCoinAmt+=5; updateCoinUI();
+    window._lastTripJson=parsedJson;
+    addMsgFull(displayText); earnCoinAmt+=5; updateCoinUI();
   }catch(e){
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     var errMsg=e.message||String(e);
@@ -1880,51 +1893,8 @@ function addMsgFull(text){
   area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 async function saveToTrip(){
-  addDalMsg(lang==='ko'?'✨ 여행 데이터 정리 중...':'✨ Organizing trip data...');
-  var tripText=window._lastTripText||'';
-  var tripQuery=window._lastTripQuery||'';
-  if(tripText){
-    // Gemini에게 JSON 구조 추출 요청
-    var extractPrompt='아래 여행 추천글에서 A/B/C 옵션 정보를 추출해 JSON으로만 답해. 설명 없이 JSON만. 모든 값 반드시 채울것.\n'+
-      '{"route":"ICN→목적지","dates":"출발~귀국","nights":5,"pax":1,'+
-      '"A":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1요약","Day2요약","Day3요약"]},'+
-      '"B":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]},'+
-      '"C":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]}}\n\n추천글:\n'+tripText.substring(0,3000);
-    try{
-      var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{role:'user',parts:[{text:extractPrompt}]}],generationConfig:{maxOutputTokens:3500,temperature:0.1}})});
-      if(res.ok){
-        var data=await res.json();
-        var raw=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text)||'';
-        raw=raw.replace(/```json/gi,'').replace(/```/g,'').trim();
-        // 방법1: 전체 raw 직접 파싱
-        var j=null;
-        try{ j=JSON.parse(raw); }catch(e1){
-          // 방법2: 첫{~마지막} 추출
-          var s=raw.indexOf('{'), e2=raw.lastIndexOf('}');
-          if(s>=0&&e2>s){
-            try{ j=JSON.parse(raw.substring(s,e2+1)); }catch(e3){
-              // 방법3: 잘린 JSON 복구 - 마지막 완전한 필드까지만
-              var partial=raw.substring(s);
-              // 열린 괄호 수 세서 닫기
-              var depth=0, cutIdx=partial.length;
-              for(var ci=0;ci<partial.length;ci++){
-                if(partial[ci]==='{')depth++;
-                else if(partial[ci]==='}'){depth--;if(depth===0){cutIdx=ci+1;break;}}
-              }
-              try{ j=JSON.parse(partial.substring(0,cutIdx)); }catch(e4){
-                addDalMsg('⚠️ JSON파싱실패(디버그): '+partial.substring(0,150));
-              }
-            }
-          } else {
-            addDalMsg('⚠️ JSON구조없음(디버그): '+raw.substring(0,150));
-          }
-        }
-        if(j) window._lastTripJson=j;
-      }
-    }catch(e){ console.warn('saveToTrip fetch:',e); }
-  }
-  // OPTIONS 업데이트
+  addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
+  // 이미 sendMsg에서 파싱된 JSON 바로 사용 (2단계 호출 없음)
   var j=window._lastTripJson;
   if(j){
     ['A','B','C'].forEach(function(o){
@@ -1955,13 +1925,18 @@ async function saveToTrip(){
   } else {
     addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
   }
+  // halfTrips에 저장
   halfTrips.unshift({
     route:(j&&j.route)||window._lastTripQuery||'여행',
     dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-    text:window._lastTripText||'',
-    json:j||null
+    nights:(j&&j.nights)||null,
+    pax:(j&&j.pax)||null,
+    A:(j&&j.A)||null,
+    B:(j&&j.B)||null,
+    C:(j&&j.C)||null,
+    text:window._lastTripText||''
   });
-  renderHalfTrips();
+  renderHalfTripsList();
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
 }
