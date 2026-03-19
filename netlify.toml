@@ -1,6 +1,6 @@
 [build]
   functions = "functions"
- 
+  image = "jammy"
+
 [build.environment]
   NODE_VERSION = "20"
- 
