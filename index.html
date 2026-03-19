@@ -1955,6 +1955,13 @@ async function saveToTrip(){
   } else {
     addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
   }
+  halfTrips.unshift({
+    route:(j&&j.route)||window._lastTripQuery||'여행',
+    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
+    text:window._lastTripText||'',
+    json:j||null
+  });
+  renderHalfTrips();
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
 }
