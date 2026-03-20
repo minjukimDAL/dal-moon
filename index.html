@@ -381,10 +381,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   <div class="tn-logo" onclick="goPage('home')">DAL</div>
   <div class="tn-right">
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
-    <div class="coin-badge" onclick="openCoinModal()">
-      <span>🪙</span><span id="coinCount">50</span><span id="t-coin-label" style="color:var(--m);font-size:10px">코인</span>
+    <div id="headerCoinBadge" class="coin-badge" onclick="openCoinModal()" style="opacity:0.4;border-color:rgba(196,175,135,.15);transition:opacity 0.3s,border-color 0.3s;">
+      <span>🪙</span><span id="coinCount">—</span><span id="t-coin-label" style="color:var(--m);font-size:10px">코인</span>
     </div>
-    <div style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;" onclick="goPage('my')">👤</div>
+    <div id="headerUserBtn" style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:border-color 0.3s,background 0.3s;" onclick="goPage('my')">👤</div>
   </div>
 </div>
 
@@ -1828,10 +1828,19 @@ async function sendMsg(){
   var thinkId='tk'+Date.now();
   addDalMsg('<span style="color:var(--m)">Gemini 2.5 Flash ✨</span>',thinkId);
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
-  var styleCtx=style?((lang==='ko'?'여행 스타일: ':'Travel style: ')+style.name+(travelSubStyle?' > '+travelSubStyle:'')+'\n'):'';
+  var styleName=style?style.name:'';
+  var subStyle=travelSubStyle||'';
+  // 유저 선택값 구조적으로 조합
+  var userCtx='';
+  if(styleName) userCtx+=(lang==='ko'?'[여행자 스타일] ':'[Traveler style] ')+styleName+(subStyle?' > '+subStyle:'')+' \n';
+  // chatInput에서 목적지/박수/인원 추출 시도
+  var inputVal=(document.getElementById('chatInput')||{}).value||text;
+  userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+inputVal+'\n';
+  // JSON 마커 스키마
+  var jsonSchema='\n\n---JSON_DATA---\n{"route":"ICN→목적지","dates":"출발~귀국","nights":5,"pax":1,"A":{"name":"옵션명","price":1500000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1요약","Day2요약","Day3요약"]},"B":{"name":"옵션명","price":1200000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1","Day2","Day3"]},"C":{"name":"옵션명","price":900000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1","Day2","Day3"]}}\n위 JSON을 답변 맨 끝에 ---JSON_DATA--- 마커와 함께 반드시 포함.';
   var sysPrompt=lang==='ko'
-    ?styleCtx+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. 현지 이벤트 파악해서 최저가 날짜 먼저 제안.\n3. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공사 편명 직항여부 좌석등급 수화물kg\n   - 호텔명 등급 룸타입 조식 아동정책\n   - Day별 동선 맛집 각 3곳(꼭 먹어야 할 메뉴 명시)\n   - 카드할인 적용 최종금액\\n\\n답변 맨 끝에 아래 형식 JSON을 반드시 추가(---JSON_DATA--- 마커 포함):---JSON_DATA---\\n{\\"route\\":\\"ICN→목적지\\",\\"dates\\":\\"출발~귀국\\",\\"nights\\":5,\\"pax\\":1,\\"A\\":{\\"name\\":\\"옵션명\\",\\"price\\":1500000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1요약\\",\\"Day2요약\\",\\"Day3요약\\"]},\\"B\\":{\\"name\\":\\"옵션명\\",\\"price\\":1200000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1\\",\\"Day2\\",\\"Day3\\"]},\\"C\\":{\\"name\\":\\"옵션명\\",\\"price\\":900000,\\"flight\\":\\"항공사+등급\\",\\"hotel\\":\\"호텔명\\",\\"days\\":[\\"Day1\\",\\"Day2\\",\\"Day3\\"]}}'
-    :styleCtx+'You are DAL AI Travel Planner. Reply in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Check local events, suggest cheapest dates first.\n3. Compare Option A(Premium) B(Smart Recommended) C(Value):\n   - Airline flight direct/stop class baggage\n   - Hotel stars room breakfast kids policy\n   - Day-by-day itinerary 3 restaurants per day\n   - Final price with card discounts';
+    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급 + 수화물\n   - 숙소: 호텔명 + 등급 + 위치 + 조식여부\n   - Day별 큰 틀 일정 (오전/오후/저녁 키워드)\n3. 금액 대신 할인 인사이트 제공:\n   - 출발 요일별 가격 차이 (예: 화/수 출발이 주말 대비 15% 저렴)\n   - 얼리버드/막판할인 적용 가능 시점\n   - 해당 시즌 특별 이벤트나 축제로 인한 가격 변동 주의사항\n   - 카드 혜택 적용 가능 여부 (카드사명 명시)\n4. 답변 마지막에 "🌕 맞춤 플래닝으로 업그레이드하면: 식당명+예약링크 / 시간대별 동선 / 확정 루트 제공" 한 줄 추가'+jsonSchema
+    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class + baggage\n   - Hotel: name + stars + location + breakfast\n   - Day-by-day outline (morning/afternoon/evening keywords)\n3. Discount insights instead of fixed prices:\n   - Best departure days (e.g. Tue/Wed 15% cheaper than weekends)\n   - Early bird vs last-minute timing\n   - Seasonal events affecting prices\n   - Credit card benefits available\n4. End with one line: "🌕 Upgrade to Custom Planning for: restaurant names+booking links / hourly route / confirmed itinerary"'+jsonSchema;
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:1800,temperature:0.7}})});
@@ -1849,23 +1858,10 @@ async function sendMsg(){
     var reply=parts.map(function(p){return p.text||'';}).join('').trim()||(lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.');
     if(!reply) reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
     // JSON 블록 파싱 후 제거 (채팅에는 표시 안 함)
-    // ---JSON_DATA--- 마커로 텍스트와 JSON 분리
-    var jsonMarker='---JSON_DATA---';
-    var markerIdx=reply.indexOf(jsonMarker);
-    var displayText=reply;
-    var parsedJson=null;
-    if(markerIdx>=0){
-      displayText=reply.substring(0,markerIdx).trim();
-      var jsonStr=reply.substring(markerIdx+jsonMarker.length).trim();
-      // ```json ... ``` 블록 제거
-      jsonStr=jsonStr.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=jsonStr.indexOf('{'),e=jsonStr.lastIndexOf('}');
-      if(s>=0&&e>s){try{parsedJson=JSON.parse(jsonStr.substring(s,e+1));}catch(ex){parsedJson=null;}}
-    }
-    window._lastTripText=displayText;
+    window._lastTripText=reply;
     window._lastTripQuery=text;
-    window._lastTripJson=parsedJson;
-    addMsgFull(displayText); earnCoinAmt+=5; updateCoinUI();
+    window._lastTripJson=null;
+    addMsgFull(reply); earnCoinAmt+=5; updateCoinUI();
   }catch(e){
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     var errMsg=e.message||String(e);
@@ -1888,13 +1884,58 @@ function addMsgFull(text){
     +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
     +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
     +(lang==='ko'?'✓ 내 여행에 저장 · 🪙 30코인 적립':'✓ Save to My Trip · Earn 🪙 30 coins')+'</button>'
+    +'<button style="width:100%;padding:9px;background:transparent;border:1px solid rgba(196,175,135,.4);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:6px;" onclick="setMode(\'full\')">'
+    +(lang==='ko'?'🌕 맞춤 플래닝으로 업그레이드 · 식당명+루트+할인타이밍 제공 · 10🪙':'🌕 Upgrade to Custom Planning · Get restaurants+routes+deals · 10🪙')+'</button>'
     +'<div style="font-size:9px;color:var(--ok);text-align:center;margin-top:6px;">+🪙 5'+(lang==='ko'?' 코인 적립완료':' coins earned')+'</div>'
     +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 async function saveToTrip(){
-  addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
-  // 이미 sendMsg에서 파싱된 JSON 바로 사용 (2단계 호출 없음)
+  addDalMsg(lang==='ko'?'✨ 여행 데이터 정리 중...':'✨ Organizing trip data...');
+  var tripText=window._lastTripText||'';
+  var tripQuery=window._lastTripQuery||'';
+  if(tripText){
+    // Gemini에게 JSON 구조 추출 요청
+    var extractPrompt='아래 여행 추천글에서 A/B/C 옵션 정보를 추출해 JSON으로만 답해. 설명 없이 JSON만. 모든 값 반드시 채울것.\n'+
+      '{"route":"ICN→목적지","dates":"출발~귀국","nights":5,"pax":1,'+
+      '"A":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1요약","Day2요약","Day3요약"]},'+
+      '"B":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]},'+
+      '"C":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]}}\n\n추천글:\n'+tripText.substring(0,3000);
+    try{
+      var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:[{text:extractPrompt}]}],generationConfig:{maxOutputTokens:3500,temperature:0.1}})});
+      if(res.ok){
+        var data=await res.json();
+        var raw=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text)||'';
+        raw=raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+        // 방법1: 전체 raw 직접 파싱
+        var j=null;
+        try{ j=JSON.parse(raw); }catch(e1){
+          // 방법2: 첫{~마지막} 추출
+          var s=raw.indexOf('{'), e2=raw.lastIndexOf('}');
+          if(s>=0&&e2>s){
+            try{ j=JSON.parse(raw.substring(s,e2+1)); }catch(e3){
+              // 방법3: 잘린 JSON 복구 - 마지막 완전한 필드까지만
+              var partial=raw.substring(s);
+              // 열린 괄호 수 세서 닫기
+              var depth=0, cutIdx=partial.length;
+              for(var ci=0;ci<partial.length;ci++){
+                if(partial[ci]==='{')depth++;
+                else if(partial[ci]==='}'){depth--;if(depth===0){cutIdx=ci+1;break;}}
+              }
+              try{ j=JSON.parse(partial.substring(0,cutIdx)); }catch(e4){
+                addDalMsg('⚠️ JSON파싱실패(디버그): '+partial.substring(0,150));
+              }
+            }
+          } else {
+            addDalMsg('⚠️ JSON구조없음(디버그): '+raw.substring(0,150));
+          }
+        }
+        if(j) window._lastTripJson=j;
+      }
+    }catch(e){ console.warn('saveToTrip fetch:',e); }
+  }
+  // OPTIONS 업데이트
   var j=window._lastTripJson;
   if(j){
     ['A','B','C'].forEach(function(o){
@@ -1925,18 +1966,6 @@ async function saveToTrip(){
   } else {
     addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
   }
-  // halfTrips에 저장
-  halfTrips.unshift({
-    route:(j&&j.route)||window._lastTripQuery||'여행',
-    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-    nights:(j&&j.nights)||null,
-    pax:(j&&j.pax)||null,
-    A:(j&&j.A)||null,
-    B:(j&&j.B)||null,
-    C:(j&&j.C)||null,
-    text:window._lastTripText||''
-  });
-  renderHalfTripsList();
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
 }
@@ -2001,7 +2030,8 @@ function hideMyPage(){
 var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
-  document.getElementById('coinCount').textContent=coins;
+  var coinEl=document.getElementById('coinCount');
+  if(coinEl) coinEl.textContent=isLoggedIn?coins:'—';
   var pc=document.getElementById('profileCoins'); if(pc)pc.textContent=coins+' 🪙';
   var bc=document.getElementById('bonusCoin'); if(bc)bc.textContent=bonusCoinAmt;
   var ec=document.getElementById('earnCoin'); if(ec)ec.textContent=earnCoinAmt;
@@ -2316,6 +2346,11 @@ function initSupabase(){
 function onLoginSuccess(user, token){
   if(!user) return;
   isLoggedIn=true;
+  // D옵션: 코인 배지 활성화 + 유저 아이콘 골드 테두리
+  var coinBadge=document.getElementById('headerCoinBadge');
+  if(coinBadge){coinBadge.style.opacity='1';coinBadge.style.borderColor='rgba(196,175,135,.5)';}
+  var userBtn=document.getElementById('headerUserBtn');
+  if(userBtn){userBtn.style.borderColor='rgba(196,175,135,.8)';userBtn.style.background='rgba(196,175,135,.1)';}
   var lv=document.getElementById('loginView'); if(lv) lv.style.display='none';
   var pv=document.getElementById('profileView'); if(pv) pv.style.display='block';
   var meta=user.user_metadata||{};
@@ -2329,6 +2364,13 @@ function onLoginSuccess(user, token){
 
 function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
+  // D옵션: 코인 배지 비활성화 + 유저 아이콘 원복
+  var coinBadge=document.getElementById('headerCoinBadge');
+  if(coinBadge){coinBadge.style.opacity='0.4';coinBadge.style.borderColor='rgba(196,175,135,.15)';}
+  var coinCount=document.getElementById('coinCount');
+  if(coinCount) coinCount.textContent='—';
+  var userBtn=document.getElementById('headerUserBtn');
+  if(userBtn){userBtn.style.borderColor='var(--b2)';userBtn.style.background='transparent';}
   var lv=document.getElementById('loginView'); if(lv) lv.style.display='flex';
   var pv=document.getElementById('profileView'); if(pv) pv.style.display='none';
 }
@@ -2607,10 +2649,12 @@ async function startFullAnalysis(){
   var thinkId='ftk'+Date.now();
   addFullMsg('dal','<span style="color:var(--m)">Gemini 2.5 Flash ✨ 맞춤 분석 중...</span>',thinkId);
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
-  var sc=style?((lang==='ko'?'여행 스타일: ':'Travel style: ')+style.name+'\\n'):'';
+  var styleName=style?style.name:'';
+  var subStyle=travelSubStyle||'';
+  var userProfile=styleName?(lang==='ko'?('[여행자 스타일] '+styleName+(subStyle?' > '+subStyle:'')+'\\n'):('[Traveler style] '+styleName+(subStyle?' > '+subStyle:'')+'\\n')):'';
   var sp=lang==='ko'
-    ?sc+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\\n조건: '+ctx+'\\n\\n1. 즉시 상세 추천. 추가질문 금지.\\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 비교\\n3. 추천 이유, 주의사항, 숨겨진 팁, 카드 할인 최적화\\n4. 최저가 예약처 안내 (네이버항공, 아고다, 클룩)'
-    :sc+'You are DAL AI Travel Planner.\\nConditions: '+ctx+'\\n\\n1. Immediate detailed recommendations.\\n2. Compare Option A/B/C.\\n3. Include reasons, warnings, hidden tips, card discounts.\\n4. Suggest booking links.';
+    ?userProfile+'[맞춤 조건] '+ctx+'\\n[요청] '+destText+'\\n\\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\\n유료 맞춤 플래닝으로 아래 항목을 구체적으로 제공:\\n1. Option A(프리미엄) B(스마트 추천) C(가성비) 상세 비교\\n2. 각 옵션별 구체적 식당명 3곳 + 예약 필요여부 + 대표 메뉴\\n3. 시간대별 동선 (오전/오후/저녁 이동 수단 + 소요시간 포함)\\n4. 이 시즌 놓치면 안 되는 할인 타이밍 (얼리버드/특가 날짜)\\n5. 카드사별 혜택 적용 시 최적 결제 방법\\n6. 현지인만 아는 팁 + 주의사항\\n7. 최저가 예약처 안내 (네이버항공, 아고다, 클룩)'
+    :userProfile+'[Custom conditions] '+ctx+'\\n[Request] '+destText+'\\n\\nYou are DAL AI Travel Planner. Reply ONLY in English.\\nPremium custom planning — provide in detail:\\n1. Option A(Premium) B(Smart Pick) C(Value) full comparison\\n2. Specific restaurant names per option (3 each) + reservation needed + must-try dish\\n3. Hour-by-hour route with transport + travel time\\n4. Discount timing this season (early bird dates, flash sales)\\n5. Best credit card payment strategy\\n6. Local insider tips + warnings\\n7. Best booking platforms (flights, hotels, tours)';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{role:'user',parts:[{text:sp+'\\n\\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
@@ -2719,7 +2763,7 @@ function selectEventDest(dest, eventName){
   var city = (DEST_NAMES[dest]&&DEST_NAMES[dest][lang]) || dest;
   var input = document.getElementById('chatInput');
   if(input){
-    input.value = city + ' — ' + eventName + ' 여행 플랜 만들어줘';
+    input.value = lang==='ko' ? city + ' — ' + eventName + ' 여행 플랜 만들어줘' : city + ' — ' + eventName + ' travel plan';
     collapseHero();
     input.focus();
     // 예산 계산기 목적지도 자동 선택
