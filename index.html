@@ -393,9 +393,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-home" class="page active">
   <div class="home-wrap">
-    <div style="display:flex;gap:6px;padding:10px 14px 0;">
-      <button id="homeTabHalf" onclick="setHomeTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;"><span id='t-homeTabHalf'>🌙 AI 플래닝 · 무료</span></button>
-      <button id="homeTabFull" onclick="setHomeTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;"><span id='t-homeTabFull'>🌕 맞춤 플래닝 · 10🪙</span></button>
+    <div style="padding:10px 14px 0;">
+      <div style="font-size:11px;font-weight:500;color:var(--ac);padding:6px 0;">🌙 <span id='t-homeTabHalf'>AI 플래닝 · 무료</span></div>
     </div>
     <div id="homeHalf" style="display:block;">
 
@@ -609,9 +608,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-trips" class="page">
   <div class="page-wrap">
-    <div style="display:flex;gap:6px;margin-bottom:14px;">
-      <button id="tripsTabHalf" onclick="setTripsTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;"><span id='t-tripsTabHalf'>🌙 플래닝 기록</span></button>
-      <button id="tripsTabFull" onclick="setTripsTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;"><span id='t-tripsTabFull'>🌕 맞춤 플래닝 기록</span></button>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:500;color:var(--ac);padding:4px 0;">🌙 <span id='t-tripsTabHalf'>플래닝 기록</span></div>
     </div>
     <div id="tripsHalf" style="display:block;">
       <div id="halfTripsList"></div>
@@ -662,7 +660,15 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div class="final-price" id="finalPrice">₩7,627,040</div>
         <div class="final-earn" id="finalEarn">+🪙 221코인 적립 예정</div>
       </div>
-      <button onclick="startUpgradeFromTrip(currentHalfTripIdx)" class="action-btn btn-dim" style="margin-top:10px;border-color:rgba(196,175,135,.3);color:var(--gold);">🌕 맞춤 플래닝으로 업그레이드 · 10🪙</button>
+      <div id="optionUnlockArea" style="margin-top:12px;background:rgba(196,175,135,.04);border:1px solid rgba(196,175,135,.15);border-radius:4px;padding:12px;">
+        <div style="font-size:10px;color:var(--gold);margin-bottom:8px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <button id="unlockBtnA" onclick="requestUnlockOption('A')" style="padding:8px 4px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option A<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+          <button id="unlockBtnB" onclick="requestUnlockOption('B')" style="padding:8px 4px;background:rgba(91,143,255,.1);border:1px solid rgba(91,143,255,.3);border-radius:4px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option B<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+          <button id="unlockBtnC" onclick="requestUnlockOption('C')" style="padding:8px 4px;background:rgba(0,200,100,.06);border:1px solid rgba(0,200,100,.2);border-radius:4px;font-size:10px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option C<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+        </div>
+        <div style="font-size:9px;color:var(--m);text-align:center;margin-top:6px;" id="t-unlock-desc">식당명 · 시간대별 동선 · 카드할인 확정 제공</div>
+      </div>
       <button class="action-btn btn-dim" onclick="openShareModal()" id="t-share-btn">✉️ 플랜 공유하기</button>
     </div>
     <div id="fullTripDetail" style="display:none;">
@@ -1206,6 +1212,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
   </div>
 </div>
+<!-- 옵션 잠금해제 확인 팝업 -->
+<div id="unlockConfirmModal" class="modal-bg" onclick="closeModalBg('unlockConfirmModal',event)" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:24px;max-width:320px;width:90%;margin:auto;">
+    <div style="font-size:16px;color:var(--sb);font-weight:500;margin-bottom:8px;text-align:center;" id="unlockConfirmTitle">🌕 Option A 상세 잠금 해제</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:16px;text-align:center;" id="unlockConfirmDesc">5🪙 코인을 사용해 Option A의 상세 정보를 열겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정</div>
+    <div style="font-size:11px;color:var(--m);text-align:center;margin-bottom:16px;">현재 보유: <span id="unlockCoinBalance" style="color:var(--gold);font-weight:500;">50🪙</span></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('unlockConfirmModal').style.display='none';" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);border-radius:4px;font-size:12px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-unlock-cancel">취소</button>
+      <button onclick="confirmUnlockOption()" style="flex:1;padding:10px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.4);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-unlock-confirm">5🪙 사용 · 잠금 해제</button>
+    </div>
+  </div>
+</div>
+
 <!-- 여행 공유 모달 R2-9 -->
 <div class="modal-bg" id="shareModal" onclick="closeModalBg('shareModal',event)">
   <div class="modal-sheet">
@@ -1464,6 +1483,11 @@ function applyLang(){
   el=document.getElementById('t-back-input'); if(el) el.innerHTML=isEn?'← Back':'← 다시 입력';
   el=document.getElementById('t-full-badge'); if(el) el.innerHTML=isEn?'🌕 Custom Planning':'🌕 맞춤 플래닝';
   el=document.getElementById('t-full-save-btn'); if(el) el.innerHTML=isEn?'✓ Save to My Trip · Earn 🪙 5 coins':'✓ 내 여행에 저장 · 🪙 5코인 적립';
+  // 옵션 잠금 해제 버튼
+  el=document.getElementById('t-unlock-title'); if(el) el.textContent=isEn?'🌕 Unlock Option Details · 5🪙 each':'🌕 옵션 상세 잠금 해제 · 각 5🪙';
+  el=document.getElementById('t-unlock-desc'); if(el) el.textContent=isEn?'Restaurant names · Hourly itinerary · Card discounts':'식당명 · 시간대별 동선 · 카드할인 확정';
+  el=document.getElementById('t-unlock-cancel'); if(el) el.textContent=isEn?'Cancel':'취소';
+  el=document.getElementById('t-unlock-confirm'); if(el) el.textContent=isEn?'Use 5🪙 · Unlock':'5🪙 사용 · 잠금 해제';
   // ① 여행 스타일 레이블
   var s1=document.querySelector('[data-step-label]');
   // 동적 콘텐츠 재생성
@@ -2588,14 +2612,12 @@ async function doWithdraw(){
 // ══ 홈 탭 전환 ══
 var currentHomeTab='half';
 function setHomeTab(tab){
-  currentHomeTab=tab;
-  var hh=document.getElementById('homeHalf');if(hh)hh.style.display=tab==='half'?'block':'none';
-  var hf=document.getElementById('homeFull');if(hf)hf.style.display=tab==='full'?'block':'none';
-  var bH=document.getElementById('homeTabHalf'),bF=document.getElementById('homeTabFull');
-  if(bH){bH.style.background=tab==='half'?'rgba(91,143,255,.08)':'transparent';bH.style.borderColor=tab==='half'?'rgba(91,143,255,.3)':'rgba(91,143,255,.1)';bH.style.color=tab==='half'?'var(--ac)':'var(--m)';}
-  if(bF){bF.style.background=tab==='full'?'rgba(196,175,135,.08)':'transparent';bF.style.borderColor=tab==='full'?'rgba(196,175,135,.3)':'rgba(196,175,135,.15)';bF.style.color=tab==='full'?'var(--gold)':'var(--m)';}
-  if(tab==='full'){var cb=document.getElementById('fullCoinBalance');if(cb)cb.textContent=coins;initDailyReward();}
-  if(tab==='half')setMode('half');
+  // 홈은 AI 플래닝(half)만 사용 — 맞춤 플래닝 탭 제거됨
+  currentHomeTab='half'; currentMode='half';
+  var hh=document.getElementById('homeHalf');if(hh)hh.style.display='block';
+  var hf=document.getElementById('homeFull');if(hf)hf.style.display='none';
+  setMode('half');
+  initDailyReward();
 }
 function selectStyleChip(el,style){
   document.querySelectorAll('.style-chip').forEach(function(c){c.classList.remove('active');});
@@ -2700,16 +2722,15 @@ function renderInfoEvents(){
 // ══ 내여행 탭 ══
 var currentTripsTab='half',halfTrips=[],fullTrips=[],currentHalfTripIdx=-1;
 function setTripsTab(tab){
-  currentTripsTab=tab;
+  // 내 여행은 플래닝 기록(half)만 사용 — 맞춤 플래닝 기록 탭 제거됨
+  currentTripsTab='half';
   var th=document.getElementById('tripsHalf'),tf=document.getElementById('tripsFull');
   var hd=document.getElementById('halfTripDetail'),fd=document.getElementById('fullTripDetail');
-  if(th)th.style.display=tab==='half'?'block':'none';
-  if(tf)tf.style.display=tab==='full'?'block':'none';
-  if(hd)hd.style.display='none';if(fd)fd.style.display='none';
-  var bH=document.getElementById('tripsTabHalf'),bF=document.getElementById('tripsTabFull');
-  if(bH){bH.style.background=tab==='half'?'rgba(91,143,255,.08)':'transparent';bH.style.borderColor=tab==='half'?'rgba(91,143,255,.3)':'rgba(91,143,255,.1)';bH.style.color=tab==='half'?'var(--ac)':'var(--m)';}
-  if(bF){bF.style.background=tab==='full'?'rgba(196,175,135,.08)':'transparent';bF.style.borderColor=tab==='full'?'rgba(196,175,135,.3)':'rgba(196,175,135,.15)';bF.style.color=tab==='full'?'var(--gold)':'var(--m)';}
-  if(tab==='half')renderHalfTripsList();else renderFullTripsList();
+  if(th)th.style.display='block';
+  if(tf)tf.style.display='none';
+  if(hd)hd.style.display='none';
+  if(fd)fd.style.display='none';
+  renderHalfTripsList();
 }
 function renderHalfTripsList(){
   var el=document.getElementById('halfTripsList');if(!el)return;
@@ -2787,6 +2808,25 @@ function showHalfDetail(idx){
   selectOption('B');
   updateTripLinks(t);
   suggestCardsForTrip(t);
+  // 이미 잠금 해제된 옵션은 버튼 상태 복원
+  ['A','B','C'].forEach(function(o){
+    var btn=document.getElementById('unlockBtn'+o);
+    if(!btn) return;
+    if(_unlockedOptions[idx]&&_unlockedOptions[idx][o]){
+      btn.disabled=false;
+      btn.style.background='rgba(196,175,135,.2)';
+      btn.style.borderColor='rgba(196,175,135,.5)';
+      btn.innerHTML='✅ Option '+o+'<br><span style="font-size:9px;color:var(--ok);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
+      btn.onclick=(function(opt,tidx){return function(){showUnlockedDetail(opt,tidx);};})(o,idx);
+    } else {
+      btn.disabled=false;
+      btn.style.background=o==='A'?'rgba(196,175,135,.1)':o==='B'?'rgba(91,143,255,.1)':'rgba(0,200,100,.06)';
+      btn.style.borderColor=o==='A'?'rgba(196,175,135,.3)':o==='B'?'rgba(91,143,255,.3)':'rgba(0,200,100,.2)';
+      btn.style.color=o==='A'?'var(--gold)':o==='B'?'var(--ac)':'var(--ok)';
+      btn.innerHTML='🔒 Option '+o+'<br><span style="font-size:9px;color:var(--m);">5🪙</span>';
+      btn.onclick=(function(opt){return function(){requestUnlockOption(opt);};})(o);
+    }
+  });
 }
 function closeHalfDetail(){var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');if(hd)hd.style.display='none';if(th)th.style.display='block';}
 function showFullDetail(idx){
@@ -2818,6 +2858,165 @@ function startUpgradeFromTrip(idx){
   setTimeout(function(){var d=document.getElementById('fullDestInput');if(d&&t)d.value=(t.route||'')+(t.dates?' · '+t.dates:'')+(t.pax?' · '+t.pax+'인':'');},300);
 }
 function openLink(url){window.open(url,'_blank');}
+
+// ══ 옵션 잠금 해제 ══
+var _pendingUnlockOpt=null;
+var UNLOCK_COIN_COST=5;
+var _unlockedOptions={}; // {tripIdx: {A:true, B:false, C:false}}
+
+function requestUnlockOption(opt){
+  var tripIdx=currentHalfTripIdx;
+  var t=halfTrips[tripIdx]; if(!t) return;
+
+  // 이미 해제됐으면 바로 표시
+  if(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt]){
+    doUnlockOption(opt, tripIdx, true);
+    return;
+  }
+  // 코인 부족 확인
+  if(coins<UNLOCK_COIN_COST){
+    alert(lang==='ko'?'코인이 부족합니다. 충전해주세요 🪙':'Insufficient coins. Please charge.');
+    openCoinModal(); return;
+  }
+
+  _pendingUnlockOpt={opt:opt, tripIdx:tripIdx};
+
+  // 팝업 내용 업데이트
+  var title=document.getElementById('unlockConfirmTitle');
+  var desc=document.getElementById('unlockConfirmDesc');
+  var bal=document.getElementById('unlockCoinBalance');
+  var confirmBtn=document.getElementById('t-unlock-confirm');
+  var cancelBtn=document.getElementById('t-unlock-cancel');
+
+  if(title) title.textContent=(lang==='ko'?'🌕 Option '+opt+' 상세 잠금 해제':'🌕 Unlock Option '+opt+' Details');
+  if(desc) desc.innerHTML=(lang==='ko'
+    ?'<strong style="color:var(--gold);">5🪙</strong> 코인을 사용해 Option '+opt+'의 상세 정보를 받겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정 루트'
+    :'Use <strong style="color:var(--gold);">5🪙</strong> coins to unlock Option '+opt+' details?<br><br>· Restaurant names + booking links<br>· Hour-by-hour itinerary<br>· Confirmed card discounts');
+  if(bal) bal.textContent=coins+'🪙';
+  if(confirmBtn) confirmBtn.textContent=lang==='ko'?'5🪙 사용 · 잠금 해제':'Use 5🪙 · Unlock';
+  if(cancelBtn) cancelBtn.textContent=lang==='ko'?'취소':'Cancel';
+
+  var modal=document.getElementById('unlockConfirmModal');
+  if(modal) modal.style.display='flex';
+}
+
+async function confirmUnlockOption(){
+  var modal=document.getElementById('unlockConfirmModal');
+  if(modal) modal.style.display='none';
+  if(!_pendingUnlockOpt) return;
+
+  var opt=_pendingUnlockOpt.opt;
+  var tripIdx=_pendingUnlockOpt.tripIdx;
+  _pendingUnlockOpt=null;
+
+  // 코인 차감 (earnCoin 먼저, 없으면 paidCoin)
+  if(earnCoinAmt>=UNLOCK_COIN_COST){
+    earnCoinAmt-=UNLOCK_COIN_COST;
+  } else {
+    var need=UNLOCK_COIN_COST-earnCoinAmt;
+    earnCoinAmt=0;
+    paidCoinAmt=Math.max(0,paidCoinAmt-need);
+  }
+  updateCoinUI();
+
+  await doUnlockOption(opt, tripIdx, false);
+}
+
+async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
+  var t=halfTrips[tripIdx]; if(!t) return;
+  var btn=document.getElementById('unlockBtn'+opt);
+
+  if(alreadyUnlocked){
+    // 이미 저장된 결과 표시
+    showUnlockedOption(opt, tripIdx);
+    return;
+  }
+
+  // 버튼 로딩 상태
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ 분석 중...<br><span style="font-size:9px;color:var(--m);">잠시만요</span>'; }
+
+  // Gemini에게 해당 옵션 상세 요청
+  var optName=(t[opt]&&t[opt].name)||('Option '+opt);
+  var prompt=lang==='ko'
+    ?'여행: '+t.route+' '+t.nights+'박 '+t.pax+'인\n'
+     +'아래 옵션에 대해 구체적인 상세 정보를 제공해줘. 반드시 한국어로.\n'
+     +'옵션: '+optName+' ('+opt+' - '+(opt==='A'?'프리미엄':opt==='B'?'스마트 추천':'가성비')+')\n'
+     +'1. 구체적 식당 3곳 (이름 + 예약 필요 여부 + 대표 메뉴)\n'
+     +'2. Day별 시간대 동선 (오전/오후/저녁 + 이동수단 + 소요시간)\n'
+     +'3. 이 여행에 적합한 카드 혜택 (카드사명 + 혜택 + 절약 금액 예시)\n'
+     +'4. 예약 팁 + 현지 주의사항'
+    :'Trip: '+t.route+' '+t.nights+' nights '+t.pax+' pax\n'
+     +'Provide detailed info for this option in English.\n'
+     +'Option: '+optName+' ('+opt+' - '+(opt==='A'?'Premium':opt==='B'?'Smart Pick':'Value')+')\n'
+     +'1. 3 specific restaurants (name + reservation needed + must-try dish)\n'
+     +'2. Day-by-day hourly itinerary (morning/afternoon/evening + transport + time)\n'
+     +'3. Best card benefits for this trip (card name + benefit + estimated savings)\n'
+     +'4. Booking tips + local warnings';
+
+  try{
+    var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
+    if(r.ok){
+      var data=await r.json();
+      var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
+      var reply=parts.map(function(p){return p.text||'';}).join('').trim();
+      if(reply){
+        // 결과 저장
+        if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
+        _unlockedOptions[tripIdx][opt]=reply;
+        showUnlockedOption(opt, tripIdx);
+      } else {
+        // 환불
+        earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
+        if(btn){ btn.disabled=false; btn.innerHTML='🔒 Option '+opt+'<br><span style="font-size:9px;color:var(--red);">다시 시도</span>'; }
+      }
+    } else {
+      var errData=await r.json().catch(function(){return{};});
+      earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
+      if(btn){ btn.disabled=false; btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:9px;color:var(--red);">'+(errData.error&&errData.error.message?errData.error.message.substring(0,20):'오류')+'</span>'; }
+    }
+  }catch(e){
+    earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
+    if(btn){ btn.disabled=false; btn.innerHTML='⚠️ 연결 오류<br><span style="font-size:9px;color:var(--red);">다시 시도</span>'; }
+  }
+}
+
+function showUnlockedOption(opt, tripIdx){
+  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
+  var btn=document.getElementById('unlockBtn'+opt);
+
+  // 버튼을 "열림" 상태로 변경
+  if(btn){
+    btn.disabled=false;
+    btn.style.background='rgba(196,175,135,.2)';
+    btn.style.borderColor='rgba(196,175,135,.5)';
+    btn.innerHTML='✅ Option '+opt+'<br><span style="font-size:9px;color:var(--ok);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
+    btn.onclick=function(){ showUnlockedDetail(opt, tripIdx); };
+  }
+
+  // 상세 내용 바로 표시
+  showUnlockedDetail(opt, tripIdx);
+}
+
+function showUnlockedDetail(opt, tripIdx){
+  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
+  if(!text) return;
+  var rendered=text
+    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--m)">· </span>$1')
+    .replace(/\n/g,'<br>');
+
+  // treeBreakdown 영역에 표시
+  var tb=document.getElementById('treeBreakdown');
+  if(tb){
+    tb.innerHTML='<div style="padding:4px 0;">'
+      +'<div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:8px;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
+      +'<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:40vh;overflow-y:auto;">'+rendered+'</div>'
+      +'</div>';
+  }
+  selectOption(opt);
+}
 
 function buildDeepLinks(trip){
   // trip: {route, dates, nights, pax, B:{flight, hotel}}
@@ -3147,6 +3346,7 @@ window.doEmailLogin=doEmailLogin; window.doEmailSignup=doEmailSignup;
 window.setHomeTab=setHomeTab; window.selectStyleChip=selectStyleChip;
 window.toggleFullChip=toggleFullChip; window.toggleFullBudget=toggleFullBudget;
 window.startFullAnalysis=startFullAnalysis; window.saveFullTrip=saveFullTrip; window.backToFullInput=backToFullInput;
+window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail;
 window.setTripsTab=setTripsTab; window.showHalfDetail=showHalfDetail; window.closeHalfDetail=closeHalfDetail;
 window.showFullDetail=showFullDetail; window.closeFullDetail=closeFullDetail;
 window.startUpgradeFromTrip=startUpgradeFromTrip; window.openLink=openLink;
