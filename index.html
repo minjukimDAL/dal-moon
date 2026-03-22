@@ -1653,6 +1653,16 @@ function calcBudget(){
 // ══════════════════════════════════════════════
 var OPTIONS = {
   A:{
+    ko:{name:'Option A',price:0,
+      flight:{label:'항공',price:0,details:[]},
+      hotel:{label:'호텔',price:0,details:[]},
+      tour:{label:'투어·교통',price:0,details:[]}},
+    en:{name:'Option A',price:0,
+      flight:{label:'Flight',price:0,details:[]},
+      hotel:{label:'Hotel',price:0,details:[]},
+      tour:{label:'Tours',price:0,details:[]}}
+  },
+  _A_ORIG:{
     ko:{name:'풀 프리미엄',price:14200000,
       flight:{label:'항공 (KE, Business)',price:6800000,details:['대한항공 KE643 · 직항','비즈니스 클래스 · 플랫베드','수화물 32kg 2개 포함','라운지 이용 포함']},
       hotel:{label:'호텔 (마리나베이샌즈 스위트)',price:6400000,details:['마리나베이샌즈 5성','스위트룸 · 무한수영장 뷰','조식 2인 포함 · 아동 무료','얼리체크인 + 레이트체크아웃']},
@@ -1663,6 +1673,16 @@ var OPTIONS = {
       tour:{label:'Tours & Transport',price:1000000,details:['Day1: MBS Infinity Pool → Gardens by the Bay → Supertree Show','Day2: Universal Studios Singapore','Day3: Chinatown → Little India','Day4: Sentosa Siloso Beach','Food: Jumbo Seafood(Chili Crab!) · Rasapura · Makansutra']}}
   },
   B:{
+    ko:{name:'Option B',price:0,
+      flight:{label:'항공',price:0,details:[]},
+      hotel:{label:'호텔',price:0,details:[]},
+      tour:{label:'투어·교통',price:0,details:[]}},
+    en:{name:'Option B',price:0,
+      flight:{label:'Flight',price:0,details:[]},
+      hotel:{label:'Hotel',price:0,details:[]},
+      tour:{label:'Tours',price:0,details:[]}}
+  },
+  _B_ORIG:{
     ko:{name:'스마트 프리미엄',price:8300000,
       flight:{label:'항공 (SQ, Economy+)',price:3200000,details:['싱가포르항공 SQ601 · 직항','이코노미 플러스 · 좌석 넓음','수화물 30kg 1개 포함','기내식 퀄리티 세계 1위']},
       hotel:{label:'호텔 (마리나베이샌즈 디럭스)',price:4800000,details:['마리나베이샌즈 5성','디럭스 시티뷰','조식 2인 포함 · 10세 이하 아동 무료','인피니티풀 이용 가능']},
@@ -1673,6 +1693,16 @@ var OPTIONS = {
       tour:{label:'Tours & Transport',price:300000,details:['Day1: Clarke Quay → Boat Quay sunset','Day2: Chinatown → Newton Food Centre(must: satay·bak kut teh·fish ball noodle)','Day3: Orchard Road shopping','Day4: Sentosa Cable Car','Food: Newton FC · Tian Tian Chicken Rice · Hawker 18']}}
   },
   C:{
+    ko:{name:'Option C',price:0,
+      flight:{label:'항공',price:0,details:[]},
+      hotel:{label:'호텔',price:0,details:[]},
+      tour:{label:'투어·교통',price:0,details:[]}},
+    en:{name:'Option C',price:0,
+      flight:{label:'Flight',price:0,details:[]},
+      hotel:{label:'Hotel',price:0,details:[]},
+      tour:{label:'Tours',price:0,details:[]}}
+  },
+  _C_ORIG:{
     ko:{name:'가성비 프리미엄',price:5900000,
       flight:{label:'항공 (SQ/OZ, Economy)',price:2100000,details:['제주항공 7C or 아시아나 경유','이코노미 · 일반석','수화물 23kg 1개 포함','경유 대기 약 2-3시간']},
       hotel:{label:'호텔 (파크로얄 마리나베이)',price:3500000,details:['파크로얄 마리나베이 4성','슈페리어 시티뷰','조식 2인 포함','마리나베이 도보 5분']},
@@ -2029,7 +2059,7 @@ async function saveToTrip(){
     selectOption('B');
     addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
   } else {
-    addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
+    addDalMsg(lang==='ko'?'✅ 저장됐습니다. (상세 내역은 플래닝 기록에서 확인하세요)':'✅ Saved. (View details in Planning History)');
   }
   // halfTrips 배열에 저장
   halfTrips.unshift({
@@ -2709,13 +2739,39 @@ function showHalfDetail(idx){
   var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');
   if(th)th.style.display='none';if(hd)hd.style.display='block';
   var t=halfTrips[idx];if(!t)return;
-  var r=document.getElementById('tripRoute');if(r)r.textContent=t.route||'ICN→?';
-  var d=document.getElementById('tripDate');if(d)d.textContent=(t.dates||'')+(t.nights?' · '+t.nights+'박':'')+(t.pax?' · '+t.pax+'인':'');
-  ['A','B','C'].forEach(function(o){var data=t[o];if(!data)return;var p=Math.round((data.price||0)*.45);OPTIONS[o].ko={name:data.name||o,price:data.price||0,flight:{label:data.flight||'항공',price:p,details:data.days||[]},hotel:{label:data.hotel||'호텔',price:Math.round((data.price||0)*.4),details:[]},tour:{label:'투어',price:(data.price||0)-p-Math.round((data.price||0)*.4),details:[]}};OPTIONS[o].en=OPTIONS[o].ko;var n=document.getElementById('t-opt'+o+'-name');if(n)n.textContent=data.name||o;var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=formatWon(data.price||0);});
+
+  // 1. 경로/날짜 표시
+  var r=document.getElementById('tripRoute');if(r)r.textContent=t.route||'?';
+  var d=document.getElementById('tripDate');if(d)d.textContent=(t.dates||new Date().toLocaleDateString('ko-KR'))+(t.nights?' · '+t.nights+(lang==='ko'?'박':' nights'):'')+(t.pax?' · '+t.pax+(lang==='ko'?'인':' pax'):'');
+
+  // 2. OPTIONS 항상 초기화 (싱가포르 기본값 제거)
+  var hasData=t.A||t.B||t.C;
+  ['A','B','C'].forEach(function(o){
+    var data=t[o];
+    var emptyOpt={name:o,price:0,flight:{label:lang==='ko'?'항공':'Flight',price:0,details:[]},hotel:{label:lang==='ko'?'호텔':'Hotel',price:0,details:[]},tour:{label:lang==='ko'?'투어·교통':'Tours',price:0,details:[]}};
+    if(data){
+      var totalP=typeof data.price==='number'?data.price:parseInt((data.price||'0').toString().replace(/[^0-9]/g,''))||0;
+      var fp=Math.round(totalP*0.45), hp=Math.round(totalP*0.40), tp=totalP-fp-hp;
+      emptyOpt={
+        name:data.name||o, price:totalP,
+        flight:{label:data.flight||(lang==='ko'?'항공':'Flight'),price:fp,details:data.days||[]},
+        hotel:{label:data.hotel||(lang==='ko'?'호텔':'Hotel'),price:hp,details:[]},
+        tour:{label:lang==='ko'?'투어·교통':'Tours',price:tp,details:data.days||[]}
+      };
+    }
+    OPTIONS[o].ko=emptyOpt; OPTIONS[o].en=emptyOpt;
+    var n=document.getElementById('t-opt'+o+'-name');if(n)n.textContent=data?(data.name||o):(lang==='ko'?'분석 중...':'Analyzing...');
+    var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=data?formatWon(emptyOpt.price):(lang==='ko'?'저장된 가격 없음':'No price data');
+  });
+
+  // 3. JSON 데이터 없으면 텍스트로 treeBreakdown 대체
+  if(!hasData && t.text){
+    var tb=document.getElementById('treeBreakdown');
+    if(tb) tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:30vh;overflow-y:auto;padding:4px 0;">'+t.text.replace(/\n/g,'<br>').substring(0,1500)+'...</div>';
+  }
+
   selectOption('B');
-  // 딥링크 업데이트
   updateTripLinks(t);
-  // 목적지/항공사 기반 카드 자동 추천
   suggestCardsForTrip(t);
 }
 function closeHalfDetail(){var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');if(hd)hd.style.display='none';if(th)th.style.display='block';}
