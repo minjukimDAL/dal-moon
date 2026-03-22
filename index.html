@@ -1238,7 +1238,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 // GEMINI 설정 (작동 확정)
 // ══════════════════════════════════════════════
 const GEMINI_API_KEY = '';
-const GEMINI_MODEL   = 'gemini-2.5-flash';
+const GEMINI_MODEL   = 'gemini-2.0-flash';
 const GEMINI_URL = '/.netlify/functions/gemini';
 const HALF_DAILY_MAX = 10;
 const FULL_COIN_COST = 0; // Phase 2에서 실제 예약 시 사용
@@ -2032,6 +2032,18 @@ async function saveToTrip(){
   } else {
     addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
   }
+  // halfTrips 배열에 저장
+  halfTrips.unshift({
+    route:(j&&j.route)||window._lastTripQuery||'여행',
+    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
+    nights:(j&&j.nights)||null,
+    pax:(j&&j.pax)||null,
+    A:(j&&j.A)||null,
+    B:(j&&j.B)||null,
+    C:(j&&j.C)||null,
+    text:window._lastTripText||''
+  });
+  renderHalfTripsList();
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
 }
