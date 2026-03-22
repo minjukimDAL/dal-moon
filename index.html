@@ -1969,7 +1969,7 @@ async function sendMsg(){
     :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class + baggage\n   - Hotel: name + stars + location + breakfast\n   - Day-by-day outline (morning/afternoon/evening keywords)\n3. Discount insights instead of fixed prices:\n   - Best departure days (e.g. Tue/Wed 15% cheaper than weekends)\n   - Early bird vs last-minute timing\n   - Seasonal events affecting prices\n   - Credit card benefits available\n4. End with one line: "🌕 Upgrade to Custom Planning for: restaurant names+booking links / hourly route / confirmed itinerary"'+jsonSchema;
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7},thinkingConfig:{thinkingBudget:0}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7,thinkingConfig:{thinkingBudget:0}}})});
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     if(res.status===429){
       if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}
@@ -1996,6 +1996,21 @@ async function sendMsg(){
       var s=jsonStr.indexOf('{'),e2=jsonStr.lastIndexOf('}');
       if(s>=0&&e2>s){try{parsedJson=JSON.parse(jsonStr.substring(s,e2+1));}catch(ex){parsedJson=null;}}
     }
+    // JSON 파싱 실패 시 텍스트에서 기본값 추출
+    if(!parsedJson){
+      var routeMatch=displayText.match(/ICN[→\-][^\s,，。]+/);
+      var nightMatch=displayText.match(/(\d+)박/);
+      var paxMatch=displayText.match(/(\d+)인/);
+      if(routeMatch||nightMatch||paxMatch){
+        parsedJson={
+          route:routeMatch?routeMatch[0]:(text.split(' ')[0]||'여행'),
+          dates:new Date().toLocaleDateString('ko-KR'),
+          nights:nightMatch?parseInt(nightMatch[1]):null,
+          pax:paxMatch?parseInt(paxMatch[1]):null,
+          A:null, B:null, C:null
+        };
+      }
+    }
     window._lastTripText=displayText;
     window._lastTripQuery=text;
     window._lastTripJson=parsedJson;
@@ -2018,7 +2033,8 @@ function addMsgFull(text){
   var area=document.getElementById('chatArea'); if(!area) return;
   var div=document.createElement('div'); div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML='<div class="msg-bubble">'+text.replace(/\n/g,'<br>')
+  var rendered=text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  div.innerHTML='<div class="msg-bubble">'+rendered
     +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
     +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
     +(lang==='ko'?'✓ 내 여행에 저장 · 🪙 30코인 적립':'✓ Save to My Trip · Earn 🪙 30 coins')+'</button>'
@@ -2764,10 +2780,19 @@ function showHalfDetail(idx){
     var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=data?formatWon(emptyOpt.price):(lang==='ko'?'저장된 가격 없음':'No price data');
   });
 
-  // 3. JSON 데이터 없으면 텍스트로 treeBreakdown 대체
+  // 3. JSON 데이터 없으면 AI 텍스트 + 맞춤 플래닝 유도
   if(!hasData && t.text){
     var tb=document.getElementById('treeBreakdown');
-    if(tb) tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:30vh;overflow-y:auto;padding:4px 0;">'+t.text.replace(/\n/g,'<br>').substring(0,1500)+'...</div>';
+    if(tb){
+      var rendered=t.text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);font-size:12px;">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:35vh;overflow-y:auto;padding:4px 0;">'+rendered+'</div>'
+        +'<div style="margin-top:12px;padding:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">'
+        +'<div style="font-size:10px;color:var(--gold);margin-bottom:6px;">'+(lang==='ko'?'🌕 맞춤 플래닝으로 업그레이드하면:':'🌕 Upgrade to Custom Planning for:')+'</div>'
+        +'<div style="font-size:10px;color:var(--m);line-height:1.7;">'+(lang==='ko'?'✓ Option A/B/C 상세 가격 비교<br>✓ 식당명 + 예약 링크<br>✓ 시간대별 동선 + 카드 할인 확정':'✓ Detailed A/B/C price comparison<br>✓ Restaurant names + booking links<br>✓ Hourly itinerary + card discounts')+'</div>'
+        +'<button onclick="setHomeTab(\'full\');goPage(\'home\')" style="margin-top:10px;width:100%;padding:10px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'
+        +(lang==='ko'?'🌕 맞춤 플래닝 시작 · 10🪙':'🌕 Start Custom Planning · 10🪙')+'</button>'
+        +'</div>';
+    }
   }
 
   selectOption('B');
@@ -2880,7 +2905,7 @@ async function startFullAnalysis(){
     :userProfile+'[Custom conditions] '+ctx+'\n[Request] '+destText+'\n\nYou are DAL AI Travel Planner. Reply ONLY in English.\nPremium custom planning — provide in detail:\n1. Option A(Premium) B(Smart Pick) C(Value) full comparison\n2. Specific restaurant names per option (3 each) + reservation needed + must-try dish\n3. Hour-by-hour route with transport + travel time\n4. Discount timing this season (early bird dates, flash sales)\n5. Best credit card payment strategy\n6. Local insider tips + warnings\n7. Best booking platforms (flights, hotels, tours)';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7},thinkingConfig:{thinkingBudget:0}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7,thinkingConfig:{thinkingBudget:0}}})});
     var te=document.getElementById(thinkId);if(te)te.remove();
     if(r.ok){
       var data=await r.json();
@@ -2914,7 +2939,13 @@ function addFullMsgResult(text){
 async function saveFullTrip(){
   var saveBtn=document.getElementById('fullSaveBtnArea');if(saveBtn)saveBtn.style.display='none';
   var dest=(document.getElementById('fullDestInput')||{value:''}).value||window._lastFullCtx||'여행';
-  fullTrips.unshift({route:dest,dates:new Date().toLocaleDateString('ko-KR'),ctx:window._lastFullCtx||'',text:window._lastFullText||'',insights:[{icon:'🧠',text:'맞춤 분석 완료. 상세 결과 탭에서 확인하세요.',type:''}]});
+  // 텍스트에서 핵심 인사이트 추출
+  var fullText=window._lastFullText||'';
+  var insightLines=fullText.split('\n').filter(function(l){return l.trim().length>20 && !l.startsWith('#');}).slice(0,3);
+  var insights=insightLines.length>0
+    ? insightLines.map(function(l){return {icon:'💡',text:l.replace(/\*\*/g,'').trim().substring(0,80),type:''};})
+    : [{icon:'🧠',text:lang==='ko'?'맞춤 분석 완료. 아래에서 확인하세요.':'Custom planning complete.',type:''}];
+  fullTrips.unshift({route:dest,dates:new Date().toLocaleDateString('ko-KR'),ctx:window._lastFullCtx||'',text:fullText,insights:insights});
   earnCoinAmt+=5;updateCoinUI();
   addFullMsg('dal',lang==='ko'?'✅ 맞춤 플래닝 기록에 저장됐습니다! 🪙 5코인 적립!':'✅ Saved! +🪙 5 coins!');
   setTimeout(function(){goPage('trips');setTripsTab('full');},800);
