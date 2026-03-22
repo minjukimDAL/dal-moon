@@ -27,11 +27,11 @@ exports.handler = async function(event) {
 
     const payload = JSON.stringify({
       contents: body.contents,
-      generationConfig: body.generationConfig || { maxOutputTokens: 2000, temperature: 0.7 }
+      generationConfig: body.generationConfig || { maxOutputTokens: 8000, temperature: 0.7 }
     });
 
     const result = await new Promise((resolve, reject) => {
-      const urlPath = `/v1/models/${model}:generateContent?key=${apiKey}`;
+      const urlPath = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const options = {
         hostname: 'generativelanguage.googleapis.com',
         path: urlPath,
