@@ -1969,7 +1969,7 @@ async function sendMsg(){
     :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class + baggage\n   - Hotel: name + stars + location + breakfast\n   - Day-by-day outline (morning/afternoon/evening keywords)\n3. Discount insights instead of fixed prices:\n   - Best departure days (e.g. Tue/Wed 15% cheaper than weekends)\n   - Early bird vs last-minute timing\n   - Seasonal events affecting prices\n   - Credit card benefits available\n4. End with one line: "🌕 Upgrade to Custom Planning for: restaurant names+booking links / hourly route / confirmed itinerary"'+jsonSchema;
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7,thinkingConfig:{thinkingBudget:0}}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7}})});
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     if(res.status===429){
       if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}
@@ -2905,7 +2905,7 @@ async function startFullAnalysis(){
     :userProfile+'[Custom conditions] '+ctx+'\n[Request] '+destText+'\n\nYou are DAL AI Travel Planner. Reply ONLY in English.\nPremium custom planning — provide in detail:\n1. Option A(Premium) B(Smart Pick) C(Value) full comparison\n2. Specific restaurant names per option (3 each) + reservation needed + must-try dish\n3. Hour-by-hour route with transport + travel time\n4. Discount timing this season (early bird dates, flash sales)\n5. Best credit card payment strategy\n6. Local insider tips + warnings\n7. Best booking platforms (flights, hotels, tours)';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7,thinkingConfig:{thinkingBudget:0}}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
     var te=document.getElementById(thinkId);if(te)te.remove();
     if(r.ok){
       var data=await r.json();
