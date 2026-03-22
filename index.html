@@ -1962,11 +1962,9 @@ async function sendMsg(){
   // chatInput에서 목적지/박수/인원 추출 시도
   var inputVal=(document.getElementById('chatInput')||{}).value||text;
   userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+inputVal+'\n';
-  // JSON 마커 스키마
-  var jsonSchema='\n\n---JSON_DATA---\n{"route":"ICN→목적지","dates":"출발~귀국","nights":5,"pax":1,"A":{"name":"옵션명","price":1500000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1요약","Day2요약","Day3요약"]},"B":{"name":"옵션명","price":1200000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1","Day2","Day3"]},"C":{"name":"옵션명","price":900000,"flight":"항공사+등급","hotel":"호텔명","days":["Day1","Day2","Day3"]}}\n위 JSON을 답변 맨 끝에 ---JSON_DATA--- 마커와 함께 반드시 포함.';
   var sysPrompt=lang==='ko'
-    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급 + 수화물\n   - 숙소: 호텔명 + 등급 + 위치 + 조식여부\n   - Day별 큰 틀 일정 (오전/오후/저녁 키워드)\n3. 금액 대신 할인 인사이트 제공:\n   - 출발 요일별 가격 차이 (예: 화/수 출발이 주말 대비 15% 저렴)\n   - 얼리버드/막판할인 적용 가능 시점\n   - 해당 시즌 특별 이벤트나 축제로 인한 가격 변동 주의사항\n   - 카드 혜택 적용 가능 여부 (카드사명 명시)\n4. 답변 마지막에 "🌕 맞춤 플래닝으로 업그레이드하면: 식당명+예약링크 / 시간대별 동선 / 확정 루트 제공" 한 줄 추가'+jsonSchema
-    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class + baggage\n   - Hotel: name + stars + location + breakfast\n   - Day-by-day outline (morning/afternoon/evening keywords)\n3. Discount insights instead of fixed prices:\n   - Best departure days (e.g. Tue/Wed 15% cheaper than weekends)\n   - Early bird vs last-minute timing\n   - Seasonal events affecting prices\n   - Credit card benefits available\n4. End with one line: "🌕 Upgrade to Custom Planning for: restaurant names+booking links / hourly route / confirmed itinerary"'+jsonSchema;
+    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급\n   - 숙소: 호텔명 + 등급 + 위치\n   - Day별 일정 키워드\n3. 금액 대신 할인 인사이트:\n   - 출발 요일별 가격 차이\n   - 얼리버드/막판할인 시점\n   - 카드 혜택 (카드사명 명시)\n4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
+    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class\n   - Hotel: name + stars + location\n   - Day-by-day outline keywords\n3. Discount insights (no fixed prices):\n   - Best departure days\n   - Early bird timing\n   - Card benefits\n4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7}})});
@@ -1984,18 +1982,9 @@ async function sendMsg(){
     var reply=parts.map(function(p){return p.text||'';}).join('').trim()||(lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.');
     if(!reply) reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
     // JSON 블록 파싱 후 제거 (채팅에는 표시 안 함)
-    // ---JSON_DATA--- 마커로 텍스트와 JSON 분리
-    var jsonMarker='---JSON_DATA---';
-    var markerIdx=reply.indexOf(jsonMarker);
+    // 전체 텍스트 저장 (JSON 마커 방식 제거 — 토큰 절약)
     var displayText=reply;
     var parsedJson=null;
-    if(markerIdx>=0){
-      displayText=reply.substring(0,markerIdx).trim();
-      var jsonStr=reply.substring(markerIdx+jsonMarker.length).trim();
-      jsonStr=jsonStr.replace(/```json/gi,'').replace(/```/g,'').trim();
-      var s=jsonStr.indexOf('{'),e2=jsonStr.lastIndexOf('}');
-      if(s>=0&&e2>s){try{parsedJson=JSON.parse(jsonStr.substring(s,e2+1));}catch(ex){parsedJson=null;}}
-    }
     // JSON 파싱 실패 시 텍스트에서 기본값 추출
     if(!parsedJson){
       var routeMatch=displayText.match(/ICN[→\-][^\s,，。]+/);
@@ -2912,14 +2901,22 @@ async function startFullAnalysis(){
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
       var reply=parts.map(function(p){return p.text||'';}).join('').trim();
       if(!reply)reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
-      window._lastFullText=reply;window._lastFullCtx=ctx;
+      window._lastFullText=reply;window._lastFullCtx=ctx||destText;
       addFullMsgResult(reply);earnCoinAmt+=5;updateCoinUI();
       if(saveBtn)saveBtn.style.display='block';
+    } else {
+      var errData=await r.json().catch(function(){return {};});
+      var errMsg=(errData.error&&errData.error.message)||('HTTP '+r.status);
+      addFullMsg('dal',(lang==='ko'?'⚠️ 오류: ':'⚠️ Error: ')+errMsg);
+      // 코인 환불
+      earnCoinAmt+=5; if(paidCoinAmt===0) earnCoinAmt+=10; updateCoinUI();
+      if(inp)inp.style.display='block'; if(res)res.style.display='none';
     }
   }catch(e){
     var te2=document.getElementById(thinkId);if(te2)te2.remove();
-    addFullMsg('dal',(lang==='ko'?'연결 오류: ':'Error: ')+e.message);
-    if(paidCoinAmt+earnCoinAmt<coins)earnCoinAmt+=10;updateCoinUI();
+    addFullMsg('dal',(lang==='ko'?'⚠️ 연결 오류: ':'⚠️ Error: ')+e.message);
+    earnCoinAmt+=10; updateCoinUI();
+    if(inp)inp.style.display='block'; if(res)res.style.display='none';
   }
 }
 function addFullMsg(who,content,id){
@@ -2933,7 +2930,12 @@ function addFullMsgResult(text){
   var area=document.getElementById('fullChatArea');if(!area)return;
   var div=document.createElement('div');div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML='<div class="msg-bubble">'+text.replace(/\n/g,'<br>')+'</div><div class="msg-meta">DAL · '+now+'</div>';
+  var rendered=text
+    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:8px;">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--m);">· </span>$1')
+    .replace(/\n/g,'<br>');
+  div.innerHTML='<div class="msg-bubble" style="line-height:1.9;">'+rendered+'</div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div);area.scrollTop=area.scrollHeight;
 }
 async function saveFullTrip(){
