@@ -1686,7 +1686,37 @@ var OPTIONS = {
 
 var selectedOpt = 'B';
 var discountToggles = [];
-var userCards = [{name:'신한카드 Deep Dream',benefit:lang==='ko'?'해외 3%':'Overseas 3%',rate:3,on:true},{name:'대한항공 SKYPASS',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true},{name:'얼리버드 60일 전',benefit:lang==='ko'?'15% 할인':'15% off',rate:15,on:true}];
+// userCards: 마이탭 카드 + 기본 카드 통합
+var _defaultCards=[{name:'얼리버드 60일+',benefit:lang==='ko'?'15% 할인':'15% off',rate:15,on:true,isDefault:true}];
+var userCards=_defaultCards.slice();
+// 마이탭 카드와 동기화
+function syncUserCards(){
+  var myCards=userCards.filter(function(c){return !c.isDefault;});
+  userCards=_defaultCards.slice().concat(myCards);
+  renderDiscountToggles(); calcFinalPrice();
+}
+function suggestCardsForTrip(trip){
+  // 항공사 기반 카드 추천 (중복 제거)
+  var existing=userCards.map(function(c){return c.name;});
+  var suggestions=[];
+  var flight=(trip&&trip.B&&trip.B.flight)||'';
+  var route=(trip&&trip.route)||'';
+  // 대한항공 → SKYPASS 추천
+  if((flight.indexOf('대한항공')>=0||flight.indexOf('Korean Air')>=0||flight.indexOf('KE')>=0) && existing.indexOf('대한항공 SKYPASS')<0)
+    suggestions.push({name:'대한항공 SKYPASS',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
+  // 아시아나 → 아시아나 클럽
+  if((flight.indexOf('아시아나')>=0||flight.indexOf('Asiana')>=0||flight.indexOf('OZ')>=0) && existing.indexOf('아시아나 클럽')<0)
+    suggestions.push({name:'아시아나 클럽',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
+  // 해외여행 → 신한 Deep Dream (해외 3%)
+  if(route.indexOf('ICN')>=0 && existing.indexOf('신한카드 Deep Dream')<0)
+    suggestions.push({name:'신한카드 Deep Dream',benefit:lang==='ko'?'해외결제 3%':'Overseas 3%',rate:3,on:true,isDefault:false,isSuggested:true});
+  // 싱가포르항공 → KrisFlyer
+  if((flight.indexOf('싱가포르항공')>=0||flight.indexOf('Singapore Airlines')>=0||flight.indexOf('SQ')>=0) && existing.indexOf('Singapore Airlines KrisFlyer')<0)
+    suggestions.push({name:'Singapore Airlines KrisFlyer',benefit:'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
+  // 추천 카드 적용
+  suggestions.forEach(function(s){ userCards.push(s); });
+  if(suggestions.length>0){ renderDiscountToggles(); calcFinalPrice(); }
+}
 
 function selectOption(opt){
   selectedOpt=opt;
@@ -1909,7 +1939,7 @@ async function sendMsg(){
     :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class + baggage\n   - Hotel: name + stars + location + breakfast\n   - Day-by-day outline (morning/afternoon/evening keywords)\n3. Discount insights instead of fixed prices:\n   - Best departure days (e.g. Tue/Wed 15% cheaper than weekends)\n   - Early bird vs last-minute timing\n   - Seasonal events affecting prices\n   - Credit card benefits available\n4. End with one line: "🌕 Upgrade to Custom Planning for: restaurant names+booking links / hourly route / confirmed itinerary"'+jsonSchema;
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:1800,temperature:0.7}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:4000,temperature:0.7},thinkingConfig:{thinkingBudget:0}})});
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     if(res.status===429){
       if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}
@@ -2157,7 +2187,7 @@ function addCard(){
   var benefit=document.getElementById('newCardBenefit').value;
   var rate=parseFloat(document.getElementById('newCardRate').value)||0;
   if(!name){alert(lang==='ko'?'카드 이름을 입력해주세요.':'Please enter card name.');return;}
-  userCards.push({name:name,benefit:benefit||rate+'%',rate:rate,on:true});
+  userCards.push({name:name,benefit:benefit||rate+'%',rate:rate,on:true,isDefault:false});
   document.getElementById('addCardModal').classList.remove('open');
   renderCardList(); renderDiscountToggles(); calcFinalPrice();
   document.getElementById('newCardName').value='';
@@ -2683,6 +2713,10 @@ function showHalfDetail(idx){
   var d=document.getElementById('tripDate');if(d)d.textContent=(t.dates||'')+(t.nights?' · '+t.nights+'박':'')+(t.pax?' · '+t.pax+'인':'');
   ['A','B','C'].forEach(function(o){var data=t[o];if(!data)return;var p=Math.round((data.price||0)*.45);OPTIONS[o].ko={name:data.name||o,price:data.price||0,flight:{label:data.flight||'항공',price:p,details:data.days||[]},hotel:{label:data.hotel||'호텔',price:Math.round((data.price||0)*.4),details:[]},tour:{label:'투어',price:(data.price||0)-p-Math.round((data.price||0)*.4),details:[]}};OPTIONS[o].en=OPTIONS[o].ko;var n=document.getElementById('t-opt'+o+'-name');if(n)n.textContent=data.name||o;var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=formatWon(data.price||0);});
   selectOption('B');
+  // 딥링크 업데이트
+  updateTripLinks(t);
+  // 목적지/항공사 기반 카드 자동 추천
+  suggestCardsForTrip(t);
 }
 function closeHalfDetail(){var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');if(hd)hd.style.display='none';if(th)th.style.display='block';}
 function showFullDetail(idx){
@@ -2690,15 +2724,22 @@ function showFullDetail(idx){
   if(tf)tf.style.display='none';if(fd)fd.style.display='block';
   var el=document.getElementById('fullDetailContent');if(!el||!t)return;
   var ins=(t.insights||[]).map(function(i){return '<div class="trc-insight"><span>'+i.icon+'</span> '+i.text+'</div>';}).join('');
-  el.innerHTML='<div style="font-size:14px;color:var(--sb);font-weight:500;margin-bottom:4px;">'+(t.route||'여행')+'</div>'
-    +'<div style="font-size:10px;color:var(--m);margin-bottom:12px;">'+(t.dates||'')+'</div>'
-    +(t.text?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;font-size:11px;color:var(--m);line-height:1.8;max-height:40vh;overflow-y:auto;">'+t.text.replace(/\n/g,'<br>')+'</div>':'')
-    +(ins?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;">'+ins+'</div>':'')
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
-    +'<button onclick="openLink(\'https://flight.naver.com\')" class="link-btn" style="padding:10px 4px;">✈️ 네이버항공</button>'
-    +'<button onclick="openLink(\'https://www.agoda.com\')" class="link-btn" style="padding:10px 4px;">🏨 아고다</button>'
-    +'<button onclick="openLink(\'https://www.klook.com\')" class="link-btn" style="padding:10px 4px;">🎫 클룩</button>'
-    +'</div>';
+  el.innerHTML=(function(){
+    var rendered=(t.text||'').replace(/\n/g,'<br>').replace(/#{1,4} (.+?)(<br>|$)/g,'<strong style="color:var(--sb);font-size:12px;">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    var dlinks=buildDeepLinks(t);
+    var naverLabel=lang==='ko'?'네이버항공':'Naver Flight';
+    var linkLabel=lang==='ko'?'🔗 최저가 바로가기 (목적지 자동 검색)':'🔗 Best Price Links (auto-search)';
+    return '<div style="font-size:14px;color:var(--sb);font-weight:500;margin-bottom:4px;">'+(t.route||'여행')+'</div>'
+      +'<div style="font-size:10px;color:var(--m);margin-bottom:12px;">'+(t.dates||'')+'</div>'
+      +(rendered?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:14px;margin-bottom:10px;font-size:11px;color:var(--m);line-height:2;overflow-y:auto;max-height:55vh;">'+rendered+'</div>':'')
+      +(ins?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;">'+ins+'</div>':'')
+      +'<div style="font-size:9px;color:var(--m);margin-bottom:6px;">'+linkLabel+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
+      +'<button onclick="openLink(\''+dlinks.naver+'\')" class="link-btn" style="padding:10px 4px;">✈️ '+naverLabel+'</button>'
+      +'<button onclick="openLink(\''+dlinks.agoda+'\')" class="link-btn" style="padding:10px 4px;">🏨 Agoda</button>'
+      +'<button onclick="openLink(\''+dlinks.klook+'\')" class="link-btn" style="padding:10px 4px;">🎫 Klook</button>'
+      +'</div>';
+  })();
 }
 function closeFullDetail(){var tf=document.getElementById('tripsFull'),fd=document.getElementById('fullTripDetail');if(fd)fd.style.display='none';if(tf)tf.style.display='block';}
 function startUpgradeFromTrip(idx){
@@ -2707,6 +2748,57 @@ function startUpgradeFromTrip(idx){
   setTimeout(function(){var d=document.getElementById('fullDestInput');if(d&&t)d.value=(t.route||'')+(t.dates?' · '+t.dates:'')+(t.pax?' · '+t.pax+'인':'');},300);
 }
 function openLink(url){window.open(url,'_blank');}
+
+function buildDeepLinks(trip){
+  // trip: {route, dates, nights, pax, B:{flight, hotel}}
+  var dest=''; var destCode='';
+  var route=(trip&&trip.route)||'';
+  // ICN→목적지 파싱
+  var routeParts=route.split(/[→\-]/);
+  var destRaw=routeParts.length>1?routeParts[routeParts.length-1].trim():'';
+  // 주요 도시 코드 매핑
+  var cityMap={'도쿄':'TYO','Tokyo':'TYO','오사카':'OSA','Osaka':'OSA','교토':'KIX','Kyoto':'KIX',
+    '방콕':'BKK','Bangkok':'BKK','치앙마이':'CNX','싱가포르':'SIN','Singapore':'SIN',
+    '파리':'CDG','Paris':'CDG','발리':'DPS','Bali':'DPS','뉴욕':'JFK','New York':'JFK',
+    '뉴욕/LA':'LAX','LA':'LAX','바르셀로나':'BCN','Barcelona':'BCN','서울':'ICN','Seoul':'ICN',
+    '제주':'CJU','Jeju':'CJU','부산':'PUS','Busan':'PUS'};
+  var flightDest='';
+  Object.keys(cityMap).forEach(function(k){if(destRaw.indexOf(k)>=0) flightDest=cityMap[k];});
+  
+  // 날짜 파싱 시도 (dates: "2026.04.10~2026.04.15" 또는 "Apr 10~15")
+  var dates=(trip&&trip.dates)||'';
+  var checkIn='',checkOut='';
+  var dm=dates.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/g);
+  if(dm&&dm.length>=2){
+    checkIn=dm[0].replace(/[.\-\/]/g,'-');
+    checkOut=dm[1].replace(/[.\-\/]/g,'-');
+  }
+  var pax=(trip&&trip.pax)||1;
+  var hotelName=(trip&&trip.B&&trip.B.hotel)||destRaw;
+  var hotelSearch=encodeURIComponent(hotelName.split('(')[0].trim());
+  var destSearch=encodeURIComponent(destRaw||'');
+
+  // 딥링크 생성
+  var naverUrl='https://flight.naver.com/flights/international/ICN-'+(flightDest||'TYO')+
+    (checkIn?'-'+checkIn.replace(/-/g,''):'')+(checkOut?'-'+checkOut.replace(/-/g,''):'')+
+    '?adult='+(pax||1);
+  var agodaUrl='https://www.agoda.com/search?city='+destSearch+
+    (checkIn?'&checkIn='+checkIn:'')+(checkOut?'&checkOut='+checkOut:'')+'&rooms=1&adults='+(pax||1);
+  var klookUrl='https://www.klook.com/en-US/search/?query='+destSearch;
+
+  return {naver:naverUrl, agoda:agodaUrl, klook:klookUrl};
+}
+
+function updateTripLinks(trip){
+  var links=buildDeepLinks(trip);
+  // 플래닝 기록 상세화면 링크 업데이트
+  var btns=document.querySelectorAll('#halfTripDetail .link-btn');
+  if(btns.length>=3){
+    btns[0].onclick=function(){openLink(links.naver);};
+    btns[1].onclick=function(){openLink(links.agoda);};
+    btns[2].onclick=function(){openLink(links.klook);};
+  }
+}
 
 // ══ 맞춤 플래닝 ══
 async function startFullAnalysis(){
@@ -2732,7 +2824,7 @@ async function startFullAnalysis(){
     :userProfile+'[Custom conditions] '+ctx+'\n[Request] '+destText+'\n\nYou are DAL AI Travel Planner. Reply ONLY in English.\nPremium custom planning — provide in detail:\n1. Option A(Premium) B(Smart Pick) C(Value) full comparison\n2. Specific restaurant names per option (3 each) + reservation needed + must-try dish\n3. Hour-by-hour route with transport + travel time\n4. Discount timing this season (early bird dates, flash sales)\n5. Best credit card payment strategy\n6. Local insider tips + warnings\n7. Best booking platforms (flights, hotels, tours)';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7},thinkingConfig:{thinkingBudget:0}})});
     var te=document.getElementById(thinkId);if(te)te.remove();
     if(r.ok){
       var data=await r.json();
