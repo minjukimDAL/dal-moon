@@ -394,8 +394,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <div id="page-home" class="page active">
   <div class="home-wrap">
     <div style="display:flex;gap:6px;padding:10px 14px 0;">
-      <button id="homeTabHalf" onclick="setHomeTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">🌙 AI 플래닝 · 무료</button>
-      <button id="homeTabFull" onclick="setHomeTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">🌕 맞춤 플래닝 · 10🪙</button>
+      <button id="homeTabHalf" onclick="setHomeTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;"><span id='t-homeTabHalf'>🌙 AI 플래닝 · 무료</span></button>
+      <button id="homeTabFull" onclick="setHomeTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;"><span id='t-homeTabFull'>🌕 맞춤 플래닝 · 10🪙</span></button>
     </div>
     <div id="homeHalf" style="display:block;">
 
@@ -403,12 +403,12 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div style="padding:10px 14px 0;">
         <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">① 여행 스타일</div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          <button onclick="selectStyleChip(this,'couple')" class="style-chip active">💑 커플</button>
-          <button onclick="selectStyleChip(this,'family')" class="style-chip">👨‍👩‍👧‍👦 가족</button>
-          <button onclick="selectStyleChip(this,'solo')" class="style-chip">🧘 혼자</button>
-          <button onclick="selectStyleChip(this,'premium')" class="style-chip">💎 프리미엄</button>
-          <button onclick="selectStyleChip(this,'value')" class="style-chip">🎯 가성비</button>
-          <button onclick="selectStyleChip(this,'backpacker')" class="style-chip">🎒 배낭</button>
+          <button onclick="selectStyleChip(this,'couple')" class="style-chip active" data-ko="💑 커플" data-en="💑 Couple">💑 커플</button>
+          <button onclick="selectStyleChip(this,'family')" class="style-chip" data-ko="👨‍👩‍👧‍👦 가족" data-en="👨‍👩‍👧‍👦 Family">👨‍👩‍👧‍👦 가족</button>
+          <button onclick="selectStyleChip(this,'solo')" class="style-chip" data-ko="🧘 혼자" data-en="🧘 Solo">🧘 혼자</button>
+          <button onclick="selectStyleChip(this,'premium')" class="style-chip" data-ko="💎 프리미엄" data-en="💎 Premium">💎 프리미엄</button>
+          <button onclick="selectStyleChip(this,'value')" class="style-chip" data-ko="🎯 가성비" data-en="🎯 Value">🎯 가성비</button>
+          <button onclick="selectStyleChip(this,'backpacker')" class="style-chip" data-ko="🎒 배낭" data-en="🎒 Backpacker">🎒 배낭</button>
         </div>
         <div id="subStyleArea" style="display:none;margin-top:6px;">
           <div class="sub-style-row" id="subStyleBtns"></div>
@@ -418,13 +418,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <!-- ② 월별 이벤트 선택 -->
       <div style="padding:10px 14px 0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;">② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span></div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;"><span id='t-step-event'>② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span></span></div>
           <select id="eventMonthFilter" onchange="renderEvents()" style="font-size:9px;padding:2px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-            <option value="all">전체</option>
-            <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option>
-            <option value="4">4월</option><option value="5">5월</option><option value="6">6월</option>
-            <option value="7">7월</option><option value="8">8월</option><option value="9">9월</option>
-            <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+            <option value="all" data-ko="전체" data-en="All">전체</option>
+            <option value="1" data-ko="1월" data-en="Jan">1월</option><option value="2" data-ko="2월" data-en="Feb">2월</option><option value="3" data-ko="3월" data-en="Mar">3월</option>
+            <option value="4" data-ko="4월" data-en="Apr">4월</option><option value="5" data-ko="5월" data-en="May">5월</option><option value="6" data-ko="6월" data-en="Jun">6월</option>
+            <option value="7" data-ko="7월" data-en="Jul">7월</option><option value="8" data-ko="8월" data-en="Aug">8월</option><option value="9" data-ko="9월" data-en="Sep">9월</option>
+            <option value="10" data-ko="10월" data-en="Oct">10월</option><option value="11" data-ko="11월" data-en="Nov">11월</option><option value="12" data-ko="12월" data-en="Dec">12월</option>
           </select>
         </div>
         <div id="eventList" style="max-height:160px;overflow-y:auto;"></div>
@@ -432,19 +432,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
       <!-- ③ 목적지 + 인원 + 박 -->
       <div style="padding:10px 14px 0;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">③ 목적지 · 인원 · 일정</div>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;"><span id='t-step-dest'>③ 목적지 · 인원 · 일정</span></div>
         <div style="display:flex;gap:6px;align-items:center;">
           <select id="planDest" onchange="updatePlanInput()" style="flex:2;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
-            <option value="">목적지 선택</option>
-            <option value="jp">🇯🇵 일본</option>
-            <option value="th">🇹🇭 태국</option>
-            <option value="sg">🇸🇬 싱가포르</option>
-            <option value="fr">🇫🇷 프랑스</option>
-            <option value="bali">🇮🇩 발리</option>
-            <option value="us">🇺🇸 미국</option>
-            <option value="sp">🇪🇸 스페인</option>
-            <option value="kr">🇰🇷 한국</option>
-            <option value="jeju">🇰🇷 제주</option>
+            <option value="" data-ko="목적지 선택" data-en="Select Destination">목적지 선택</option>
+            <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option>
+            <option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
+            <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
+            <option value="fr" data-ko="🇫🇷 프랑스" data-en="🇫🇷 France">🇫🇷 프랑스</option>
+            <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option>
+            <option value="us" data-ko="🇺🇸 미국" data-en="🇺🇸 USA">🇺🇸 미국</option>
+            <option value="sp" data-ko="🇪🇸 스페인" data-en="🇪🇸 Spain">🇪🇸 스페인</option>
+            <option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
+            <option value="jeju" data-ko="🇰🇷 제주" data-en="🇰🇷 Jeju">🇰🇷 제주</option>
           </select>
           <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
           <input id="planNights" type="number" min="1" max="30" value="5" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="박">
@@ -453,9 +453,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
       <!-- ④ AI 입력창 (자동 채워짐 + 직접 수정 가능) -->
       <div style="padding:10px 14px 6px;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span></div>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;"><span id='t-step-ai'>④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span></span></div>
         <div style="display:flex;gap:6px;align-items:flex-end;">
-          <textarea id="chatInput" rows="2" onkeydown="handleKey(event)" style="flex:1;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;" placeholder="위에서 선택하거나 직접 입력하세요&#10;예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘"></textarea>
+          <textarea id="chatInput" rows="2" onkeydown="handleKey(event)" style="flex:1;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;" placeholder="Select above or type · e.g. Bangkok 5 nights 2 pax couple"></textarea>
           <button onclick="sendMsg()" style="padding:10px 14px;background:var(--ac);border:none;border-radius:2px;color:#fff;font-size:16px;cursor:pointer;height:52px;flex-shrink:0;">↑</button>
         </div>
         <div class="limit-bar" id="limitBar" style="margin-top:6px;">
@@ -483,76 +483,76 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             <div style="font-size:11px;color:var(--sb);font-weight:500;" id="dailyStreakText">🔥 연속 접속 1일째</div>
             <div style="font-size:9px;color:var(--m);margin-top:1px;" id="dailyStreakSub">맞춤 플래닝 이용 시 출석 체크</div>
           </div>
-          <button id="dailyCheckInBtn" onclick="doDailyCheckIn()" style="background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:2px;padding:5px 12px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🪙 출석 체크</button>
+          <button id="dailyCheckInBtn" onclick="doDailyCheckIn()" style="background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:2px;padding:5px 12px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🪙 출석 체크" data-en="🪙 Check In">🪙 출석 체크</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;" id="streakCalendar"></div>
       </div>
       <div id="fullInputArea" style="padding:14px;">
-        <div style="font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;">맞춤 플래닝 조건 입력</div>
+        <div style="font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;"><span id='t-full-input-label'>맞춤 플래닝 조건 입력</span></div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 1 · 여행자 구성</div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 1 · 여행자 구성" data-en="STEP 1 · Travelers">STEP 1 · 여행자 구성</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip">혼자</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active">2인</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">3인</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">4인+</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active">커플</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">가족</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">친구</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">아이 동반</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid">알레르기/특이사항</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="혼자" data-en="Solo">혼자</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="2인" data-en="2 pax">2인</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="3인" data-en="3 pax">3인</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="4인+" data-en="4+ pax">4인+</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="커플" data-en="Couple">커플</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="가족" data-en="Family">가족</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="친구" data-en="Friends">친구</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="아이 동반" data-en="With Kids">아이 동반</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="알레르기/특이사항" data-en="Allergies/Special needs">알레르기/특이사항</button>
           </div>
         </div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 2 · 여행 목표 &amp; 피하고 싶은 것</div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 2 · 여행 목표 &amp; 피하고 싶은 것" data-en="STEP 2 · Travel Goals &amp; Avoids">STEP 2 · 여행 목표 &amp; 피하고 싶은 것</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active">휴식</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active">미식</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">쇼핑</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">자연</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">문화/역사</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">액티비티</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid">붐비는 곳 피함</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid">장거리 이동 피함</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="휴식" data-en="Relaxation">휴식</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="미식" data-en="Dining">미식</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="쇼핑" data-en="Shopping">쇼핑</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="자연" data-en="Nature">자연</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="문화/역사" data-en="Culture/History">문화/역사</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="액티비티" data-en="Activities">액티비티</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="붐비는 곳 피함" data-en="Avoid crowded spots">붐비는 곳 피함</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="장거리 이동 피함" data-en="Avoid long travel">장거리 이동 피함</button>
           </div>
         </div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 3 · 예산 &amp; 조건</div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 3 · 예산 &amp; 조건" data-en="STEP 3 · Budget &amp; Conditions">STEP 3 · 예산 &amp; 조건</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullBudget(this)" class="full-chip budget">100만원대</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget active">200-300만원</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget">400-500만원</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget">500만원+</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="100만원대" data-en="Under $1000">100만원대</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget active" data-ko="200-300만원" data-en="$1500-2500">200-300만원</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="400-500만원" data-en="$3000-4000">400-500만원</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="500만원+" data-en="$4000+">500만원+</button>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active">직항</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">경유 가능</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active">호텔</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">리조트</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">에어비앤비</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="직항" data-en="Direct flight">직항</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="경유 가능" data-en="Stopover ok">경유 가능</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="호텔" data-en="Hotel">호텔</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="리조트" data-en="Resort">리조트</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="에어비앤비" data-en="Airbnb">에어비앤비</button>
           </div>
         </div>
         <div style="margin-bottom:12px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 4 · AI 심화 분석</div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 4 · AI 심화 분석" data-en="STEP 4 · AI Deep Analysis">STEP 4 · AI 심화 분석</span></div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active">현지 이벤트 체크</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active">카드 할인 최적화</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">환율/가성비 타이밍</button>
-            <button onclick="toggleFullChip(this)" class="full-chip">현지인 숨겨진 팁</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="현지 이벤트 체크" data-en="Check local events">현지 이벤트 체크</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="카드 할인 최적화" data-en="Card discount opt.">카드 할인 최적화</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="환율/가성비 타이밍" data-en="FX/value timing">환율/가성비 타이밍</button>
+            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="현지인 숨겨진 팁" data-en="Local hidden tips">현지인 숨겨진 팁</button>
           </div>
         </div>
-        <textarea id="fullDestInput" rows="2" placeholder="목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;margin-bottom:10px;"></textarea>
-        <button onclick="startFullAnalysis()" style="width:100%;padding:13px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:5px;">🌕 맞춤 플래닝 시작 →</button>
-        <div style="font-size:9px;color:var(--m);text-align:center;">10🪙 차감 · 잔액 <span id="fullCoinBalance">50</span>🪙 · 완료 후 +5🪙 적립</div>
+        <textarea id="fullDestInput" rows="2" placeholder="Destination, duration, special requests" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;margin-bottom:10px;"></textarea>
+        <button onclick="startFullAnalysis()" style="width:100%;padding:13px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:5px;"><span id='t-full-start-btn'>🌕 맞춤 플래닝 시작 →</span></button>
+        <div style="font-size:9px;color:var(--m);text-align:center;"><span id="t-full-coin-info">10🪙 차감 · 잔액 <span id="fullCoinBalance">50</span>🪙 · 완료 후 +5🪙 적립</span></div>
       </div>
       <div id="fullResultArea" style="display:none;padding:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <button onclick="backToFullInput()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0;">← 다시 입력</button>
-          <div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);padding:3px 10px;border-radius:10px;">🌕 맞춤 플래닝</div>
+          <button onclick="backToFullInput()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0;" id="t-back-input">← 다시 입력</button>
+          <div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);padding:3px 10px;border-radius:10px;" id="t-full-badge">🌕 맞춤 플래닝</div>
         </div>
         <div class="chat-area" id="fullChatArea" style="max-height:55vh;overflow-y:auto;margin-bottom:10px;"></div>
         <div id="fullSaveBtnArea" style="display:none;">
-          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">✓ 내 여행에 저장 · 🪙 5코인 적립</button>
+          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-full-save-btn">✓ 내 여행에 저장 · 🪙 5코인 적립</button>
         </div>
       </div>
     </div>
@@ -587,8 +587,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
     <div class="sec-label" id="t-svc-select">서비스 선택</div>
     <div class="lug-cards">
-      <div class="lug-card" onclick="bookLuggage('공항 수화물 픽업',30)"><div style="font-size:20px;margin-bottom:6px;">🤖</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l1">공항 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l1s">로봇이 직접 픽업. 인천 T1.</div><div style="font-size:11px;color:var(--gold);">🪙 30코인</div><span class="badge b-ok">Beta</span></div>
-      <div class="lug-card" onclick="bookLuggage('수화물 보관',20)"><div style="font-size:20px;margin-bottom:6px;">🗄️</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l2s">위탁 전 안전 보관.</div><div style="font-size:11px;color:var(--gold);">🪙 20코인/6h</div><span class="badge b-ok">Beta</span></div>
+      <div class="lug-card" onclick="bookLuggage('공항 수화물 픽업',30)"><div style="font-size:20px;margin-bottom:6px;">🤖</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l1">공항 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l1s">로봇이 직접 픽업. 인천 T1.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin1'>🪙 30코인</span></div><span class="badge b-ok">Beta</span></div>
+      <div class="lug-card" onclick="bookLuggage('수화물 보관',20)"><div style="font-size:20px;margin-bottom:6px;">🗄️</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l2s">위탁 전 안전 보관.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin2'>🪙 20코인/6h</span></div><span class="badge b-ok">Beta</span></div>
       <div class="lug-card disabled"><div class="coming-badge">2027+</div><div style="font-size:20px;margin-bottom:6px;">🏨</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l3">호텔→공항</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l3s">호텔에서 자동 배송.</div><div style="font-size:11px;color:var(--m);">Coming Soon</div></div>
       <div class="lug-card" onclick="bookLuggage('안마의자 라운지',50)"><div style="font-size:20px;margin-bottom:6px;">💺</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l4">안마의자 라운지</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l4s">짐 없이 편안한 휴식.</div><div style="font-size:11px;color:var(--gold);">🪙 50코인/1h</div><span class="badge b-warn">준비중</span></div>
     </div>
@@ -610,8 +610,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <div id="page-trips" class="page">
   <div class="page-wrap">
     <div style="display:flex;gap:6px;margin-bottom:14px;">
-      <button id="tripsTabHalf" onclick="setTripsTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">🌙 플래닝 기록</button>
-      <button id="tripsTabFull" onclick="setTripsTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">🌕 맞춤 플래닝 기록</button>
+      <button id="tripsTabHalf" onclick="setTripsTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;"><span id='t-tripsTabHalf'>🌙 플래닝 기록</span></button>
+      <button id="tripsTabFull" onclick="setTripsTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;"><span id='t-tripsTabFull'>🌕 맞춤 플래닝 기록</span></button>
     </div>
     <div id="tripsHalf" style="display:block;">
       <div id="halfTripsList"></div>
@@ -624,7 +624,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div id="fullTripsList"></div>
       <div class="trip-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;gap:8px;cursor:pointer;" onclick="setHomeTab('full');goPage('home')">
         <div style="font-size:22px;color:var(--gold)">+</div>
-        <div style="font-size:11px;color:var(--gold)">🌕 맞춤 플래닝 새로 시작 · 10🪙</div>
+        <div style="font-size:11px;color:var(--gold)"><span data-ko="🌕 맞춤 플래닝 새로 시작 · 10🪙" data-en="🌕 Start Custom Planning · 10🪙">🌕 맞춤 플래닝 새로 시작 · 10🪙</span></div>
       </div>
     </div>
     <div id="halfTripDetail" style="display:none;">
@@ -683,37 +683,37 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <button class="tab-btn active" onclick="showSocialTab('msg',this)" id="t-tab-msg">메신저</button>
     <button class="tab-btn" onclick="showSocialTab('feed',this)" id="t-tab-feed">피드</button>
     <button class="tab-btn" onclick="showSocialTab('follow',this)" id="t-tab-follow">팔로잉</button>
-    <button class="tab-btn" onclick="showSocialTab('info',this)" id="t-tab-info">정보</button>
+    <button class="tab-btn" onclick="showSocialTab('info',this)" id="t-tab-info"><span id='t-tab-info-label'>정보</span></button>
   </div>
   <!-- 메신저 -->
   <div id="social-msg" style="padding:14px 18px;">
     <div class="msg-room" onclick="openChat('김민지','👩')">
       <div class="room-avatar">👩</div>
       <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">김민지</div><div style="font-size:10px;color:var(--m);">싱가포르 F1 피하는 팁 알려줄게요!</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);margin-bottom:4px;">방금</div><div class="room-badge">2</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);margin-bottom:4px;"><span data-ko="방금" data-en="now">방금</span></div><div class="room-badge">2</div></div>
     </div>
     <div class="msg-room" onclick="openChat('DAL 여행그룹','🌍')">
       <div class="room-avatar">🌍</div>
       <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">DAL 여행그룹</div><div style="font-size:10px;color:var(--m);">10월 싱가포르 동행 구합니다</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);">1시간</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="1시간" data-en="1h ago">1시간</span></div></div>
     </div>
     <div class="msg-room" onclick="openChat('박준혁','🧑')">
       <div class="room-avatar">🧑</div>
       <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">박준혁</div><div style="font-size:10px;color:var(--m);">도쿄 맛집 리스트 공유!</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);">어제</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="어제" data-en="Yesterday">어제</span></div></div>
     </div>
     <button class="action-btn btn-gold" style="margin-top:14px;" onclick="openNewChat()" id="t-new-msg">+ 새 메시지</button>
-    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:8px;padding:6px;background:rgba(91,143,255,.05);border-radius:2px;border:1px solid rgba(91,143,255,.1);">Beta · 실제 메시지 전송 기능 테스트 중</div>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:8px;padding:6px;background:rgba(91,143,255,.05);border-radius:2px;border:1px solid rgba(91,143,255,.1);"><span id='t-beta-msg'>Beta · 실제 메시지 전송 기능 테스트 중</span></div>
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
     <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);">2시간 전 · 싱가포르</div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
+      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="2시간 전 · 싱가포르" data-en="2h ago · Singapore">2시간 전 · 싱가포르</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
       <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇸🇬 싱가포르 10월 꿀팁! F1 그랑프리(10/17-19) 피해서 10/20 이후 예약하면 호텔 40% 저렴. 마리나베이샌즈 뷰룸 1박 35만원에 잡았어요 🎉 DAL Full 모드로 비교하고 바로 예약!</div>
-      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
+      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)"><span data-ko="🔗 공유" data-en="🔗 Share">🔗 공유</span></button></div>
     </div>
     <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);">어제 · 도쿄</div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
+      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="어제 · 도쿄" data-en="Yesterday · Tokyo">어제 · 도쿄</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
       <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br>DAL Full 모드 검색 → 🪙 5코인 적립!</div>
       <div class="feed-actions"><button class="feed-btn">❤️ 41</button><button class="feed-btn">💬 12</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
     </div>
@@ -723,34 +723,34 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   <div id="social-follow" style="padding:14px 18px;display:none;">
     <div style="font-size:10px;color:var(--m);margin-bottom:12px;line-height:1.8;" id="t-follow-sub">팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.</div>
     <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:8px;" id="t-suggested">추천 여행자</div>
-    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);">싱가포르·발리 전문 · 팔로워 234</div></div><button class="follow-btn following">팔로잉 ✓</button></div>
-    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);">도쿄·오사카 전문 · 팔로워 189</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
-    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);">파리·바르셀로나 전문 · 팔로워 312</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
-    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);">동남아 가성비 · 팔로워 521</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
-    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;">팔로워 100명 달성 시 🪙 50코인 지급</div>
+    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="싱가포르·발리 전문 · 팔로워 234" data-en="Singapore·Bali expert · 234 followers">싱가포르·발리 전문 · 팔로워 234</span></div></div><button class="follow-btn following"><span data-ko="팔로잉 ✓" data-en="Following ✓">팔로잉 ✓</span></button></div>
+    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="도쿄·오사카 전문 · 팔로워 189" data-en="Tokyo·Osaka expert · 189 followers">도쿄·오사카 전문 · 팔로워 189</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);"><span data-ko="파리·바르셀로나 전문 · 팔로워 312" data-en="Paris·Barcelona expert · 312 followers">파리·바르셀로나 전문 · 팔로워 312</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);"><span data-ko="동남아 가성비 · 팔로워 521" data-en="SE Asia value expert · 521 followers">동남아 가성비 · 팔로워 521</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;"><span data-ko="팔로워 100명 달성 시 🪙 50코인 지급" data-en="Reach 100 followers · Earn 🪙 50 coins">팔로워 100명 달성 시 🪙 50코인 지급</span></div>
   </div>
   <div id="social-info" style="display:none;padding:14px 18px;">
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:12px;color:var(--sb);font-weight:500;">🎉 Local Main Events</div>
         <select id="infoEventFilter" onchange="renderInfoEvents()" style="font-size:9px;padding:3px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-          <option value="all">전체</option>
-          <option value="jp">🇯🇵 일본</option><option value="th">🇹🇭 태국</option>
-          <option value="sg">🇸🇬 싱가포르</option><option value="fr">🇫🇷 프랑스</option>
-          <option value="bali">🇮🇩 발리</option><option value="us">🇺🇸 미국</option>
-          <option value="sp">🇪🇸 스페인</option><option value="kr">🇰🇷 한국</option>
+          <option value="all" data-ko="전체" data-en="All">전체</option>
+          <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option><option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
+          <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option><option value="fr" data-ko="🇫🇷 프랑스" data-en="🇫🇷 France">🇫🇷 프랑스</option>
+          <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option><option value="us" data-ko="🇺🇸 미국" data-en="🇺🇸 USA">🇺🇸 미국</option>
+          <option value="sp" data-ko="🇪🇸 스페인" data-en="🇪🇸 Spain">🇪🇸 스페인</option><option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
         </select>
       </div>
       <div id="infoEventList"></div>
     </div>
     <div style="margin-bottom:14px;">
-      <div style="font-size:12px;color:var(--sb);font-weight:500;margin-bottom:10px;">✅ 여행 준비 체크리스트</div>
+      <div style="font-size:12px;color:var(--sb);font-weight:500;margin-bottom:10px;" id="t-checklist-title">✅ 여행 준비 체크리스트</div>
       <div class="checklist" id="infoChecklist"></div>
     </div>
     <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;">
-      <div style="font-size:11px;color:var(--sb);margin-bottom:4px;">⚠️ 안전 정보</div>
-      <div style="font-size:10px;color:var(--m);margin-bottom:8px;">전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.</div>
-      <button onclick="openLink('https://www.0404.go.kr')" style="width:100%;padding:8px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">외교부 해외안전여행 바로가기 →</button>
+      <div style="font-size:11px;color:var(--sb);margin-bottom:4px;" id="t-safety-title">⚠️ 안전 정보</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;" id="t-safety-desc">전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.</div>
+      <button onclick="openLink('https://www.0404.go.kr')" style="width:100%;padding:8px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-safety-btn">외교부 해외안전여행 바로가기 →</button>
     </div>
   </div>
   <!-- 채팅방 (서브) -->
@@ -777,13 +777,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <button class="social-btn" onclick="doLogin('google')"><span style="font-size:18px;width:22px;text-align:center;">🟡</span><span id="t-google">Google로 계속하기</span></button>
       <button class="social-btn" onclick="doLogin('kakao')"><span style="font-size:18px;width:22px;text-align:center;">💬</span><span id="t-kakao">카카오로 계속하기</span></button>
       <button class="social-btn" onclick="doLogin('apple')"><span style="font-size:18px;width:22px;text-align:center;">🍎</span><span id="t-apple">Apple로 계속하기</span></button>
-      <div style="font-size:10px;color:var(--m);text-align:center;padding:4px 0">— 또는 이메일로 —</div>
-      <input id="loginEmailInput" type="email" placeholder="이메일" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
-      <input id="loginPwInput" type="password" placeholder="비밀번호 (6자 이상)" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
+      <div style="font-size:10px;color:var(--m);text-align:center;padding:4px 0" id="t-or-email">— 또는 이메일로 —</div>
+      <input id="loginEmailInput" type="email" id="loginEmailPlaceholder" placeholder="이메일" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
+      <input id="loginPwInput" type="password" id="loginPwPlaceholder" placeholder="비밀번호 (6자 이상)" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
       <div id="loginErrMsg" style="font-size:10px;color:#ff6b6b;text-align:center;min-height:16px;margin-bottom:4px;"></div>
       <div style="display:flex;gap:6px;">
-        <button class="social-btn" onclick="doEmailLogin()" style="flex:1;">✉️ 로그인</button>
-        <button class="social-btn" onclick="doEmailSignup()" style="flex:1;">✨ 회원가입</button>
+        <button class="social-btn" onclick="doEmailLogin()" style="flex:1;" id="t-email-login-btn">✉️ 로그인</button>
+        <button class="social-btn" onclick="doEmailSignup()" style="flex:1;" id="t-email-signup-btn">✨ 회원가입</button>
       </div>
     </div>
     <div style="font-size:9px;color:var(--m);text-align:center;line-height:1.9;max-width:280px;" id="t-terms">계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.</div>
@@ -797,7 +797,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div>
           <div style="font-size:14px;color:var(--sb);margin-bottom:2px;" id="profileName">사용자</div>
           <div style="font-size:10px;color:var(--m);" id="profileEmail">—</div>
-          <div style="font-size:9px;color:var(--ok);margin-top:3px;" id="profileProvider">● 로그인됨</div>
+          <div style="font-size:9px;color:var(--ok);margin-top:3px;" id="profileProvider"><span id='t-provider-status'>● 로그인됨</span></div>
         </div>
       </div>
       <!-- 코인 -->
@@ -807,9 +807,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button style="padding:8px 14px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openCoinModal()" id="t-charge">충전하기</button>
         </div>
         <div class="coin-types">
-          <div class="coin-type"><div class="ct-amount" id="bonusCoin">50</div><div class="ct-label">가입<br>보너스</div><div style="font-size:7px;color:var(--red);margin-top:3px;">환불불가</div></div>
-          <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label">앱사용<br>적립</div><div style="font-size:7px;color:var(--red);margin-top:3px;">환불불가</div></div>
-          <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label">개인<br>충전</div><div style="font-size:7px;color:var(--ok);margin-top:3px;">환불가능</div></div>
+          <div class="coin-type"><div class="ct-amount" id="bonusCoin">50</div><div class="ct-label"><span id='t-coin-type1'>가입<br>보너스</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund1'>환불불가</span></div></div>
+          <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label"><span id='t-coin-type2'>앱사용<br>적립</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund2'>환불불가</span></div></div>
+          <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label"><span id='t-coin-type3'>개인<br>충전</span></div><div style="font-size:7px;color:var(--ok);margin-top:3px;"><span id='t-coin-refund'>환불가능</span></div></div>
         </div>
       </div>
       <!-- 카드 & 혜택 — R2-2 활성화 -->
@@ -1404,6 +1404,68 @@ function applyLang(){
     var el=document.getElementById('t-'+k);
     if(el) el.innerHTML=t[k];
   });
+  // 하드코딩된 한국어 요소들 번역
+  var isEn=lang==='en';
+  var el;
+  el=document.getElementById('t-homeTabHalf'); if(el) el.innerHTML=isEn?'🌙 AI Planning · Free':'🌙 AI 플래닝 · 무료';
+  el=document.getElementById('t-homeTabFull'); if(el) el.innerHTML=isEn?'🌕 Custom Planning · 10🪙':'🌕 맞춤 플래닝 · 10🪙';
+  el=document.getElementById('t-step-event'); if(el) el.innerHTML=isEn?'② Monthly Travel Events <span style="color:var(--m);font-size:8px;">(auto-fills destination)</span>':'② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span>';
+  el=document.getElementById('t-step-dest'); if(el) el.innerHTML=isEn?'③ Destination · Travelers · Nights':'③ 목적지 · 인원 · 일정';
+  el=document.getElementById('t-step-ai'); if(el) el.innerHTML=isEn?'④ AI Planning Request <span style="color:var(--m);font-size:8px;">(edit freely)</span>':'④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span>';
+  el=document.getElementById('t-full-input-label'); if(el) el.innerHTML=isEn?'Custom Planning Input':'맞춤 플래닝 조건 입력';
+  el=document.getElementById('t-full-start-btn'); if(el) el.innerHTML=isEn?'🌕 Start Custom Planning →':'🌕 맞춤 플래닝 시작 →';
+  el=document.getElementById('t-tripsTabHalf'); if(el) el.innerHTML=isEn?'🌙 Planning History':'🌙 플래닝 기록';
+  el=document.getElementById('t-tripsTabFull'); if(el) el.innerHTML=isEn?'🌕 Custom Planning History':'🌕 맞춤 플래닝 기록';
+  el=document.getElementById('t-tab-info-label'); if(el) el.innerHTML=isEn?'Info':'정보';
+  el=document.getElementById('t-beta-msg'); if(el) el.innerHTML=isEn?'Beta · messaging feature in test':'Beta · 실제 메시지 전송 기능 테스트 중';
+  el=document.getElementById('t-lug-coin1'); if(el) el.innerHTML=isEn?'🪙 30 coins':'🪙 30코인';
+  el=document.getElementById('t-lug-coin2'); if(el) el.innerHTML=isEn?'🪙 20 coins/6h':'🪙 20코인/6h';
+  el=document.getElementById('t-coin-type1'); if(el) el.innerHTML=isEn?'Sign-up<br>Bonus':'가입<br>보너스';
+  el=document.getElementById('t-coin-type2'); if(el) el.innerHTML=isEn?'App<br>Earned':'앱사용<br>적립';
+  el=document.getElementById('t-coin-type3'); if(el) el.innerHTML=isEn?'Personal<br>Charged':'개인<br>충전';
+  el=document.getElementById('t-coin-no-refund1'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
+  el=document.getElementById('t-coin-no-refund2'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
+  el=document.getElementById('t-coin-refund'); if(el) el.innerHTML=isEn?'Refundable':'환불가능';
+  el=document.getElementById('t-provider-status'); if(el && el.textContent) el.innerHTML=el.innerHTML.replace('● 로그인됨','● Connected').replace('● email 연동','● email connected');
+  // data-ko/data-en 속성 가진 모든 요소 일괄 번역
+  document.querySelectorAll('[data-ko][data-en]').forEach(function(el){
+    el.innerHTML=isEn?el.getAttribute('data-en'):el.getAttribute('data-ko');
+  });
+  // select option 번역
+  document.querySelectorAll('option[data-ko][data-en]').forEach(function(opt){
+    opt.textContent=isEn?opt.getAttribute('data-en'):opt.getAttribute('data-ko');
+  });
+  // placeholder 번역
+  var ciEl=document.getElementById('chatInput');
+  if(ciEl) ciEl.placeholder=isEn?'e.g. Bangkok 5 nights 2 pax couple — create Option A/B/C plan':'위에서 선택하거나 직접 입력하세요\n예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘';
+  var fdEl=document.getElementById('fullDestInput-field');
+  if(fdEl) fdEl.placeholder=isEn?'Destination, duration, special requests (e.g. Bangkok 5 nights honeymoon)':'목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)';
+  var emEl=document.getElementById('loginEmailInput');
+  if(emEl) emEl.placeholder=isEn?'Email':'이메일';
+  var pwEl=document.getElementById('loginPwInput');
+  if(pwEl) pwEl.placeholder=isEn?'Password (min 6 chars)':'비밀번호 (6자 이상)';
+  var orEl=document.getElementById('t-or-email');
+  if(orEl) orEl.textContent=isEn?'— or continue with email —':'— 또는 이메일로 —';
+  var lbEl=document.getElementById('t-email-login-btn');
+  if(lbEl) lbEl.innerHTML=isEn?'✉️ Sign In':'✉️ 로그인';
+  var sbEl=document.getElementById('t-email-signup-btn');
+  if(sbEl) sbEl.innerHTML=isEn?'✨ Sign Up':'✨ 회원가입';
+  // 체크리스트/안전정보/코인안내
+  el=document.getElementById('t-checklist-title'); if(el) el.innerHTML=isEn?'✅ Trip Preparation Checklist':'✅ 여행 준비 체크리스트';
+  el=document.getElementById('t-safety-title'); if(el) el.innerHTML=isEn?'⚠️ Safety Info':'⚠️ 안전 정보';
+  el=document.getElementById('t-safety-desc'); if(el) el.innerHTML=isEn?'Check official government travel advisories for the latest safety updates.':'전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.';
+  el=document.getElementById('t-safety-btn'); if(el) el.innerHTML=isEn?'Korea Travel Advisory (0404.go.kr) →':'외교부 해외안전여행 바로가기 →';
+  el=document.getElementById('t-full-coin-info'); if(el){var cb=document.getElementById('fullCoinBalance');var cval=cb?cb.textContent:'50';el.innerHTML='10🪙 '+(isEn?'deducted · Balance ':'차감 · 잔액 ')+'<span id="fullCoinBalance">'+cval+'</span>🪙 · '+(isEn?'Earn +5🪙 on completion':'완료 후 +5🪙 적립');}
+  // fullDestInput placeholder
+  var fdEl2=document.getElementById('fullDestInput'); if(fdEl2) fdEl2.placeholder=isEn?'Destination, duration, special requests (e.g. Bangkok 5 nights honeymoon)':'목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)';
+  // renderDailyUI 재실행으로 언어 업데이트
+  var dd=getDailyData(); if(dd) renderDailyUI(dd,new Date().toDateString());
+  // 결과 화면 버튼들
+  el=document.getElementById('t-back-input'); if(el) el.innerHTML=isEn?'← Back':'← 다시 입력';
+  el=document.getElementById('t-full-badge'); if(el) el.innerHTML=isEn?'🌕 Custom Planning':'🌕 맞춤 플래닝';
+  el=document.getElementById('t-full-save-btn'); if(el) el.innerHTML=isEn?'✓ Save to My Trip · Earn 🪙 5 coins':'✓ 내 여행에 저장 · 🪙 5코인 적립';
+  // ① 여행 스타일 레이블
+  var s1=document.querySelector('[data-step-label]');
   // 동적 콘텐츠 재생성
   renderChips();
   renderRanking();
@@ -1420,11 +1482,15 @@ function applyLang(){
 }
 function toggleLang(){
   lang = lang==='ko'?'en':'ko';
-  document.getElementById('langBtn').textContent = lang==='ko'?'EN':'한';
+  document.getElementById('langBtn').textContent = lang==='ko'?'EN':'KR';
   document.getElementById('htmlRoot').lang = lang;
   applyLang();
   setMode(currentMode);
   updateLimitBar();
+  // 채팅 초기 메시지 언어 업데이트
+  var area=document.getElementById('chatArea');
+  if(area && area.children.length>0){ area.innerHTML=''; initChat(); }
+  updatePlanInput();
 }
 function t(key){ return (TR[lang]&&TR[lang][key])||TR['ko'][key]||key; }
 
@@ -1773,13 +1839,13 @@ function setMode(m){
 }
 function updateChatPlaceholder(){
   var el=document.getElementById('chatInput'); if(!el) return;
-  el.placeholder=lang==='ko'?'예: 방콕 5박 2인 커플여행 — AI가 무료로 Option A/B/C 플랜을 만들어드립니다':'e.g. Bangkok 5 nights 2 people — AI creates Option A/B/C plan for free';
+  el.placeholder=lang==='ko'?'위에서 선택하거나 직접 입력하세요\n예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘':'Select above or type directly\ne.g. Bangkok 5 nights 2 pax couple — create A/B/C plan';
 }
 function initChat(){
   var area=document.getElementById('chatArea'); if(!area||area.children.length>0) return;
   var msg=lang==='ko'
-    ?'안녕하세요! DAL Full 플래너입니다 🌕<br><br>여행 스타일과 목적지·기간을 입력하시면 <strong>Option A·B·C 3가지 상세 비교</strong>를 드립니다.<br><br><em style="color:var(--m);font-size:11px">예: "4인가족, 싱가포르, 10월, 10박"</em>'
-    :'Hello! I\'m DAL Full Planner 🌕<br><br>Enter your travel style, destination & duration for a detailed <strong>3-option comparison (A·B·C)</strong>.<br><br><em style="color:var(--m);font-size:11px">e.g. "Family 4, Singapore, October, 10 nights"</em>';
+    ?'안녕하세요! DAL AI 플래너입니다 🌙<br><br>여행 스타일과 목적지·기간을 입력하시면 <strong>Option A·B·C 3가지 비교</strong>를 드립니다.<br><br><em style="color:var(--m);font-size:11px">예: "방콕 5박 2인 커플 — A/B/C 플랜 만들어줘"</em>'
+    :'Hello! I\'m DAL AI Planner 🌙<br><br>Enter your travel style, destination & duration for a <strong>3-option comparison (A·B·C)</strong>.<br><br><em style="color:var(--m);font-size:11px">e.g. "Bangkok 5 nights 2 people — create A/B/C plan"</em>';
   addDalMsg(msg);
 }
 function updateLimitBar(){
@@ -2075,12 +2141,12 @@ async function doWithdraw(){
   var email=document.getElementById('profileEmail')?document.getElementById('profileEmail').textContent:'';
   var pw=document.getElementById('withdrawPwInput').value;
   var err=document.getElementById('withdrawErrMsg');
-  if(!pw){err.textContent='비밀번호를 입력해주세요.';return;}
+  if(!pw){err.textContent=lang==='en'?'Please enter your password.':'비밀번호를 입력해주세요.';return;}
   err.textContent='확인 중...';
   // 1단계: 비밀번호 재확인 (로그인 시도)
   try{
     var r2=await _sf('/auth/v1/token?grant_type=password',{email:email,password:pw});
-    if(r2.error||r2.error_description){err.textContent='비밀번호가 틀렸습니다.';return;}
+    if(r2.error||r2.error_description){err.textContent=lang==='en'?'Incorrect password.':'비밀번호가 틀렸습니다.';return;}
   }catch(e){err.textContent='오류: '+e.message;return;}
   // 2단계: 환불 안내
   err.textContent='';
@@ -2358,7 +2424,7 @@ function onLoginSuccess(user, token){
   var el;
   el=document.getElementById('profileName'); if(el) el.textContent=nick;
   el=document.getElementById('profileEmail'); if(el) el.textContent=user.email||'';
-  el=document.getElementById('profileProvider'); if(el) el.textContent='● email'+(lang==='ko'?' 연동':' connected');
+  el=document.getElementById('profileProvider'); if(el) el.innerHTML='<span id="t-provider-status">● email '+(lang==='ko'?'연동':'connected')+'</span>';
   if(user.id){el=document.getElementById('myInviteCode');if(el) el.textContent='DAL-'+user.id.substring(0,8).toUpperCase();}
 }
 
@@ -2379,28 +2445,28 @@ async function doEmailSignup(){
   var email=document.getElementById('loginEmailInput').value.trim();
   var pw=document.getElementById('loginPwInput').value;
   var err=document.getElementById('loginErrMsg');
-  if(!email||!pw){err.textContent='이메일과 비밀번호를 입력해주세요.';return;}
+  if(!email||!pw){err.textContent=lang==='en'?'Please enter email and password.':'이메일과 비밀번호를 입력해주세요.';return;}
   if(pw.length<6){err.textContent='비밀번호는 6자 이상이어야 합니다.';return;}
-  err.textContent='가입 중...';
+  err.textContent=lang==='en'?'Signing up...':'가입 중...';
   try{
     var r=await _sf('/auth/v1/signup',{email:email,password:pw});
     if(r.error||r.error_description){err.textContent=r.error_description||r.error;}
-    else{err.textContent='✅ 가입완료! 이메일을 확인해주세요.';}
-  }catch(e){err.textContent='오류: '+e.message;}
+    else{err.textContent=lang==='en'?'✅ Sign up complete! Check your email.':'✅ 가입완료! 이메일을 확인해주세요.';}
+  }catch(e){err.textContent=(lang==='en'?'Error: ':'오류: ')+e.message;}
 }
 
 async function doEmailLogin(){
   var email=document.getElementById('loginEmailInput').value.trim();
   var pw=document.getElementById('loginPwInput').value;
   var err=document.getElementById('loginErrMsg');
-  if(!email||!pw){err.textContent='이메일과 비밀번호를 입력해주세요.';return;}
-  err.textContent='로그인 중...';
+  if(!email||!pw){err.textContent=lang==='en'?'Please enter email and password.':'이메일과 비밀번호를 입력해주세요.';return;}
+  err.textContent=lang==='en'?'Signing in...':'로그인 중...';
   try{
     var r=await _sf('/auth/v1/token?grant_type=password',{email:email,password:pw});
     if(r.error||r.error_description){
       var msg=r.error_description||r.error||'';
-      err.textContent=msg==='Invalid login credentials'?'이메일 또는 비밀번호가 틀렸습니다.':
-                      msg.includes('not confirmed')?'이메일 인증이 필요합니다.':msg||'로그인 실패';
+      err.textContent=msg==='Invalid login credentials'?(lang==='en'?'Invalid email or password.':'이메일 또는 비밀번호가 틀렸습니다.'):
+                      msg.includes('not confirmed')?(lang==='en'?'Email verification required.':'이메일 인증이 필요합니다.'):(msg||( lang==='en'?'Login failed':'로그인 실패'));
     }else if(r.access_token){
       _saveSession(r); err.textContent=''; onLoginSuccess(r.user,r.access_token);
     }
@@ -2501,6 +2567,32 @@ function toggleFullBudget(el){el.parentElement.querySelectorAll('.full-chip.budg
 
 // ══ 이벤트 데이터 ══
 function getEventsData(){
+  if(lang==='en') return [
+    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[3,4],monthStr:'Mar-Apr',name:'Cherry Blossom Season',desc:'Nationwide bloom in Tokyo, Kyoto & Osaka.',type:'Nature',hot:true},
+    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[7],monthStr:'Jul',name:'Gion Matsuri',desc:'Kyoto 1,100-year-old traditional festival.',type:'Culture'},
+    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[8],monthStr:'Aug',name:'Obon & Fireworks',desc:'Sumida River fireworks — Japans largest.',type:'Festival'},
+    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[11],monthStr:'Nov',name:'Autumn Foliage',desc:'Golden leaves in Kyoto, Nikko & Hakone.',type:'Nature',hot:true},
+    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[4],monthStr:'Apr 13-15',name:'Songkran (Water Festival)',desc:'Nationwide water fight. Bangkok & Chiang Mai.',type:'Festival',hot:true,warn:'Hotels 2-3x price surge'},
+    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[11],monthStr:'Nov',name:'Loy Krathong (Lantern Festival)',desc:'Thousands of lanterns fill Chiang Mai sky.',type:'Festival',hot:true},
+    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[11,12,1,2],monthStr:'Nov–Feb',name:'Dry Season',desc:'Best time to visit Thailand.',type:'Season'},
+    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[10],monthStr:'Oct',name:'F1 Singapore Grand Prix',desc:'Night race at Marina Bay. Global fans converge.',type:'Sports',hot:true,warn:'Hotels 4-5x price surge'},
+    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[1,2],monthStr:'Jan-Feb',name:'Chinese New Year',desc:'Chinatown decorations and performances.',type:'Festival'},
+    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[8],monthStr:'Aug 9',name:'Singapore National Day',desc:'Fireworks & airshow at Marina Bay.',type:'Holiday'},
+    {dest:'fr',flag:'🇫🇷',country:'France',months:[5,6],monthStr:'May-Jun',name:'Cannes Film Festival',desc:'World top film festival. Red carpet & stars.',type:'Culture'},
+    {dest:'fr',flag:'🇫🇷',country:'France',months:[7],monthStr:'Jul',name:'Bastille Day & Tour de France',desc:'Eiffel Tower fireworks and cycling finale.',type:'Holiday',hot:true},
+    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[3,4],monthStr:'Mar-Apr',name:'Nyepi (Day of Silence)',desc:'24-hour island-wide silence. Unique experience.',type:'Culture'},
+    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[6,7,8],monthStr:'Jun-Aug',name:'Dry Season',desc:'Golden season for Bali. Best for surfing and trekking.',type:'Season',hot:true},
+    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[6],monthStr:'Jun',name:'Bali Arts Festival',desc:'Traditional dance, music and sculpture. Ubud Palace.',type:'Culture'},
+    {dest:'us',flag:'🇺🇸',country:'USA',months:[2],monthStr:'Feb',name:'Super Bowl',desc:'America biggest sports event.',type:'Sports',hot:true,warn:'Hotels 3-5x price surge'},
+    {dest:'us',flag:'🇺🇸',country:'USA',months:[10],monthStr:'Oct',name:'Halloween',desc:'Parades in New York & New Orleans.',type:'Festival'},
+    {dest:'us',flag:'🇺🇸',country:'USA',months:[11],monthStr:'Nov',name:'Thanksgiving & Black Friday',desc:'Shopping heaven. NYC Macys Parade.',type:'Festival'},
+    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[7],monthStr:'Jul',name:'San Fermín (Bull Run)',desc:'Running of the bulls in Pamplona.',type:'Festival',hot:true},
+    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[8],monthStr:'Aug',name:'La Tomatina',desc:'Tomato fight festival in Buñol.',type:'Festival'},
+    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[3],monthStr:'Mar',name:'Las Fallas',desc:'Valencia fireworks. UNESCO Intangible Heritage.',type:'Culture'},
+    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[4],monthStr:'Apr',name:'Cherry Blossom Season',desc:'Yeouido, Gyeongju & Jinhae nationwide.',type:'Nature',hot:true},
+    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[10],monthStr:'Oct',name:'Busan Intl Film Festival BIFF',desc:'Asias largest film festival.',type:'Culture'},
+    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[10,11],monthStr:'Oct-Nov',name:'Autumn Foliage',desc:'Seoraksan, Naejangsan & Jirisan.',type:'Nature'},
+  ];
   return [
     {dest:'jp',flag:'🇯🇵',country:'일본',months:[3,4],monthStr:'3-4월',name:'벚꽃 시즌',desc:'도쿄·교토·오사카 전국 개화.',type:'자연',hot:true},
     {dest:'jp',flag:'🇯🇵',country:'일본',months:[7],monthStr:'7월',name:'기온 마쓰리',desc:'교토 1,100년 전통 축제.',type:'문화'},
@@ -2534,8 +2626,10 @@ function renderEventList(el,destFilter,monthFilter){
   if(destFilter&&destFilter!=='all')filtered=filtered.filter(function(e){return e.dest===destFilter;});
   if(monthFilter&&monthFilter!=='all'){var m=parseInt(monthFilter);filtered=filtered.filter(function(e){return e.months.indexOf(m)>=0;});}
   filtered.sort(function(a,b){return (b.hot?1:0)-(a.hot?1:0);});
-  if(filtered.length===0){el.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:12px;">해당 조건의 이벤트가 없습니다</div>';return;}
-  var tc={자연:'var(--ok)',축제:'var(--gold)',스포츠:'var(--ac)',문화:'#b08aff',시즌:'var(--m)',국경일:'var(--red)'};
+  if(filtered.length===0){el.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:12px;">'+(lang==='en'?'No events for selected period':'해당 조건의 이벤트가 없습니다')+'</div>';return;}
+  var tc=lang==='en'
+    ?{Nature:'var(--ok)',Festival:'var(--gold)',Sports:'var(--ac)',Culture:'#b08aff',Season:'var(--m)',Holiday:'var(--red)'}
+    :{자연:'var(--ok)',축제:'var(--gold)',스포츠:'var(--ac)',문화:'#b08aff',시즌:'var(--m)',국경일:'var(--red)'};
   var _evCache=[]; el.innerHTML=filtered.map(function(e,_eIdx){
     return '<div style="padding:10px 0;border-bottom:1px solid var(--b1);cursor:pointer;" onclick="selectEventByIdx('+_eIdx+')">' 
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">'
@@ -2573,7 +2667,7 @@ function setTripsTab(tab){
 }
 function renderHalfTripsList(){
   var el=document.getElementById('halfTripsList');if(!el)return;
-  if(halfTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙</div>';return;}
+  if(halfTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙':'No saved trips yet.<br>Start AI Planning from Home 🌙')+'</div>';return;}
   el.innerHTML=halfTrips.map(function(t,i){
     return '<div class="trip-record-card" onclick="showHalfDetail('+i+')">'
       +'<div class="trc-head"><div class="trc-dest">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
@@ -2586,7 +2680,7 @@ function renderHalfTripsList(){
 }
 function renderFullTripsList(){
   var el=document.getElementById('fullTripsList');if(!el)return;
-  if(fullTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">아직 맞춤 플래닝 결과가 없어요.<br>홈 🌕 맞춤 플래닝 탭에서 시작하거나<br>AI 플래닝 기록에서 업그레이드하세요</div>';return;}
+  if(fullTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 맞춤 플래닝 결과가 없어요.<br>홈 🌕 맞춤 플래닝 탭에서 시작하거나<br>AI 플래닝 기록에서 업그레이드하세요':'No custom planning yet.<br>Start from 🌕 Custom Planning tab<br>or upgrade from AI Planning history')+'</div>';return;}
   el.innerHTML=fullTrips.map(function(t,i){
     return '<div class="trip-record-card" onclick="showFullDetail('+i+')">'
       +'<div class="trc-head"><div class="trc-dest">'+(t.route||'여행')+'</div><span class="trc-badge full">맞춤 플래닝</span></div>'
@@ -2712,14 +2806,14 @@ function initDailyReward(){
 }
 function renderDailyUI(d,today){
   var streak=d.streak||0,checked=d.lastDate===today;
-  var st=document.getElementById('dailyStreakText');if(st)st.textContent='🔥 연속 접속 '+(streak||1)+'일째';
-  var ss=document.getElementById('dailyStreakSub');if(ss)ss.textContent=checked?'오늘 출석 완료 🎉':'오늘 출석 시 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+'코인 지급';
-  var btn=document.getElementById('dailyCheckInBtn');if(btn){btn.textContent=checked?'✓ 완료':'🪙 출석 체크';btn.style.opacity=checked?'0.4':'1';btn.style.cursor=checked?'default':'pointer';}
+  var st=document.getElementById('dailyStreakText');if(st)st.textContent=lang==='en'?'🔥 Day '+(streak||1)+' streak':'🔥 연속 접속 '+(streak||1)+'일째';
+  var ss=document.getElementById('dailyStreakSub');if(ss)ss.textContent=checked?(lang==='en'?'Checked in today 🎉':'오늘 출석 완료 🎉'):(lang==='en'?'Check in today · Earn 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+' coins':'오늘 출석 시 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+'코인 지급');
+  var btn=document.getElementById('dailyCheckInBtn');if(btn){btn.textContent=checked?(lang==='en'?'✓ Done':'✓ 완료'):(lang==='en'?'🪙 Check In':'🪙 출석 체크');btn.style.opacity=checked?'0.4':'1';btn.style.cursor=checked?'default':'pointer';}
   renderStreakCalendar(streak,checked);
 }
 function renderStreakCalendar(streak,checked){
   var el=document.getElementById('streakCalendar');if(!el)return;
-  var days=['월','화','수','목','금','토','일'];el.innerHTML='';
+  var days=lang==='en'?['M','T','W','T','F','S','S']:['월','화','수','목','금','토','일'];el.innerHTML='';
   for(var i=0;i<7;i++){
     var done=i<streak||(i===streak&&checked);
     var div=document.createElement('div');
@@ -2777,9 +2871,8 @@ function selectEventDest(dest, eventName){
 
 // ══ 플래닝 입력 자동 업데이트 ══
 var DEST_LABELS = {
-  jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)',
-  sg:'싱가포르', fr:'프랑스(파리)', bali:'발리',
-  us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도'
+  ko:{ jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)', sg:'싱가포르', fr:'프랑스(파리)', bali:'발리', us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도' },
+  en:{ jp:'Japan(Tokyo/Kyoto/Osaka)', th:'Thailand(Bangkok/Chiang Mai)', sg:'Singapore', fr:'France(Paris)', bali:'Bali', us:'USA(New York/LA)', sp:'Spain(Barcelona)', kr:'Korea(Seoul/Busan)', jeju:'Jeju Island' }
 };
 
 function updatePlanInput(){
@@ -2788,20 +2881,20 @@ function updatePlanInput(){
   var nts  = (document.getElementById('planNights')||{value:'5'}).value || '5';
   var style = STYLES[travelStyle] && STYLES[travelStyle][lang];
   var styleLabel = style ? style.name : '';
-  var destLabel = DEST_LABELS[dest] || '';
+  var destLabel = (DEST_LABELS[lang]&&DEST_LABELS[lang][dest]) || '';
 
   var inp = document.getElementById('chatInput');
   if(!inp) return;
 
   if(!destLabel){
-    inp.placeholder = '위에서 선택하거나 직접 입력하세요';
+    inp.placeholder = lang==='en'?'Select above or type directly':'위에서 선택하거나 직접 입력하세요';
     inp.value = '';
     return;
   }
 
-  var txt = destLabel + ' ' + nts + '박 ' + ppl + '인';
-  if(styleLabel) txt += ' ' + styleLabel;
-  txt += (lang==='ko' ? ' 여행 — Option A/B/C 플랜 만들어줘' : ' trip — create Option A/B/C plan');
+  var txt = lang==='ko'
+    ? destLabel + ' ' + nts + '박 ' + ppl + '인' + (styleLabel?' '+styleLabel:'') + ' 여행 — Option A/B/C 플랜 만들어줘'
+    : destLabel + ' ' + nts + ' nights ' + ppl + ' pax' + (styleLabel?' '+styleLabel:'') + ' trip — create Option A/B/C plan';
   inp.value = txt;
 
   // 예산 계산기 연동
