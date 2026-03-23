@@ -691,7 +691,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div class="final-earn" id="finalEarn">+🪙 221코인 적립 예정</div>
       </div>
       <div id="optionUnlockArea" style="margin-top:12px;background:rgba(196,175,135,.04);border:1px solid rgba(196,175,135,.15);border-radius:4px;padding:12px;">
-        <div style="font-size:10px;color:var(--gold);margin-bottom:8px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
+        <div style="font-size:10px;color:var(--gold);margin-bottom:6px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
+        <div id="unlockNotice" style="font-size:9px;color:var(--m);text-align:center;margin-bottom:8px;padding:4px 8px;background:rgba(91,143,255,.04);border-radius:4px;line-height:1.6;"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
           <button id="unlockBtnA" onclick="requestUnlockOption('A')" style="padding:8px 4px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option A<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
           <button id="unlockBtnB" onclick="requestUnlockOption('B')" style="padding:8px 4px;background:rgba(91,143,255,.1);border:1px solid rgba(91,143,255,.3);border-radius:4px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option B<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
@@ -2857,6 +2858,20 @@ function showHalfDetail(idx){
   selectOption('B');
   updateTripLinks(t);
   suggestCardsForTrip(t);
+  // 박수 기반 공지 표시
+  var noticeEl = document.getElementById('unlockNotice');
+  if(noticeEl){
+    var nights = parseInt(t.nights)||5;
+    if(nights >= 7){
+      noticeEl.style.display = 'block';
+      noticeEl.innerHTML = lang==='ko'
+        ? '⚠️ '+nights+'박 이상: 시간표 대신 <strong style="color:var(--sb);">전체 일정 핵심 동선</strong>으로 제공됩니다'
+        : '⚠️ '+nights+'+ nights: Provided as <strong style="color:var(--sb);">daily key highlights</strong> (not hourly schedule)';
+    } else {
+      noticeEl.style.display = 'none';
+    }
+  }
+
   // 이미 잠금 해제된 옵션은 버튼 상태 복원
   ['A','B','C'].forEach(function(o){
     var btn=document.getElementById('unlockBtn'+o);
@@ -2999,8 +3014,8 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
     nextKeywords.forEach(function(k){ var i=fullText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
   }
   var originalText = optStart>=0
-    ? fullText.substring(optStart, Math.min(optEnd, optStart+1500))
-    : fullText.substring(0,1000);
+    ? fullText.substring(optStart, Math.min(optEnd, optStart+500))
+    : fullText.substring(0,500);
 
   // 원본 유무에 따라 프롬프트 분기
   var hasOriginal = originalText.length > 50;
@@ -3012,25 +3027,38 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
         ? '여행: '+t.route+' '+(t.nights||'?')+'박 '+(t.pax||'?')+'인\nOption '+opt+' ('+(opt==='A'?'프리미엄':opt==='B'?'스마트 추천':'가성비')+') 상세 플랜을 새로 작성해줘.\n'
         : 'Trip: '+t.route+' '+(t.nights||'?')+' nights '+(t.pax||'?')+' pax\nCreate a fresh detailed Option '+opt+' ('+(opt==='A'?'Premium':opt==='B'?'Smart Pick':'Value')+') plan.\n');
 
+  var nights = parseInt(t.nights)||5;
+  var isLong = nights >= 7;
+
   var detailPart = lang==='ko'
-    ? '반드시 한국어로. 여행 기간 전체 일정 빠짐없이 완성.\n'
-      +'1. 실제 식당명 3곳 + 위치 + 대표메뉴 + 가격대\n'
-      +'2. Day별 동선 (오전/오후/저녁 + 이동수단 + 비용)\n'
-      +'3. 카드 혜택 추천 (카드사 + 혜택 + 예상절약)\n'
-      +'4. 예약 팁 + 현지 주의사항\n'
-      +'5. 총 예상 비용 breakdown'
-    : 'Reply in English. Complete itinerary for ALL days, never stop mid-way.\n'
-      +'1. 3 real restaurant names + location + dish + price\n'
-      +'2. Day-by-day hourly route (morning/afternoon/evening + transport + cost)\n'
-      +'3. Card benefits (card name + benefit + savings estimate)\n'
-      +'4. Booking tips + local warnings\n'
-      +'5. Total cost breakdown';
+    ? (isLong
+        ? '한국어로. '+nights+'박 전체를 핵심 키워드로 간략히 제공 (상세 시간표 없이):\n'
+          +'1. 식당 3곳 (이름+메뉴+가격)\n'
+          +'2. Day 1~'+nights+' 전체 핵심 동선 (하루 2~3줄 요약)\n'
+          +'3. 추천 카드 혜택\n'
+          +'4. 총 예상 비용'
+        : '한국어로. 아래만 간결하게:\n'
+          +'1. 식당 3곳 (이름+메뉴+가격)\n'
+          +'2. Day 1~'+nights+' 시간대 동선 (오전/오후/저녁)\n'
+          +'3. 추천 카드 혜택\n'
+          +'4. 총 예상 비용')
+    : (isLong
+        ? 'English. Provide full '+nights+'-day itinerary as brief daily summaries (no hourly detail):\n'
+          +'1. 3 restaurants (name+dish+price)\n'
+          +'2. Day 1~'+nights+' full itinerary (2-3 bullet points per day)\n'
+          +'3. Best card benefit\n'
+          +'4. Total estimated cost'
+        : 'Brief English response:\n'
+          +'1. 3 restaurants (name+dish+price)\n'
+          +'2. Day 1~'+nights+' hourly itinerary (morning/afternoon/evening)\n'
+          +'3. Best card benefit\n'
+          +'4. Total estimated cost');
 
   var prompt = contextPart + detailPart;
 
   try{
     var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:6000,temperature:0.7}})});
+      body:JSON.stringify({model:'gemini-2.0-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2500,temperature:0.7}})});
     if(r.ok){
       var data=await r.json();
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
