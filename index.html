@@ -435,15 +435,45 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div style="display:flex;gap:6px;align-items:center;">
           <select id="planDest" onchange="updatePlanInput()" style="flex:2;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
             <option value="" data-ko="목적지 선택" data-en="Select Destination">목적지 선택</option>
-            <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option>
-            <option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
+            <optgroup label="🌏 아시아 / Asia">
+            <option value="jp" data-ko="🇯🇵 일본 (도쿄/교토/오사카)" data-en="🇯🇵 Japan (Tokyo/Kyoto/Osaka)">🇯🇵 일본 (도쿄/교토/오사카)</option>
+            <option value="th" data-ko="🇹🇭 태국 (방콕/치앙마이)" data-en="🇹🇭 Thailand (Bangkok/Chiang Mai)">🇹🇭 태국 (방콕/치앙마이)</option>
             <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
-            <option value="fr" data-ko="🇫🇷 프랑스" data-en="🇫🇷 France">🇫🇷 프랑스</option>
-            <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option>
-            <option value="us" data-ko="🇺🇸 미국" data-en="🇺🇸 USA">🇺🇸 미국</option>
-            <option value="sp" data-ko="🇪🇸 스페인" data-en="🇪🇸 Spain">🇪🇸 스페인</option>
-            <option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
-            <option value="jeju" data-ko="🇰🇷 제주" data-en="🇰🇷 Jeju">🇰🇷 제주</option>
+            <option value="bali" data-ko="🇮🇩 발리 (인도네시아)" data-en="🇮🇩 Bali (Indonesia)">🇮🇩 발리 (인도네시아)</option>
+            <option value="vn" data-ko="🇻🇳 베트남 (다낭/하노이/호치민)" data-en="🇻🇳 Vietnam (Da Nang/Hanoi/HCMC)">🇻🇳 베트남 (다낭/하노이/호치민)</option>
+            <option value="ph" data-ko="🇵🇭 필리핀 (세부/보라카이)" data-en="🇵🇭 Philippines (Cebu/Boracay)">🇵🇭 필리핀 (세부/보라카이)</option>
+            <option value="tw" data-ko="🇹🇼 대만 (타이베이)" data-en="🇹🇼 Taiwan (Taipei)">🇹🇼 대만 (타이베이)</option>
+            <option value="hk" data-ko="🇭🇰 홍콩" data-en="🇭🇰 Hong Kong">🇭🇰 홍콩</option>
+            <option value="my" data-ko="🇲🇾 말레이시아 (쿠알라룸푸르)" data-en="🇲🇾 Malaysia (Kuala Lumpur)">🇲🇾 말레이시아 (쿠알라룸푸르)</option>
+            <option value="in" data-ko="🇮🇳 인도 (델리/뭄바이/고아)" data-en="🇮🇳 India (Delhi/Mumbai/Goa)">🇮🇳 인도 (델리/뭄바이/고아)</option>
+            <option value="kr" data-ko="🇰🇷 한국 (서울/부산)" data-en="🇰🇷 Korea (Seoul/Busan)">🇰🇷 한국 (서울/부산)</option>
+            <option value="jeju" data-ko="🇰🇷 제주도" data-en="🇰🇷 Jeju Island">🇰🇷 제주도</option>
+            </optgroup>
+            <optgroup label="🌍 유럽 / Europe">
+            <option value="fr" data-ko="🇫🇷 프랑스 (파리)" data-en="🇫🇷 France (Paris)">🇫🇷 프랑스 (파리)</option>
+            <option value="sp" data-ko="🇪🇸 스페인 (바르셀로나/마드리드)" data-en="🇪🇸 Spain (Barcelona/Madrid)">🇪🇸 스페인 (바르셀로나/마드리드)</option>
+            <option value="it" data-ko="🇮🇹 이탈리아 (로마/피렌체/밀라노)" data-en="🇮🇹 Italy (Rome/Florence/Milan)">🇮🇹 이탈리아 (로마/피렌체/밀라노)</option>
+            <option value="uk" data-ko="🇬🇧 영국 (런던)" data-en="🇬🇧 UK (London)">🇬🇧 영국 (런던)</option>
+            <option value="de" data-ko="🇩🇪 독일 (베를린/뮌헨)" data-en="🇩🇪 Germany (Berlin/Munich)">🇩🇪 독일 (베를린/뮌헨)</option>
+            <option value="gr" data-ko="🇬🇷 그리스 (아테네/산토리니)" data-en="🇬🇷 Greece (Athens/Santorini)">🇬🇷 그리스 (아테네/산토리니)</option>
+            <option value="pt" data-ko="🇵🇹 포르투갈 (리스본/포르투)" data-en="🇵🇹 Portugal (Lisbon/Porto)">🇵🇹 포르투갈 (리스본/포르투)</option>
+            <option value="ch" data-ko="🇨🇭 스위스 (취리히/루체른)" data-en="🇨🇭 Switzerland (Zurich/Lucerne)">🇨🇭 스위스 (취리히/루체른)</option>
+            <option value="nl" data-ko="🇳🇱 네덜란드 (암스테르담)" data-en="🇳🇱 Netherlands (Amsterdam)">🇳🇱 네덜란드 (암스테르담)</option>
+            <option value="tr" data-ko="🇹🇷 튀르키예 (이스탄불/카파도키아)" data-en="🇹🇷 Turkey (Istanbul/Cappadocia)">🇹🇷 튀르키예 (이스탄불/카파도키아)</option>
+            </optgroup>
+            <optgroup label="🌎 미주·오세아니아 / Americas & Oceania">
+            <option value="us" data-ko="🇺🇸 미국 (뉴욕/LA/라스베가스)" data-en="🇺🇸 USA (New York/LA/Las Vegas)">🇺🇸 미국 (뉴욕/LA/라스베가스)</option>
+            <option value="ca" data-ko="🇨🇦 캐나다 (토론토/밴쿠버)" data-en="🇨🇦 Canada (Toronto/Vancouver)">🇨🇦 캐나다 (토론토/밴쿠버)</option>
+            <option value="mx" data-ko="🇲🇽 멕시코 (칸쿤/멕시코시티)" data-en="🇲🇽 Mexico (Cancun/Mexico City)">🇲🇽 멕시코 (칸쿤/멕시코시티)</option>
+            <option value="au" data-ko="🇦🇺 호주 (시드니/멜버른)" data-en="🇦🇺 Australia (Sydney/Melbourne)">🇦🇺 호주 (시드니/멜버른)</option>
+            <option value="nz" data-ko="🇳🇿 뉴질랜드 (오클랜드/퀸스타운)" data-en="🇳🇿 New Zealand (Auckland/Queenstown)">🇳🇿 뉴질랜드 (오클랜드/퀸스타운)</option>
+            </optgroup>
+            <optgroup label="🌺 기타 / Others">
+            <option value="ae" data-ko="🇦🇪 두바이 (UAE)" data-en="🇦🇪 Dubai (UAE)">🇦🇪 두바이 (UAE)</option>
+            <option value="ma" data-ko="🇲🇦 모로코 (마라케시/페스)" data-en="🇲🇦 Morocco (Marrakech/Fes)">🇲🇦 모로코 (마라케시/페스)</option>
+            <option value="za" data-ko="🇿🇦 남아프리카 (케이프타운)" data-en="🇿🇦 South Africa (Cape Town)">🇿🇦 남아프리카 (케이프타운)</option>
+            <option value="eg" data-ko="🇪🇬 이집트 (카이로/룩소르)" data-en="🇪🇬 Egypt (Cairo/Luxor)">🇪🇬 이집트 (카이로/룩소르)</option>
+            </optgroup>
           </select>
           <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
           <input id="planNights" type="number" min="1" max="30" value="5" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="박">
@@ -3272,8 +3302,8 @@ function selectEventDest(dest, eventName){
 
 // ══ 플래닝 입력 자동 업데이트 ══
 var DEST_LABELS = {
-  ko:{ jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)', sg:'싱가포르', fr:'프랑스(파리)', bali:'발리', us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도' },
-  en:{ jp:'Japan(Tokyo/Kyoto/Osaka)', th:'Thailand(Bangkok/Chiang Mai)', sg:'Singapore', fr:'France(Paris)', bali:'Bali', us:'USA(New York/LA)', sp:'Spain(Barcelona)', kr:'Korea(Seoul/Busan)', jeju:'Jeju Island' }
+  ko:{ jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)', sg:'싱가포르', fr:'프랑스(파리)', bali:'발리(인도네시아)', us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도', vn:'베트남(다낭/하노이)', ph:'필리핀(세부/보라카이)', tw:'대만(타이베이)', hk:'홍콩', my:'말레이시아(쿠알라룸푸르)', in:'인도(델리/뭄바이)', it:'이탈리아(로마/피렌체)', uk:'영국(런던)', de:'독일(베를린/뮌헨)', gr:'그리스(산토리니)', pt:'포르투갈(리스본)', ch:'스위스(루체른)', nl:'네덜란드(암스테르담)', tr:'튀르키예(이스탄불)', ca:'캐나다(밴쿠버)', mx:'멕시코(칸쿤)', au:'호주(시드니)', nz:'뉴질랜드(퀸스타운)', ae:'두바이(UAE)', ma:'모로코(마라케시)', za:'남아프리카(케이프타운)', eg:'이집트(카이로)' },
+  en:{ jp:'Japan(Tokyo/Kyoto/Osaka)', th:'Thailand(Bangkok/Chiang Mai)', sg:'Singapore', fr:'France(Paris)', bali:'Bali', us:'USA(New York/LA)', sp:'Spain(Barcelona)', kr:'Korea(Seoul/Busan)', jeju:'Jeju Island', vn:'Vietnam(Da Nang/Hanoi)', ph:'Philippines(Cebu/Boracay)', tw:'Taiwan(Taipei)', hk:'Hong Kong', my:'Malaysia(Kuala Lumpur)', in:'India(Delhi/Mumbai)', it:'Italy(Rome/Florence)', uk:'UK(London)', de:'Germany(Berlin/Munich)', gr:'Greece(Santorini)', pt:'Portugal(Lisbon)', ch:'Switzerland(Lucerne)', nl:'Netherlands(Amsterdam)', tr:'Turkey(Istanbul)', ca:'Canada(Vancouver)', mx:'Mexico(Cancun)', au:'Australia(Sydney)', nz:'New Zealand(Queenstown)', ae:'Dubai(UAE)', ma:'Morocco(Marrakech)', za:'South Africa(Cape Town)', eg:'Egypt(Cairo)' }
 };
 
 function updatePlanInput(){
@@ -3342,12 +3372,13 @@ function selectEventByIdx(idx){
   if(!events || !events[idx]) return;
   var e = events[idx];
 
-  // ① 목적지 드롭다운 자동 세팅
+  // ① 목적지 드롭다운 자동 세팅 + 강조 표시
   var pd = document.getElementById('planDest');
   if(pd){
     pd.value = e.dest;
     pd.style.borderColor = 'var(--gold)';
-    setTimeout(function(){ pd.style.borderColor = 'var(--b2)'; }, 1500);
+    pd.style.background = 'rgba(196,175,135,.08)';
+    setTimeout(function(){ pd.style.borderColor = 'var(--b2)'; pd.style.background='var(--s1)'; }, 2000);
   }
 
   // ② 이벤트명 저장 → updatePlanInput에서 참조
@@ -3356,12 +3387,13 @@ function selectEventByIdx(idx){
   // ③ updatePlanInput으로 전체 통합 갱신
   updatePlanInput();
 
-  // ④ 입력창 하이라이트
+  // ④ 입력창 하이라이트 + 스크롤
   var inp = document.getElementById('chatInput');
   if(inp){
     inp.style.borderColor = 'var(--ac)';
-    setTimeout(function(){ inp.style.borderColor = 'var(--b2)'; }, 1500);
+    setTimeout(function(){ inp.style.borderColor = 'var(--b2)'; }, 2000);
     inp.scrollIntoView({behavior:'smooth', block:'center'});
+    inp.focus();
   }
 }
 
