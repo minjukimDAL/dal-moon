@@ -1,5 +1,11 @@
 [build]
   functions = "functions"
-  
+
 [build.environment]
   NODE_VERSION = "20"
+
+[functions]
+  node_bundler = "esbuild"
+
+[functions."gemini"]
+  timeout = 30
