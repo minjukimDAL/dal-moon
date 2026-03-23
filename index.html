@@ -2999,33 +2999,38 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
     nextKeywords.forEach(function(k){ var i=fullText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
   }
   var originalText = optStart>=0
-    ? fullText.substring(optStart, Math.min(optEnd, optStart+2000))
-    : fullText.substring(0,1500);
-  var prompt=lang==='ko'
-    ?'아래는 AI가 생성한 여행 플랜 원문이야:\n---\n'+originalText+'\n---\n\n'
-     +'위 원문에서 [Option '+opt+'] 부분을 기반으로, 더 구체적이고 실용적인 상세 정보를 제공해줘. 반드시 한국어로.\n'
-     +'여행: '+t.route+' '+(t.nights||'')+'박 '+(t.pax||'')+'인\n'
-     +'옵션: '+optName+' ('+opt+' - '+(opt==='A'?'프리미엄':opt==='B'?'스마트 추천':'가성비')+')\n\n'
-     +'중요: 일정이 짧아도 반드시 여행 기간 전체(1일~마지막 날)를 빠짐없이 완성할 것. 절대 중간에 끊지 말 것.\n원문보다 더 풍부하게, 아래 항목을 구체적으로 작성:\n'
-     +'1. 구체적 식당 3곳 이상 (실제 식당명 + 주소/위치 + 예약 필요여부 + 대표 메뉴 + 가격대)\n'
-     +'2. Day별 시간대 동선 (오전/오후/저녁 각각 + 이동수단 + 소요시간 + 입장료/비용)\n'
-     +'3. 이 여행에 맞는 카드 혜택 (카드사명 + 구체적 혜택 + 예상 절약 금액)\n'
-     +'4. 현지 예약 팁 + 주의사항 + 숨겨진 꿀팁\n'
-     +'5. 이 옵션 선택 시 총 예상 비용 (항공+숙소+식비+교통+투어 각각)'
-    :'Below is the original AI travel plan:\n---\n'+originalText+'\n---\n\n'
-     +'Based on [Option '+opt+'] from the plan above, provide MORE detailed and practical information in English.\n'
-     +'Trip: '+t.route+' '+(t.nights||'')+' nights '+(t.pax||'')+' pax\n'
-     +'Option: '+optName+' ('+opt+' - '+(opt==='A'?'Premium':opt==='B'?'Smart Pick':'Value')+')\n\n'
-     +'IMPORTANT: Complete the FULL itinerary for ALL days (Day 1 to last day) without stopping. Never cut off mid-way.\nExpand on the original with more specifics:\n'
-     +'1. 3+ specific restaurants (real name + location + reservation needed + signature dish + price range)\n'
-     +'2. Day-by-day hourly itinerary (morning/afternoon/evening + transport + duration + cost)\n'
-     +'3. Best card benefits for this trip (card name + specific benefit + estimated savings)\n'
-     +'4. Booking tips + local warnings + hidden gems\n'
-     +'5. Estimated total cost breakdown (flight + hotel + food + transport + tours)';
+    ? fullText.substring(optStart, Math.min(optEnd, optStart+1500))
+    : fullText.substring(0,1000);
+
+  // 원본 유무에 따라 프롬프트 분기
+  var hasOriginal = originalText.length > 50;
+  var contextPart = hasOriginal
+    ? (lang==='ko'
+        ? '아래는 이 여행의 AI 플랜 원문 (Option '+opt+' 부분):\n---\n'+originalText+'\n---\n\n위 원문을 기반으로 더 상세하게 확장해줘.\n'
+        : 'Below is the original AI plan (Option '+opt+' section):\n---\n'+originalText+'\n---\n\nExpand on this with more detail.\n')
+    : (lang==='ko'
+        ? '여행: '+t.route+' '+(t.nights||'?')+'박 '+(t.pax||'?')+'인\nOption '+opt+' ('+(opt==='A'?'프리미엄':opt==='B'?'스마트 추천':'가성비')+') 상세 플랜을 새로 작성해줘.\n'
+        : 'Trip: '+t.route+' '+(t.nights||'?')+' nights '+(t.pax||'?')+' pax\nCreate a fresh detailed Option '+opt+' ('+(opt==='A'?'Premium':opt==='B'?'Smart Pick':'Value')+') plan.\n');
+
+  var detailPart = lang==='ko'
+    ? '반드시 한국어로. 여행 기간 전체 일정 빠짐없이 완성.\n'
+      +'1. 실제 식당명 3곳 + 위치 + 대표메뉴 + 가격대\n'
+      +'2. Day별 동선 (오전/오후/저녁 + 이동수단 + 비용)\n'
+      +'3. 카드 혜택 추천 (카드사 + 혜택 + 예상절약)\n'
+      +'4. 예약 팁 + 현지 주의사항\n'
+      +'5. 총 예상 비용 breakdown'
+    : 'Reply in English. Complete itinerary for ALL days, never stop mid-way.\n'
+      +'1. 3 real restaurant names + location + dish + price\n'
+      +'2. Day-by-day hourly route (morning/afternoon/evening + transport + cost)\n'
+      +'3. Card benefits (card name + benefit + savings estimate)\n'
+      +'4. Booking tips + local warnings\n'
+      +'5. Total cost breakdown';
+
+  var prompt = contextPart + detailPart;
 
   try{
     var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
+      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:6000,temperature:0.7}})});
     if(r.ok){
       var data=await r.json();
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
@@ -3042,12 +3047,23 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       }
     } else {
       var errData=await r.json().catch(function(){return{};});
+      var errMsg=(errData.error&&errData.error.message)||('HTTP '+r.status);
+      console.error('Unlock Option '+opt+' error:', errMsg);
       earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-      if(btn){ btn.disabled=false; btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:9px;color:var(--red);">'+(errData.error&&errData.error.message?errData.error.message.substring(0,20):'오류')+'</span>'; }
+      if(btn){
+        btn.disabled=false;
+        btn.onclick=function(){requestUnlockOption(opt);};
+        btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+errMsg.substring(0,30)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
+      }
     }
   }catch(e){
+    console.error('Unlock Option '+opt+' catch:', e.message);
     earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-    if(btn){ btn.disabled=false; btn.innerHTML='⚠️ 연결 오류<br><span style="font-size:9px;color:var(--red);">다시 시도</span>'; }
+    if(btn){
+      btn.disabled=false;
+      btn.onclick=function(){requestUnlockOption(opt);};
+      btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+e.message.substring(0,30)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
+    }
   }
 }
 
