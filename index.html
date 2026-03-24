@@ -2089,12 +2089,8 @@ function addMsgFull(text){
   div.innerHTML='<div class="msg-bubble">'+rendered
     +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
     +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
-    +(lang==='ko'?'✓ 내 여행에 저장 · 🪙 30코인 적립':'✓ Save to My Trip · Earn 🪙 30 coins')+'</button>'
-    +'<button style="width:100%;padding:9px;background:transparent;border:1px solid rgba(196,175,135,.4);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-top:6px;" onclick="setMode(\'full\')">'
-    +(lang==='ko'?'🌕 맞춤 플래닝으로 업그레이드 · 식당명+루트+할인타이밍 제공 · 10🪙':'🌕 Upgrade to Custom Planning · Get restaurants+routes+deals · 10🪙')+'</button>'
-    +'<div style="font-size:9px;color:var(--ok);text-align:center;margin-top:6px;">+🪙 5'+(lang==='ko'?' 코인 적립완료':' coins earned')+'</div>'
+    +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
     +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
-  area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 async function saveToTrip(){
   addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
@@ -2784,16 +2780,25 @@ function setTripsTab(tab){
 }
 function renderHalfTripsList(){
   var el=document.getElementById('halfTripsList');if(!el)return;
-  if(halfTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙':'No saved trips yet.<br>Start AI Planning from Home 🌙')+'</div>';return;}
-  el.innerHTML=halfTrips.map(function(t,i){
-    return '<div class="trip-record-card" onclick="showHalfDetail('+i+')">'
+  if(halfTrips.length===0){
+    el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'
+      +(lang==='ko'?'아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙':'No saved trips yet.<br>Start AI Planning from Home 🌙')
+      +'</div>';
+    return;
+  }
+  var html='';
+  for(var i=0;i<halfTrips.length;i++){
+    var t=halfTrips[i];
+    var btnLabel=lang==='ko'?'← 홈으로':'← Home';
+    html+='<div class="trip-record-card" onclick="showHalfDetail('+i+')">'
       +'<div class="trc-head"><div class="trc-dest">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
       +'<div class="trc-sub">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</div>'
       +(t.B?'<div class="trc-row"><span>✈️ '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>🏨 '+(t.B.hotel||'-')+'</span></div>':'')
-      +(t.B&&t.B.price?'<div class="trc-total"><span>예상 총액</span><span>'+formatWon(t.B.price)+'</span></div>':'')
-      +'<button onclick="event.stopPropagation();startUpgradeFromTrip('+i+')" class="upg-btn-small">🌕 맞춤 플래닝으로 업그레이드 · 10🪙</button>'
+      +(t.B&&t.B.price?'<div class="trc-total"><span>'+(lang==='ko'?'예상 총액':'Est. Total')+'</span><span>'+formatWon(t.B.price)+'</span></div>':'')
+      +'<button onclick="event.stopPropagation();goPage(\'home\')" class="upg-btn-small" style="border-color:rgba(91,143,255,.3);color:var(--ac);">'+btnLabel+'</button>'
       +'</div>';
-  }).join('');
+  }
+  el.innerHTML=html;
 }
 function renderFullTripsList(){
   var el=document.getElementById('fullTripsList');if(!el)return;
@@ -3058,7 +3063,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 
   try{
     var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.0-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2500,temperature:0.7}})});
+      body:JSON.stringify({model:'gemini-1.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2500,temperature:0.7}})});
     if(r.ok){
       var data=await r.json();
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
