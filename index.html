@@ -2935,7 +2935,9 @@ var _unlockedOptions={}; // {tripIdx: {A:true, B:false, C:false}}
 
 function requestUnlockOption(opt){
   var tripIdx=currentHalfTripIdx;
-  var t=halfTrips[tripIdx]; if(!t) return;
+  var t=halfTrips[tripIdx];
+  console.log('[Unlock] opt='+opt+' tripIdx='+tripIdx+' t='+!!t+' coins='+coins+' cost='+UNLOCK_COIN_COST);
+  if(!t){console.error('[Unlock] halfTrips['+tripIdx+'] 없음. halfTrips.length='+halfTrips.length);return;}
 
   // 이미 해제됐으면 바로 표시
   if(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt]){
@@ -3086,7 +3088,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       if(btn){
         btn.disabled=false;
         btn.onclick=function(){requestUnlockOption(opt);};
-        btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+errMsg.substring(0,30)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
+        btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+errMsg.substring(0,50)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
       }
     }
   }catch(e){
