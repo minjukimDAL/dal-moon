@@ -655,29 +655,54 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div style="font-size:11px;color:var(--gold)"><span data-ko="🌕 맞춤 플래닝 새로 시작 · 10🪙" data-en="🌕 Start Custom Planning · 10🪙">🌕 맞춤 플래닝 새로 시작 · 10🪙</span></div>
       </div>
     </div>
-    <div id="halfTripDetail" style="display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div id="halfTripDetail" style="display:none;">
+      <!-- 헤더 -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="closeHalfDetail()" style="background:transparent;border:none;color:var(--m);font-size:20px;cursor:pointer;padding:0;">←</button>
         <div style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);padding:3px 10px;border-radius:10px;">AI 플래닝</div>
       </div>
-      <div class="option-tabs">
-        <div class="opt-tab" id="optA" onclick="selectOption('A')"><div style="font-size:8px;color:var(--gold);margin-bottom:2px;">OPTION A</div><div id="t-optA-name">풀 프리미엄</div><div id="t-optA-price" style="font-size:11px;margin-top:2px;">₩14.2M</div></div>
-        <div class="opt-tab sel-b" id="optB" onclick="selectOption('B')"><div style="font-size:8px;color:var(--ac);margin-bottom:2px;">OPTION B ⭐</div><div id="t-optB-name">스마트 추천</div><div id="t-optB-price" style="font-size:11px;margin-top:2px;">₩8.3M</div></div>
-        <div class="opt-tab" id="optC" onclick="selectOption('C')"><div style="font-size:8px;color:var(--ok);margin-bottom:2px;">OPTION C</div><div id="t-optC-name">가성비</div><div id="t-optC-price" style="font-size:11px;margin-top:2px;">₩5.9M</div></div>
+
+      <!-- 여행 제목/날짜 (숨겨진 opt탭 ID 유지) -->
+      <div id="optA" style="display:none;"></div>
+      <div id="optB" style="display:none;"></div>
+      <div id="optC" style="display:none;"></div>
+      <div id="t-optA-name" style="display:none;"></div>
+      <div id="t-optB-name" style="display:none;"></div>
+      <div id="t-optC-name" style="display:none;"></div>
+      <div id="t-optA-price" style="display:none;"></div>
+      <div id="t-optB-price" style="display:none;"></div>
+      <div id="t-optC-price" style="display:none;"></div>
+      <div style="margin-bottom:14px;">
+        <div class="tc-route" id="tripRoute" style="font-size:16px;font-weight:500;margin-bottom:4px;">ICN → SIN</div>
+        <div style="font-size:10px;color:var(--m);" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
       </div>
-      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
-        <div class="tc-route" id="tripRoute">ICN → SIN</div>
-        <div style="font-size:10px;color:var(--m);margin-bottom:10px;" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
-        <div id="treeBreakdown"></div>
+
+      <!-- 잠금 해제 버튼 (상단) -->
+      <div id="optionUnlockArea" style="margin-bottom:14px;background:rgba(196,175,135,.04);border:1px solid rgba(196,175,135,.15);border-radius:4px;padding:12px;">
+        <div style="font-size:10px;color:var(--gold);margin-bottom:6px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
+        <div id="unlockNotice" style="font-size:9px;color:var(--m);text-align:center;margin-bottom:8px;padding:4px 8px;background:rgba(91,143,255,.04);border-radius:4px;line-height:1.6;display:none;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <button id="unlockBtnA" onclick="requestUnlockOption('A')" style="padding:10px 4px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option A<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+          <button id="unlockBtnB" onclick="requestUnlockOption('B')" style="padding:10px 4px;background:rgba(91,143,255,.1);border:1px solid rgba(91,143,255,.3);border-radius:4px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option B<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+          <button id="unlockBtnC" onclick="requestUnlockOption('C')" style="padding:10px 4px;background:rgba(0,200,100,.06);border:1px solid rgba(0,200,100,.2);border-radius:4px;font-size:10px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option C<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
+        </div>
+        <div style="font-size:9px;color:var(--m);text-align:center;margin-top:6px;" id="t-unlock-desc">식당명 · 시간대별 동선 · 카드할인 확정 제공</div>
       </div>
+
+      <!-- 상세 내역 (전체 표시, 잘림 없음) -->
+      <div id="treeBreakdown" style="margin-bottom:14px;font-size:11px;color:var(--m);line-height:1.9;"></div>
+
+      <!-- 최저가 링크 -->
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
-        <div class="sec-label" style="margin-bottom:8px;">🔗 최저가 바로가기</div>
+        <div class="sec-label" style="margin-bottom:8px;" id="t-cheapest">🔗 최저가 바로가기</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
           <button onclick="openLink('https://flight.naver.com')" class="link-btn" style="padding:8px 4px;">✈️ 네이버항공</button>
           <button onclick="openLink('https://www.agoda.com')" class="link-btn" style="padding:8px 4px;">🏨 아고다</button>
           <button onclick="openLink('https://www.klook.com')" class="link-btn" style="padding:8px 4px;">🎫 클룩</button>
         </div>
       </div>
+
+      <!-- 적용 할인 -->
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <div class="sec-label" style="margin-bottom:0;" id="t-discounts">적용 할인</div>
@@ -685,22 +710,14 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
         <div id="discountToggles"></div>
       </div>
+
+      <!-- 최종 금액 -->
       <div class="final-price-box">
         <div class="final-label" id="t-final-label">최종 결제 금액</div>
-        <div class="final-price" id="finalPrice">₩7,627,040</div>
-        <div class="final-earn" id="finalEarn">+🪙 221코인 적립 예정</div>
+        <div class="final-price" id="finalPrice">₩0</div>
+        <div class="final-earn" id="finalEarn">+🪙 0코인 적립 예정</div>
       </div>
-      <div id="optionUnlockArea" style="margin-top:12px;background:rgba(196,175,135,.04);border:1px solid rgba(196,175,135,.15);border-radius:4px;padding:12px;">
-        <div style="font-size:10px;color:var(--gold);margin-bottom:6px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
-        <div id="unlockNotice" style="font-size:9px;color:var(--m);text-align:center;margin-bottom:8px;padding:4px 8px;background:rgba(91,143,255,.04);border-radius:4px;line-height:1.6;"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-          <button id="unlockBtnA" onclick="requestUnlockOption('A')" style="padding:8px 4px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option A<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-          <button id="unlockBtnB" onclick="requestUnlockOption('B')" style="padding:8px 4px;background:rgba(91,143,255,.1);border:1px solid rgba(91,143,255,.3);border-radius:4px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option B<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-          <button id="unlockBtnC" onclick="requestUnlockOption('C')" style="padding:8px 4px;background:rgba(0,200,100,.06);border:1px solid rgba(0,200,100,.2);border-radius:4px;font-size:10px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option C<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-        </div>
-        <div style="font-size:9px;color:var(--m);text-align:center;margin-top:6px;" id="t-unlock-desc">식당명 · 시간대별 동선 · 카드할인 확정 제공</div>
-      </div>
-      <button class="action-btn btn-dim" onclick="openShareModal()" id="t-share-btn">✉️ 플랜 공유하기</button>
+      <button class="action-btn btn-dim" onclick="openShareModal()" id="t-share-btn" style="margin-bottom:30px;">✉️ 플랜 공유하기</button>
     </div>
     <div id="fullTripDetail" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -2914,12 +2931,12 @@ function showHalfDetail(idx){
     var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=data?formatWon(emptyOpt.price):(lang==='ko'?'저장된 가격 없음':'No price data');
   });
 
-  // 3. JSON 데이터 없으면 AI 텍스트 + 맞춤 플래닝 유도
+  // 3. JSON 데이터 없으면 AI 텍스트 전체 표시
   if(!hasData && t.text){
     var tb=document.getElementById('treeBreakdown');
     if(tb){
-      var rendered=t.text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);font-size:12px;">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-      tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:35vh;overflow-y:auto;padding:4px 0;">'+rendered+'</div>'
+      var rendered=t.text.replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">').replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:8px;">$1</strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>'
         +'<div style="margin-top:12px;padding:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">'
         +'<div style="font-size:10px;color:var(--gold);margin-bottom:6px;">'+(lang==='ko'?'🌕 맞춤 플래닝으로 업그레이드하면:':'🌕 Upgrade to Custom Planning for:')+'</div>'
         +'<div style="font-size:10px;color:var(--m);line-height:1.7;">'+(lang==='ko'?'✓ Option A/B/C 상세 가격 비교<br>✓ 식당명 + 예약 링크<br>✓ 시간대별 동선 + 카드 할인 확정':'✓ Detailed A/B/C price comparison<br>✓ Restaurant names + booking links<br>✓ Hourly itinerary + card discounts')+'</div>'
@@ -3175,26 +3192,17 @@ function showUnlockedDetail(opt, tripIdx){
   var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
   if(!text) return;
   var rendered=text
-    .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">')
-    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;">$1</strong>')
+    .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:10px 0;">')
+    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:12px;">$1</strong>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--m)">· </span>$1')
     .replace(/\n/g,'<br>');
-  // treeBreakdown 영역에 표시
   var tb=document.getElementById('treeBreakdown');
   if(tb){
-    tb.innerHTML='<div style="padding:4px 0;">'
-      +'<div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:8px;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
-      +'<div style="font-size:11px;color:var(--m);line-height:1.9;overflow-y:auto;">'+rendered+'</div>'
-      +'</div>';
+    tb.innerHTML='<div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:12px;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
+      +'<div>'+rendered+'</div>';
   }
-  // selectOption 대신 탭 스타일만 업데이트 (renderTreeBreakdown 호출 방지)
   selectedOpt=opt;
-  ['A','B','C'].forEach(function(o){
-    var el=document.getElementById('opt'+o);if(!el)return;
-    el.className='opt-tab'+(o===opt?' sel-'+(o==='A'?'a':o==='B'?'b':'c'):'');
-  });
-  // 상단 옵션 탭 이름도 업데이트
   var t=halfTrips[tripIdx];
   if(t){
     var optData=t[opt];
