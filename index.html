@@ -3155,17 +3155,17 @@ function showUnlockedDetail(opt, tripIdx){
   var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
   if(!text) return;
   var rendered=text
+    .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">')
     .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;">$1</strong>')
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
     .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--m)">· </span>$1')
     .replace(/\n/g,'<br>');
-
   // treeBreakdown 영역에 표시
   var tb=document.getElementById('treeBreakdown');
   if(tb){
     tb.innerHTML='<div style="padding:4px 0;">'
       +'<div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);padding:3px 8px;border-radius:10px;display:inline-block;margin-bottom:8px;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
-      +'<div style="font-size:11px;color:var(--m);line-height:1.9;max-height:40vh;overflow-y:auto;">'+rendered+'</div>'
+      +'<div style="font-size:11px;color:var(--m);line-height:1.9;overflow-y:auto;">'+rendered+'</div>'
       +'</div>';
   }
   // selectOption 대신 탭 스타일만 업데이트 (renderTreeBreakdown 호출 방지)
