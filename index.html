@@ -2098,6 +2098,7 @@ function addMsgFull(text){
     +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
     +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
     +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
+  area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 async function saveToTrip(){
   if(!requireLogin(function(){ saveToTrip(); })) return;
