@@ -637,7 +637,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- PAGE: TRIPS — R2-7 폴더트리, R2-8 할인토글, R2-9 공유 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-trips" class="page">
-  <div class="page-wrap">
+  <div class="page-wrap" style="height:100%;display:flex;flex-direction:column;">
     <div style="margin-bottom:14px;">
       <div style="font-size:11px;font-weight:500;color:var(--ac);padding:4px 0;">🌙 <span id='t-tripsTabHalf'>플래닝 기록</span></div>
     </div>
@@ -655,7 +655,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div style="font-size:11px;color:var(--gold)"><span data-ko="🌕 맞춤 플래닝 새로 시작 · 10🪙" data-en="🌕 Start Custom Planning · 10🪙">🌕 맞춤 플래닝 새로 시작 · 10🪙</span></div>
       </div>
     </div>
-    <div id="halfTripDetail" style="display:none;">
+    <div id="halfTripDetail" style="display:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="closeHalfDetail()" style="background:transparent;border:none;color:var(--m);font-size:20px;cursor:pointer;padding:0;">←</button>
         <div style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);padding:3px 10px;border-radius:10px;">AI 플래닝</div>
@@ -668,7 +668,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
         <div class="tc-route" id="tripRoute">ICN → SIN</div>
         <div style="font-size:10px;color:var(--m);margin-bottom:10px;" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
-        <div id="treeBreakdown" style="max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+        <div id="treeBreakdown"></div>
       </div>
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
         <div class="sec-label" style="margin-bottom:8px;">🔗 최저가 바로가기</div>
