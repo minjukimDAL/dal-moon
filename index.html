@@ -2014,6 +2014,8 @@ async function sendMsg(){
   addMsg('user',text); input.value='';
   usage.count++;
   updateLimitBar();
+  // 새 검색 시작 시 이전 데이터 초기화
+  window._lastTripText=null; window._lastTripJson=null; window._lastTripQuery=null;
   var thinkId='tk'+Date.now();
   addDalMsg('<span style="color:var(--m)">Gemini 2.5 Flash ✨</span>',thinkId);
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
@@ -2059,9 +2061,12 @@ async function sendMsg(){
       var routeMatch=displayText.match(/ICN[→\-][^\s,，。]+/);
       var nightMatch=displayText.match(/(\d+)박/);
       var paxMatch=displayText.match(/(\d+)인/);
-      if(routeMatch||nightMatch||paxMatch){
+      // 목적지 추출 개선 — 입력 text에서 직접 추출
+      var destFromText=text.replace(/[\d]박.*$/,'').replace(/Option.*$/,'').replace(/플랜.*$/,'').trim();
+      destFromText=destFromText.substring(0,30);
+      if(routeMatch||nightMatch||paxMatch||destFromText){
         parsedJson={
-          route:routeMatch?routeMatch[0]:(text.split(' ')[0]||'여행'),
+          route:routeMatch?routeMatch[0]:(destFromText||text.split(' ')[0]||'여행'),
           dates:new Date().toLocaleDateString('ko-KR'),
           nights:nightMatch?parseInt(nightMatch[1]):null,
           pax:paxMatch?parseInt(paxMatch[1]):null,
@@ -2135,17 +2140,29 @@ async function saveToTrip(){
     addDalMsg(lang==='ko'?'✅ 저장됐습니다. (상세 내역은 플래닝 기록에서 확인하세요)':'✅ Saved. (View details in Planning History)');
   }
   // halfTrips 배열에 저장
-  halfTrips.unshift({
-    route:(j&&j.route)||window._lastTripQuery||'여행',
-    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-    nights:(j&&j.nights)||null,
-    pax:(j&&j.pax)||null,
-    A:(j&&j.A)||null,
-    B:(j&&j.B)||null,
-    C:(j&&j.C)||null,
-    text:window._lastTripText||''
+  var newRoute=(j&&j.route)||window._lastTripQuery||'여행';
+  var newText=window._lastTripText||'';
+  // 중복 저장 방지 — 같은 route + text 앞 50자가 같으면 저장 안 함
+  var isDup=halfTrips.some(function(t){
+    return t.route===newRoute && (t.text||'').substring(0,50)===(newText).substring(0,50);
   });
-  renderHalfTripsList();
+  if(isDup){
+    addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
+    setTimeout(function(){goPage('trips');},800);
+  } else {
+    halfTrips.unshift({
+      route:newRoute,
+      dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
+      nights:(j&&j.nights)||null,
+      pax:(j&&j.pax)||null,
+      A:(j&&j.A)||null,
+      B:(j&&j.B)||null,
+      C:(j&&j.C)||null,
+      text:newText,
+      id:Date.now()
+    });
+    renderHalfTripsList();
+  }
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
 }
@@ -2821,16 +2838,37 @@ function renderHalfTripsList(){
   for(var i=0;i<halfTrips.length;i++){
     var t=halfTrips[i];
     var btnLabel=lang==='ko'?'← 홈으로':'← Home';
-    html+='<div class="trip-record-card" onclick="showHalfDetail('+i+')">'
-      +'<div class="trc-head"><div class="trc-dest">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
+    html+='<div class="trip-record-card" onclick="showHalfDetail('+i+')" style="position:relative;">'
+      +'<button onclick="event.stopPropagation();deleteTripConfirm('+i+')" style="position:absolute;top:8px;right:8px;background:transparent;border:none;font-size:13px;color:var(--m);cursor:pointer;padding:2px 4px;" title="삭제">🗑</button>'
+      +'<div class="trc-head"><div class="trc-dest" style="max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
       +'<div class="trc-sub">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</div>'
-      +(t.B?'<div class="trc-row"><span>✈️ '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>🏨 '+(t.B.hotel||'-')+'</span></div>':'')
+      +(t.B?'<div class="trc-row"><span>\u2708\ufe0f '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>\ud83c\udfe8 '+(t.B.hotel||'-')+'</span></div>':'')
       +(t.B&&t.B.price?'<div class="trc-total"><span>'+(lang==='ko'?'예상 총액':'Est. Total')+'</span><span>'+formatWon(t.B.price)+'</span></div>':'')
       +'<button onclick="event.stopPropagation();goPage(\'home\')" class="upg-btn-small" style="border-color:rgba(91,143,255,.3);color:var(--ac);">'+btnLabel+'</button>'
       +'</div>';
   }
   el.innerHTML=html;
 }
+function deleteTripConfirm(idx){
+  var t=halfTrips[idx]; if(!t) return;
+  var msg=lang==='ko'?'"'+(t.route||'여행')+'" 여행을 삭제하겠습니까?':'Delete "' +(t.route||'trip')+'"?';
+  if(confirm(msg)){
+    halfTrips.splice(idx,1);
+    // 해당 idx의 unlocked 데이터도 삭제
+    delete _unlockedOptions[idx];
+    // idx 재정렬
+    var newUnlocked={};
+    Object.keys(_unlockedOptions).forEach(function(k){
+      var ki=parseInt(k);
+      if(ki<idx) newUnlocked[ki]=_unlockedOptions[k];
+      else if(ki>idx) newUnlocked[ki-1]=_unlockedOptions[k];
+    });
+    _unlockedOptions=newUnlocked;
+    renderHalfTripsList();
+  }
+}
+window.deleteTripConfirm=deleteTripConfirm;
+
 function renderFullTripsList(){
   var el=document.getElementById('fullTripsList');if(!el)return;
   if(fullTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 맞춤 플래닝 결과가 없어요.<br>홈 🌕 맞춤 플래닝 탭에서 시작하거나<br>AI 플래닝 기록에서 업그레이드하세요':'No custom planning yet.<br>Start from 🌕 Custom Planning tab<br>or upgrade from AI Planning history')+'</div>';return;}
