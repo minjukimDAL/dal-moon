@@ -665,10 +665,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div class="opt-tab sel-b" id="optB" onclick="selectOption('B')"><div style="font-size:8px;color:var(--ac);margin-bottom:2px;">OPTION B ⭐</div><div id="t-optB-name">스마트 추천</div><div id="t-optB-price" style="font-size:11px;margin-top:2px;">₩8.3M</div></div>
         <div class="opt-tab" id="optC" onclick="selectOption('C')"><div style="font-size:8px;color:var(--ok);margin-bottom:2px;">OPTION C</div><div id="t-optC-name">가성비</div><div id="t-optC-price" style="font-size:11px;margin-top:2px;">₩5.9M</div></div>
       </div>
-      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;overflow-y:auto;max-height:60vh;">
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
         <div class="tc-route" id="tripRoute">ICN → SIN</div>
         <div style="font-size:10px;color:var(--m);margin-bottom:10px;" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
-        <div id="treeBreakdown"></div>
+        <div id="treeBreakdown" style="max-height:50vh;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
       </div>
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
         <div class="sec-label" style="margin-bottom:8px;">🔗 최저가 바로가기</div>
@@ -3042,29 +3042,11 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
   var optName=(t[opt]&&t[opt].name)||('Option '+opt);
   // 원본에서 해당 옵션 부분만 추출 (전체 전달 시 입력 토큰 낭비)
   var fullText=t.text||'';
-  var optKeywords=['Option '+opt, 'OPTION '+opt, opt+'. ', opt+'번'];
-  var optStart=-1;
-  optKeywords.forEach(function(k){ if(optStart<0) optStart=fullText.indexOf(k); });
-  // 다음 옵션 시작점 찾기
-  var nextOpt = opt==='A'?'B':opt==='B'?'C':null;
-  var optEnd=fullText.length;
-  if(nextOpt){
-    var nextKeywords=['Option '+nextOpt,'OPTION '+nextOpt];
-    nextKeywords.forEach(function(k){ var i=fullText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
-  }
-  var originalText = optStart>=0
-    ? fullText.substring(optStart, Math.min(optEnd, optStart+500))
-    : fullText.substring(0,500);
-
-  // 원본 유무에 따라 프롬프트 분기
-  var hasOriginal = originalText.length > 50;
-  var contextPart = hasOriginal
-    ? (lang==='ko'
-        ? '아래는 이 여행의 AI 플랜 원문 (Option '+opt+' 부분):\n---\n'+originalText+'\n---\n\n위 원문을 기반으로 더 상세하게 확장해줘.\n'
-        : 'Below is the original AI plan (Option '+opt+' section):\n---\n'+originalText+'\n---\n\nExpand on this with more detail.\n')
-    : (lang==='ko'
-        ? '여행: '+t.route+' '+(t.nights||'?')+'박 '+(t.pax||'?')+'인\nOption '+opt+' ('+(opt==='A'?'프리미엄':opt==='B'?'스마트 추천':'가성비')+') 상세 플랜을 새로 작성해줘.\n'
-        : 'Trip: '+t.route+' '+(t.nights||'?')+' nights '+(t.pax||'?')+' pax\nCreate a fresh detailed Option '+opt+' ('+(opt==='A'?'Premium':opt==='B'?'Smart Pick':'Value')+') plan.\n');
+  // 원본 텍스트 없이 명확한 프롬프트만 사용 (원본 추출 시 다른 옵션 혼입 방지)
+  var optLabel = opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
+  var contextPart = lang==='ko'
+    ? '여행: '+t.route+' '+(t.nights||'?')+'박 '+(t.pax||'?')+'인\n'      +'반드시 [Option '+opt+' - '+optLabel+'] 에 대해서만 답변해줘. 다른 옵션(A/B/C) 내용 절대 포함 금지.\n'
+    : 'Trip: '+t.route+' '+(t.nights||'?')+' nights '+(t.pax||'?')+' pax\n'      +'Answer ONLY about [Option '+opt+' - '+optLabel+']. Do NOT include other options.\n';
 
   var nights = parseInt(t.nights)||5;
   var isLong = nights >= 7;
