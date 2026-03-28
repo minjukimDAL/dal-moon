@@ -2096,8 +2096,8 @@ async function sendMsg(){
   // text 변수 직접 사용 (input.value는 이미 초기화됨)
   userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+text+'\n';
   var sysPrompt=lang==='ko'
-    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급\n   - 숙소: 호텔명 + 등급 + 위치\n   - Day별 일정 키워드\n3. 금액 대신 할인 인사이트:\n   - 출발 요일별 가격 차이\n   - 얼리버드/막판할인 시점\n   - 카드 혜택 (카드사명 명시)\n4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
-    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n1. Immediate recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class\n   - Hotel: name + stars + location\n   - Day-by-day outline keywords\n3. Discount insights (no fixed prices):\n   - Best departure days\n   - Early bird timing\n   - Card benefits\n4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
+    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우: 해당 기간 전체 여행 플랜을 주별로 요약해줘. (예: 2주 여행 = 1주차 요약 + 2주차 요약. 절대 1주/7일짜리로 축소하지 말 것)\n'+'1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급\n   - 숙소: 호텔명 + 등급 + 위치\n   - 주별 일정 키워드 (각 주 핵심 테마+장소)\n3. 금액 대신 할인 인사이트:\n   - 출발 요일별 가격 차이\n   - 얼리버드/막판할인 시점\n   - 카드 혜택 (카드사명 명시)\n4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
+    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip": provide a full multi-week plan summarized by week. (e.g. 2-week trip = Week 1 summary + Week 2 summary. NEVER shrink to 1 week/7 days.)\n'+'1. Immediate recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class\n   - Hotel: name + stars + location\n   - Weekly itinerary keywords (key theme+places per week)\n3. Discount insights (no fixed prices):\n   - Best departure days\n   - Early bird timing\n   - Card benefits\n4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
@@ -3295,6 +3295,7 @@ function showUnlockedDetail(opt, tripIdx){
     +'<div style="font-size:9px;color:'+optColor+';background:rgba(196,175,135,.06);padding:3px 10px;border-radius:10px;border:1px solid '+optColor+'40;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
     +'<button onclick="shareOptionPlan(\''+opt+'\')" style="font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--m);cursor:pointer;">📤 '+shareLabel+'</button>'
     +'</div>'
+    +'<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>';
 
   if(existing){
     area.replaceChild(block, existing);
@@ -3582,7 +3583,7 @@ function updatePlanInput(){
   if(_nightsMode==='weeks'){
     var wks=(document.getElementById('planWeeks')||{value:'1'}).value||'1';
     nts=parseInt(wks)*7;
-    durationLabel=wks+(lang==='ko'?'주':'wk');
+    durationLabel=wks+(lang==='ko'?'주 여행':' week trip');  // "2주 여행" 명확히
   } else {
     nts=(document.getElementById('planNights')||{value:'5'}).value||'5';
     durationLabel=nts+(lang==='ko'?'박':' nights');
