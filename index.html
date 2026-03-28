@@ -637,7 +637,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- PAGE: TRIPS — R2-7 폴더트리, R2-8 할인토글, R2-9 공유 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-trips" class="page">
-  <div class="page-wrap" style="height:100%;display:flex;flex-direction:column;">
+  <!-- 목록 영역 -->
+  <div id="tripsListWrap" class="page-wrap">
     <div style="margin-bottom:14px;">
       <div style="font-size:11px;font-weight:500;color:var(--ac);padding:4px 0;">🌙 <span id='t-tripsTabHalf'>플래닝 기록</span></div>
     </div>
@@ -655,7 +656,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div style="font-size:11px;color:var(--gold)"><span data-ko="🌕 맞춤 플래닝 새로 시작 · 10🪙" data-en="🌕 Start Custom Planning · 10🪙">🌕 맞춤 플래닝 새로 시작 · 10🪙</span></div>
       </div>
     </div>
-    <div id="halfTripDetail" style="display:none;">
+  </div>
+  <!-- 상세 영역 (page-wrap 밖, page 직속으로 스크롤) -->
+  <div id="halfTripDetail" style="display:none;padding:20px 18px 40px;">
       <!-- 헤더 -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="closeHalfDetail()" style="background:transparent;border:none;color:var(--m);font-size:20px;cursor:pointer;padding:0;">←</button>
@@ -714,7 +717,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div id="finalEarn" style="display:none;"></div>
       <div id="t-final-label" style="display:none;"></div>
 
-      <button class="action-btn btn-dim" onclick="openShareModal()" id="t-share-btn" style="margin-bottom:30px;">✉️ 플랜 공유하기</button>
+
     </div>
     <div id="fullTripDetail" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -2901,7 +2904,8 @@ function renderFullTripsList(){
 function showHalfDetail(idx){
   currentHalfTripIdx=idx;
   var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');
-  if(th)th.style.display='none';if(hd)hd.style.display='block';
+  var listWrap=document.getElementById('tripsListWrap');
+  if(listWrap)listWrap.style.display='none'; if(hd)hd.style.display='block';
   var t=halfTrips[idx];if(!t)return;
 
   // 1. 경로/날짜 표시
@@ -2984,7 +2988,7 @@ function showHalfDetail(idx){
     }
   });
 }
-function closeHalfDetail(){var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');if(hd)hd.style.display='none';if(th)th.style.display='block';}
+function closeHalfDetail(){var hd=document.getElementById('halfTripDetail');var listWrap=document.getElementById('tripsListWrap');if(hd)hd.style.display='none';if(listWrap)listWrap.style.display='block';renderHalfTripsList();}
 function showFullDetail(idx){
   var t=fullTrips[idx],tf=document.getElementById('tripsFull'),fd=document.getElementById('fullTripDetail');
   if(tf)tf.style.display='none';if(fd)fd.style.display='block';
