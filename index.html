@@ -636,7 +636,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- PAGE: TRIPS — R2-7 폴더트리, R2-8 할인토글, R2-9 공유 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div id="page-trips" class="page">
+<div id="page-trips" class="page" style="touch-action:pan-y;">
   <!-- 목록 영역 -->
   <div id="tripsListWrap" class="page-wrap">
     <div style="margin-bottom:14px;">
@@ -2905,7 +2905,13 @@ function showHalfDetail(idx){
   currentHalfTripIdx=idx;
   var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');
   var listWrap=document.getElementById('tripsListWrap');
-  if(listWrap)listWrap.style.display='none'; if(hd)hd.style.display='block';
+  if(listWrap)listWrap.style.display='none';
+  if(hd){
+    hd.style.display='block';
+    // 페이지 스크롤 최상단으로 리셋
+    var pageEl=document.getElementById('page-trips');
+    if(pageEl) pageEl.scrollTop=0;
+  }
   var t=halfTrips[idx];if(!t)return;
 
   // 1. 경로/날짜 표시
@@ -3001,7 +3007,7 @@ function showFullDetail(idx){
     var linkLabel=lang==='ko'?'🔗 최저가 바로가기 (목적지 자동 검색)':'🔗 Best Price Links (auto-search)';
     return '<div style="font-size:14px;color:var(--sb);font-weight:500;margin-bottom:4px;">'+(t.route||'여행')+'</div>'
       +'<div style="font-size:10px;color:var(--m);margin-bottom:12px;">'+(t.dates||'')+'</div>'
-      +(rendered?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:14px;margin-bottom:10px;font-size:11px;color:var(--m);line-height:2;overflow-y:auto;max-height:55vh;">'+rendered+'</div>':'')
+      +(rendered?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:14px;margin-bottom:10px;font-size:11px;color:var(--m);line-height:2;">'+rendered+'</div>':'')
       +(ins?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;">'+ins+'</div>':'')
       +'<div style="font-size:9px;color:var(--m);margin-bottom:6px;">'+linkLabel+'</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
@@ -3223,7 +3229,7 @@ function showUnlockedDetail(opt, tripIdx){
   var optColor=opt==='A'?'var(--gold)':opt==='B'?'var(--ac)':'var(--ok)';
   var block=document.createElement('div');
   block.id='unlockBlock'+opt;
-  block.style.cssText='margin-bottom:20px;padding:14px;background:var(--s1);border:1px solid var(--b1);border-radius:4px;';
+  block.style.cssText='margin-bottom:20px;padding:14px;background:var(--s1);border:1px solid var(--b1);border-radius:4px;width:100%;box-sizing:border-box;';
   block.innerHTML='<div style="font-size:9px;color:'+optColor+';background:rgba(196,175,135,.06);padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:12px;border:1px solid '+optColor+'40;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
     +'<div style="font-size:11px;color:var(--m);line-height:2;">'+rendered+'</div>';
 
