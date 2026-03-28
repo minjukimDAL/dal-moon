@@ -709,7 +709,17 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div id="t-discounts" style="display:none;"></div>
 
       <!-- 4. 상세 내역 영역 (잠금 해제 시 아래로 추가, 높이 제한 없음) -->
-      <div id="unlockedDetailsArea" style="margin-bottom:30px;"></div>
+      <div id="unlockedDetailsArea" style="margin-bottom:20px;"></div>
+
+      <!-- 공유 버튼 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:30px;" id="shareArea">
+        <button onclick="shareExternal()" style="padding:12px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">
+          📤 <span data-ko="외부 공유" data-en="Share">외부 공유</span>
+        </button>
+        <button onclick="shareToDalSocial()" style="padding:12px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">
+          🌙 <span data-ko="DAL 소셜 공유" data-en="Share to DAL">DAL 소셜</span>
+        </button>
+      </div>
 
       <!-- 숨겨진 호환 ID -->
       <div id="treeBreakdown" style="display:none;"></div>
@@ -2939,17 +2949,17 @@ function showHalfDetail(idx){
   });
 
   // 3. JSON 데이터 없으면 AI 텍스트 전체 표시
-  if(!hasData && t.text){
-    var tb=document.getElementById('treeBreakdown');
-    if(tb){
-      var rendered=t.text.replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">').replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:8px;">$1</strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-      tb.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>'
-        +'<div style="margin-top:12px;padding:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">'
-        +'<div style="font-size:10px;color:var(--gold);margin-bottom:6px;">'+(lang==='ko'?'🌕 맞춤 플래닝으로 업그레이드하면:':'🌕 Upgrade to Custom Planning for:')+'</div>'
-        +'<div style="font-size:10px;color:var(--m);line-height:1.7;">'+(lang==='ko'?'✓ Option A/B/C 상세 가격 비교<br>✓ 식당명 + 예약 링크<br>✓ 시간대별 동선 + 카드 할인 확정':'✓ Detailed A/B/C price comparison<br>✓ Restaurant names + booking links<br>✓ Hourly itinerary + card discounts')+'</div>'
-        +'<button onclick="setHomeTab(\'full\');goPage(\'home\')" style="margin-top:10px;width:100%;padding:10px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'
-        +(lang==='ko'?'🌕 맞춤 플래닝 시작 · 10🪙':'🌕 Start Custom Planning · 10🪙')+'</button>'
-        +'</div>';
+  // 원본 AI 텍스트를 unlockedDetailsArea에 미리보기 표시
+  if(t.text){
+    var uda2=document.getElementById('unlockedDetailsArea');
+    if(uda2&&uda2.innerHTML===''){
+      var preR=t.text
+        .replace(/\r\n/g,'\n').replace(/\n{3,}/g,'\n\n')
+        .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">')
+        .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;">$1</strong>')
+        .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--w);">$1</strong>')
+        .replace(/\n\n/g,'<br>').replace(/\n/g,'<br>');
+      uda2.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;padding-bottom:10px;">'+preR+'</div>';
     }
   }
 
@@ -3163,6 +3173,23 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
       var reply=parts.map(function(p){return p.text||'';}).join('').trim();
       if(reply){
+        // 응답 잘림 감지 — 마지막 문자가 완전한 문장 아니면 이어받기
+        var isIncomplete = reply.length > 100 && !reply.match(/[.。！!?？\n]\s*$/);
+        if(isIncomplete){
+          // 이어받기 호출
+          if(btn) btn.innerHTML='⏳ 이어받는 중...<br><span style="font-size:9px;color:var(--m);">잠시만요</span>';
+          try{
+            var continuePrompt = (lang==='ko'?'위 내용에 이어서 계속 작성해줘. 중복 없이 이어서만:':'Continue exactly from where you left off. No repetition, just continue:') + '\n' + reply.slice(-200);
+            var r2=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
+              body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:continuePrompt}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
+            if(r2.ok){
+              var d2=await r2.json();
+              var p2=(d2.candidates&&d2.candidates[0]&&d2.candidates[0].content&&d2.candidates[0].content.parts)||[];
+              var reply2=p2.map(function(p){return p.text||'';}).join('').trim();
+              if(reply2) reply=reply+'\n'+reply2;
+            }
+          }catch(e2){ console.warn('이어받기 실패:', e2); }
+        }
         // 결과 저장
         if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
         _unlockedOptions[tripIdx][opt]=reply;
@@ -3608,6 +3635,29 @@ window.doEmailLogin=doEmailLogin; window.doEmailSignup=doEmailSignup;
 window.setHomeTab=setHomeTab; window.selectStyleChip=selectStyleChip;
 window.toggleFullChip=toggleFullChip; window.toggleFullBudget=toggleFullBudget;
 window.startFullAnalysis=startFullAnalysis; window.saveFullTrip=saveFullTrip; window.backToFullInput=backToFullInput;
+window.shareExternal=async function(){
+  var t=halfTrips[currentHalfTripIdx];
+  if(!t) return;
+  var shareText=(lang==='ko'?'DAL🌙로 찾은 여행 플랜: ':'My travel plan via DAL🌙: ')+(t.route||'')+(t.nights?' · '+(t.nights)+(lang==='ko'?'박':'n'):'');
+  if(navigator.share){
+    try{ await navigator.share({title:'DAL 여행 플랜', text:shareText, url:'https://dal-moon.com'}); }
+    catch(e){}
+  } else {
+    navigator.clipboard&&navigator.clipboard.writeText(shareText+' https://dal-moon.com')
+      .then(function(){ alert(lang==='ko'?'링크가 복사되었습니다!':'Link copied!'); });
+  }
+};
+window.shareToDalSocial=function(){
+  var t=halfTrips[currentHalfTripIdx];
+  if(!t) return;
+  var msg=(lang==='ko'?'📍 '+(t.route||'여행')+' '+(t.nights||'')+'박 여행 플랜 공유! DAL AI로 만들었어요 🌙':'📍 Sharing my '+(t.nights||'')+'-night trip to '+(t.route||'')+' via DAL AI 🌙');
+  // 소셜 탭으로 이동하면서 게시글 미리 채우기
+  goPage('social');
+  setTimeout(function(){
+    var inp=document.getElementById('newPostInput');
+    if(inp){ inp.value=msg; inp.focus(); }
+  },300);
+};
 window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail;
 window.setTripsTab=setTripsTab; window.showHalfDetail=showHalfDetail; window.closeHalfDetail=closeHalfDetail;
 window.showFullDetail=showFullDetail; window.closeFullDetail=closeFullDetail;
