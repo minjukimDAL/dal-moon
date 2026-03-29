@@ -746,15 +746,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <!-- 4. 상세 내역 영역 (잠금 해제 시 아래로 추가, 높이 제한 없음) -->
       <div id="unlockedDetailsArea" style="margin-bottom:20px;"></div>
 
-      <!-- 공유 버튼 -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:30px;" id="shareArea">
-        <button onclick="shareExternal()" style="padding:12px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">
-          📤 <span data-ko="외부 공유" data-en="Share">외부 공유</span>
-        </button>
-        <button onclick="shareToDalSocial()" style="padding:12px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">
-          🌙 <span data-ko="DAL 소셜 공유" data-en="Share to DAL">DAL 소셜</span>
-        </button>
-      </div>
+      <!-- 공유 버튼 제거 (각 옵션 블록 내부로 통합) -->
 
       <!-- 숨겨진 호환 ID -->
       <div id="treeBreakdown" style="display:none;"></div>
@@ -2096,8 +2088,8 @@ async function sendMsg(){
   // text 변수 직접 사용 (input.value는 이미 초기화됨)
   userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+text+'\n';
   var sysPrompt=lang==='ko'
-    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우: 해당 기간 전체 여행 플랜을 주별로 요약해줘. (예: 2주 여행 = 1주차 요약 + 2주차 요약. 절대 1주/7일짜리로 축소하지 말 것)\n'+'1. 즉시 상세 추천. 추가질문 금지.\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공: 항공사명 + 직항여부 + 좌석등급\n   - 숙소: 호텔명 + 등급 + 위치\n   - 주별 일정 키워드 (각 주 핵심 테마+장소)\n3. 금액 대신 할인 인사이트:\n   - 출발 요일별 가격 차이\n   - 얼리버드/막판할인 시점\n   - 카드 혜택 (카드사명 명시)\n4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
-    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip": provide a full multi-week plan summarized by week. (e.g. 2-week trip = Week 1 summary + Week 2 summary. NEVER shrink to 1 week/7 days.)\n'+'1. Immediate recommendations, no follow-up questions.\n2. Compare Option A(Premium) B(Smart Pick) C(Value):\n   - Flight: airline + direct/stop + class\n   - Hotel: name + stars + location\n   - Weekly itinerary keywords (key theme+places per week)\n3. Discount insights (no fixed prices):\n   - Best departure days\n   - Early bird timing\n   - Card benefits\n4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
+    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우:\n'+'  - 절대 daily 일정을 주지 말 것. 반드시 주차별(Week 1, Week 2...) 요약만 제공.\n'+'  - 각 주차: 핵심 테마 + 추천 장소 3~4개 + 숙소 타입 + 이동 팁 (3~5줄)\n'+'  - 토큰 절약을 위해 간결하게. 전체 주차를 빠짐없이 완성할 것.\n'+'[일반] "X박 여행"인 경우: Day별 오전/오후/저녁 키워드로 간결하게.\n'+'1. 즉시 상세 추천. 추가질문 금지.\n'+'2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n'+'   - 항공: 항공사명 + 직항여부 + 좌석등급\n'+'   - 숙소: 호텔명 + 등급 + 위치\n'+'   - 박여행: Day별 키워드 / 주여행: Week별 핵심 테마+장소\n'+'3. 금액 대신 할인 인사이트:\n'+'   - 출발 요일별 가격 차이 / 얼리버드 시점 / 카드 혜택 (카드사명 명시)\n'+'4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
+    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip":\n'+'  - NEVER give daily schedules. Provide ONLY weekly summaries (Week 1, Week 2...).\n'+'  - Each week: core theme + 3-4 key places + accommodation type + transport tip (3-5 lines).\n'+'  - Be concise to fit all weeks. Complete ALL weeks without stopping.\n'+'[NORMAL] If "X nights": Day-by-day morning/afternoon/evening keywords, concise.\n'+'1. Immediate recommendations, no follow-up questions.\n'+'2. Compare Option A(Premium) B(Smart Pick) C(Value):\n'+'   - Flight: airline + direct/stop + class\n'+'   - Hotel: name + stars + location\n'+'   - Nights trip: daily keywords / Week trip: weekly theme+places\n'+'3. Discount insights (no fixed prices):\n'+'   - Best departure days / Early bird timing / Card benefits (card name)\n'+'4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
@@ -3031,8 +3023,8 @@ function showHalfDetail(idx){
       btn.style.background=o==='A'?'rgba(196,175,135,.2)':o==='B'?'rgba(91,143,255,.2)':'rgba(0,200,100,.15)';
       btn.innerHTML='✅ Option '+o+'<br><span style="font-size:9px;color:var(--m);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
       btn.onclick=(function(opt,tidx){return function(){showUnlockedDetail(opt,tidx);};})(o,idx);
-      // 이미 해제된 옵션 자동 표시
-      showUnlockedDetail(o, idx);
+      // showUnlockedOption 통해 표시 (중복 방지)
+      showUnlockedOption(o, idx);
     } else {
       btn.disabled=false;
       btn.style.background=o==='A'?'rgba(196,175,135,.1)':o==='B'?'rgba(91,143,255,.1)':'rgba(0,200,100,.06)';
@@ -3157,36 +3149,40 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
   var optName=(t[opt]&&t[opt].name)||('Option '+opt);
   // 원본에서 해당 옵션 부분만 추출 (전체 전달 시 입력 토큰 낭비)
   var fullText=t.text||'';
-  // 원본 텍스트 없이 명확한 프롬프트만 사용 (원본 추출 시 다른 옵션 혼입 방지)
   var optLabel = opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
-  var contextPart = lang==='ko'
-    ? '여행: '+t.route+' '+(t.nights||'?')+'박 '+(t.pax||'?')+'인\n'      +'반드시 [Option '+opt+' - '+optLabel+'] 에 대해서만 답변해줘. 다른 옵션(A/B/C) 내용 절대 포함 금지.\n'
-    : 'Trip: '+t.route+' '+(t.nights||'?')+' nights '+(t.pax||'?')+' pax\n'      +'Answer ONLY about [Option '+opt+' - '+optLabel+']. Do NOT include other options.\n';
-
   var nights = parseInt(t.nights)||5;
-  var isLong = nights >= 7;
+  var isWeekTrip = nights >= 7; // 7박 이상 = 주단위 여행
+  var weeks = Math.round(nights/7);
+
+  var contextPart = lang==='ko'
+    ? '여행: '+t.route+' '+(isWeekTrip ? weeks+'주 ('+nights+'박)' : nights+'박')+' '+(t.pax||'?')+'인\n'
+      +'반드시 [Option '+opt+' - '+optLabel+'] 에 대해서만 답변. 다른 옵션 금지.\n'
+    : 'Trip: '+t.route+' '+(isWeekTrip ? weeks+' weeks ('+nights+' nights)' : nights+' nights')+' '+(t.pax||'?')+' pax\n'
+      +'Answer ONLY about [Option '+opt+' - '+optLabel+']. No other options.\n';
 
   var detailPart = lang==='ko'
-    ? '한국어로. 아래 형식으로 작성. 반드시 끝까지 완성하고 마지막에 [완료] 표시:\n'
-      +'[첫 줄] '+opt+'번 옵션('+optLabel+') 총 예상 비용: XXX만원~XXX만원 (항공+숙소+식비+교통 합산)\n\n'
-      +(isLong
-        ? '1. 추천 식당 3곳 (이름+대표메뉴+가격대)\n'
-          +'2. Day 1~'+nights+' 핵심 동선 (하루 2~3줄)\n'
+    ? '한국어로. 반드시 끝까지 완성. 마지막에 [완료] 표시.\n'
+      +'[첫 줄] Option '+opt+'('+optLabel+') 총 예상 비용: XXX만원~XXX만원\n\n'
+      +(isWeekTrip
+        ? '※ 주단위 여행이므로 Week별 상세 daily 플랜 제공:\n'
+          +'각 Week마다: (Day 1~7 오전/오후/저녁 동선 + 숙소 + 추천 식당 1~2곳)\n'
+          +'Week 1부터 Week '+weeks+'까지 전부 완성.\n'
         : '1. 추천 식당 3곳 (이름+대표메뉴+가격대)\n'
           +'2. Day 1~'+nights+' 동선 (오전/오후/저녁)\n')
       +'3. 할인 인사이트: 출발요일 가격차이 / 얼리버드 타이밍 / 추천 카드 (카드사명+절약금액)\n'
-      +'4. 이 옵션('+opt+'번)만의 총 예상 비용 breakdown (항공/숙소/식비/교통/기타)\n'
-      +'마지막 줄에 반드시 [완료] 라고 표시'
-    : 'English. Follow this format. MUST finish completely and write [DONE] at the end:\n'
-      +'[First line] Option '+opt+' ('+optLabel+') estimated total: $XXX~$XXX (flight+hotel+food+transport)\n\n'
-      +(isLong
-        ? '1. 3 restaurants (name+dish+price)\n'
-          +'2. Day 1~'+nights+' key itinerary (2-3 lines per day)\n'
+      +'4. 총 예상 비용 breakdown (항공/숙소/식비/교통)\n'
+      +'[완료]'
+    : 'English. Complete everything. Write [DONE] at end.\n'
+      +'[First line] Option '+opt+'('+optLabel+') total: $XXX~$XXX\n\n'
+      +(isWeekTrip
+        ? '※ Week-based trip — provide detailed daily plan per week:\n'
+          +'Each week: Day 1-7 morning/afternoon/evening + hotel + 1-2 restaurants\n'
+          +'Complete all weeks from Week 1 to Week '+weeks+'.\n'
         : '1. 3 restaurants (name+dish+price)\n'
-          +'2. Day 1~'+nights+' itinerary (morning/afternoon/evening)\n')
-      +'3. Discount insights: best departure days / early bird timing / card benefits (card name+savings)\n'
-      +'4. Cost breakdown for Option '+opt+' only (flight/hotel/food/transport/other)\n'
-      +'Write [DONE] on the last line';
+          +'2. Day 1-'+nights+' itinerary (morning/afternoon/evening)\n')
+      +'3. Discount insights: departure days / early bird / card benefits (card+savings)\n'
+      +'4. Cost breakdown (flight/hotel/food/transport)\n'
+      +'[DONE]';
 
   var prompt = contextPart + detailPart;
 
@@ -3290,10 +3286,13 @@ function showUnlockedDetail(opt, tripIdx){
   var block=document.createElement('div');
   block.id='unlockBlock'+opt;
   block.style.cssText='margin-bottom:4px;padding:14px 0;width:100%;box-sizing:border-box;border-bottom:1px solid var(--b1);';
-  var shareLabel=lang==='ko'?'공유':'Share';
+  var dalLabel=lang==='ko'?'DAL':'DAL';
   block.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
     +'<div style="font-size:9px;color:'+optColor+';background:rgba(196,175,135,.06);padding:3px 10px;border-radius:10px;border:1px solid '+optColor+'40;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
-    +'<button onclick="shareOptionPlan(\''+opt+'\')" style="font-size:10px;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--m);cursor:pointer;">📤 '+shareLabel+'</button>'
+    +'<div style="display:flex;gap:5px;">'
+    +'<button onclick="shareOptionPlan(\''+opt+'\')" style="font-size:10px;padding:4px 8px;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--m);cursor:pointer;" title="외부 공유">📤</button>'
+    +'<button onclick="shareToDalSocialOpt(\''+opt+'\')" style="font-size:10px;padding:4px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.3);border-radius:10px;color:var(--gold);cursor:pointer;" title="DAL 소셜 공유">🌙</button>'
+    +'</div>'
     +'</div>'
     +'<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>';
 
@@ -3746,6 +3745,21 @@ window.shareExternal=async function(){
     navigator.clipboard&&navigator.clipboard.writeText(shareText+' https://dal-moon.com')
       .then(function(){ alert(lang==='ko'?'링크가 복사되었습니다!':'Link copied!'); });
   }
+};
+window.shareToDalSocialOpt=function(opt){
+  var t=halfTrips[currentHalfTripIdx];
+  if(!t) return;
+  var optLabel=opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
+  var detail=(_unlockedOptions[currentHalfTripIdx]&&_unlockedOptions[currentHalfTripIdx][opt])||'';
+  var preview=detail.replace(/<[^>]+>/g,'').substring(0,80);
+  var msg=(lang==='ko'
+    ?'📍 '+( t.route||'여행')+' Option '+opt+' ('+optLabel+') 공유!\n'+preview+'...\nDAL AI로 만든 플랜 🌙'
+    :'📍 '+( t.route||'trip')+' Option '+opt+' ('+optLabel+') shared!\n'+preview+'...\nMade with DAL AI 🌙');
+  goPage('social');
+  setTimeout(function(){
+    var inp=document.getElementById('newPostInput');
+    if(inp){ inp.value=msg; inp.focus(); }
+  },300);
 };
 window.shareToDalSocial=function(){
   var t=halfTrips[currentHalfTripIdx];
