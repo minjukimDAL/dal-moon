@@ -3185,66 +3185,57 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
         : 'Day 1~'+nights+' each: morning/afternoon/evening + restaurant (name+dish+price). Flight/hotel reasons + 1 alternative. Discounts: card names+savings.\n')
       +'※ After completing all items, write only [DONE] on the last line';
 
+  // 이어받기 헬퍼 함수
+  async function callGemini(text, tokens){
+    var res=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:text}]}],generationConfig:{maxOutputTokens:tokens||2500,temperature:0.7}})});
+    if(!res.ok) return null;
+    var d=await res.json();
+    var pts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    return pts.map(function(p){return p.text||'';}).join('').trim()||null;
+  }
+
   try{
-    var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
-    if(r.ok){
-      var data=await r.json();
-      var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
-      var reply=parts.map(function(p){return p.text||'';}).join('').trim();
-      if(reply){
-        // 이어받기 루프 — [완료]/[DONE] 나올때까지 최대 4회 반복
-        var maxContinue=4, continueCount=0;
-        while(continueCount<maxContinue){
-          var isDone=reply.includes('[완료]')||reply.includes('[DONE]');
-          if(isDone) break;
-          continueCount++;
-          if(btn) btn.innerHTML='⏳ '+(lang==='ko'?'이어받는 중... ('+continueCount+'/'+maxContinue+')':'Continuing... ('+continueCount+'/'+maxContinue+')')+'<br><span style="font-size:9px;color:var(--m);">잠시만요</span>';
-          try{
-            var lastChunk=reply.slice(-400);
-            var continuePrompt=lang==='ko'
-              ?'[이어쓰기] 아래는 작성 중인 여행 상세 내용의 마지막 부분이야. 여기서 바로 이어서 계속 작성해줘. 중복 없이 자연스럽게 이어서만. 완전히 끝나면 마지막에 [완료] 표시:\n---\n'+lastChunk
-              :'[CONTINUE] Below is the last part of the travel detail being written. Continue naturally from here. No repetition. Write [DONE] only when fully complete:\n---\n'+lastChunk;
-            var rc=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:continuePrompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
-            if(rc.ok){
-              var dc=await rc.json();
-              var pc=(dc.candidates&&dc.candidates[0]&&dc.candidates[0].content&&dc.candidates[0].content.parts)||[];
-              var replyC=pc.map(function(p){return p.text||'';}).join('').trim();
-              if(replyC) reply=reply+'\n'+replyC;
-              else break;
-            } else break;
-          }catch(ec){ console.warn('이어받기 실패:',ec); break; }
-        }
-        // 마커 제거
-        reply=reply.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
-        // 결과 저장
-        if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
-        _unlockedOptions[tripIdx][opt]=reply;
-        showUnlockedOption(opt, tripIdx);
-      } else {
-        // 환불
-        earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-        if(btn){ btn.disabled=false; btn.innerHTML='🔒 Option '+opt+'<br><span style="font-size:9px;color:var(--red);">다시 시도</span>'; }
-      }
-    } else {
-      var errData=await r.json().catch(function(){return{};});
-      var errMsg=(errData.error&&errData.error.message)||('HTTP '+r.status);
-      console.error('Unlock Option '+opt+' error:', errMsg);
+    // 1차 호출 — 2000토큰으로 빠르게 (타임아웃 방지)
+    if(btn) btn.innerHTML='⏳ '+(lang==='ko'?'분석 중... (1/5)':'Analyzing... (1/5)')+'<br><span style="font-size:9px;color:var(--m);">잠시만요</span>';
+    var reply = await callGemini(prompt, 2000);
+    console.log('[Unlock] 1차 응답 길이:', reply ? reply.length : 0);
+
+    if(!reply){
       earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-      if(btn){
-        btn.disabled=false;
-        btn.onclick=function(){requestUnlockOption(opt);};
-        btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+errMsg.substring(0,50)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
+      if(btn){ btn.disabled=false; btn.onclick=function(){requestUnlockOption(opt);}; btn.innerHTML='⚠️ 응답 없음<br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>'; }
+    } else {
+      // 이어받기 루프 — [완료]/[DONE] 나올 때까지 최대 4회
+      var maxContinue=6, continueCount=0;
+      while(continueCount<maxContinue){
+        var isDone=reply.includes('[완료]')||reply.includes('[DONE]');
+        console.log('[Unlock] 이어받기 체크:', continueCount, '완료여부:', isDone, '길이:', reply.length);
+        if(isDone) break;
+        continueCount++;
+        if(btn) btn.innerHTML='⏳ '+(lang==='ko'?'이어받는 중... ('+continueCount+'/'+maxContinue+')':'Continuing... ('+continueCount+'/'+maxContinue+')')+'<br><span style="font-size:9px;color:var(--m);">잠시만요</span>';
+        var lastChunk=reply.slice(-500);
+        var continuePrompt=lang==='ko'
+          ?'[이어쓰기] 아래 여행 상세 내용의 마지막 부분에서 바로 이어서 작성해줘. 중복 없이. 다 끝나면 [완료] 표시:\n---\n'+lastChunk
+          :'[CONTINUE] Continue writing from where this ends. No overlap. Write [DONE] when complete:\n---\n'+lastChunk;
+        var replyC = await callGemini(continuePrompt, 2000);
+        console.log('[Unlock] '+continueCount+'차 이어받기 길이:', replyC ? replyC.length : 0);
+        if(replyC) reply=reply+'\n'+replyC;
+        else break;
       }
+      // 마커 제거 후 저장
+      reply=reply.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
+      console.log('[Unlock] 최종 응답 길이:', reply.length);
+      if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
+      _unlockedOptions[tripIdx][opt]=reply;
+      showUnlockedOption(opt, tripIdx);
     }
   }catch(e){
-    console.error('Unlock Option '+opt+' catch:', e.message);
+    console.error('[Unlock] 오류:', e.message);
     earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
     if(btn){
       btn.disabled=false;
       btn.onclick=function(){requestUnlockOption(opt);};
-      btn.innerHTML='⚠️ Option '+opt+'<br><span style="font-size:8px;color:var(--red);">'+e.message.substring(0,30)+'</span><br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
+      btn.innerHTML='⚠️ '+e.message.substring(0,30)+'<br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>';
     }
   }
 }
