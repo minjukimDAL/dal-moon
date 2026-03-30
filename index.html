@@ -3169,18 +3169,25 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 
   // 프롬프트: 원본을 기반으로 각 항목을 구체적으로 확장
   var prompt = lang==='ko'
-    ? '아래는 DAL AI가 생성한 여행 플랜의 [Option '+opt+' - '+optLabel+'] 부분이야:\n'      +'---\n'+optionBase+'\n---\n\n'      +'위 내용을 기반으로 각 항목을 구체적으로 확장해줘. 반드시 한국어로. 마지막에 [완료] 표시.\n\n'      +'[첫 줄] Option '+opt+'('+optLabel+') 총 예상 비용: XXX~XXX만원 (항공+숙소+식비+교통)\n\n'      +(isWeekTrip
-        ? '**항공 확장**: 원본 항공 추천 이유 + 대안 항공사 1개\n'          +'**숙소 확장**: 원본 숙소 선택 이유 + 비슷한 수준 대안 1곳 + 예상 가격\n'          +'**주차별 확장** (Week 1~'+weeks+'): 각 주차 핵심 장소 구체 설명 + 추천 식당 2곳 (이름+메뉴+가격)\n'          +'**할인 인사이트 확장**: 구체적 카드사명 + 예상 절약 금액 + 얼리버드 타이밍\n'
-        : '**항공 확장**: 원본 항공 추천 이유 + 대안 항공사 1개\n'          +'**숙소 확장**: 원본 숙소 선택 이유 + 비슷한 수준 대안 1곳 + 예상 가격\n'          +'**Day별 확장** (Day 1~'+nights+'): 오전/오후/저녁 + 추천 식당 (이름+메뉴+가격)\n'          +'**할인 인사이트 확장**: 구체적 카드사명 + 예상 절약 금액 + 얼리버드 타이밍\n')
+    ? '아래는 DAL AI 여행 플랜의 [Option '+opt+' - '+optLabel+'] 부분이야:\n---\n'+optionBase+'\n---\n\n'
+      +'위 내용을 기반으로 자연스러운 문체로 구체적으로 확장해줘. 한국어로. 마지막에 [완료] 표시.\n'
+      +'주석이나 **항공확장** 같은 레이블 없이 바로 내용만 작성.\n\n'
+      +'[첫 줄] Option '+opt+'('+optLabel+') 총 예상 비용: XXX~XXX만원\n\n'
+      +(isWeekTrip
+        ? 'Week 1~'+weeks+'까지 각 주차: 핵심 장소 상세설명 + 식당 2곳(이름+메뉴+가격). 항공/숙소 추천 이유와 대안 1곳. 할인: 카드사명+절약금액.\n'
+        : 'Day 1~'+nights+'까지 각 날: 오전/오후/저녁 동선 + 식당(이름+메뉴+가격). 항공/숙소 추천 이유와 대안 1곳. 할인: 카드사명+절약금액.\n')
       +'[완료]'
-    : 'Below is the [Option '+opt+' - '+optLabel+'] section from the DAL AI travel plan:\n'      +'---\n'+optionBase+'\n---\n\n'      +'Expand each item specifically based on the above. English only. Write [DONE] at end.\n\n'      +'[First line] Option '+opt+'('+optLabel+') total: $XXX~$XXX (flight+hotel+food+transport)\n\n'      +(isWeekTrip
-        ? '**Flight expand**: reason for recommendation + 1 alternative airline\n'          +'**Hotel expand**: why this hotel + 1 similar alternative + estimated price\n'          +'**Weekly expand** (Week 1~'+weeks+'): specific places per week + 2 restaurants (name+dish+price)\n'          +'**Discount expand**: specific card names + estimated savings + early bird timing\n'
-        : '**Flight expand**: reason for recommendation + 1 alternative airline\n'          +'**Hotel expand**: why this hotel + 1 similar alternative + estimated price\n'          +'**Daily expand** (Day 1~'+nights+'): morning/afternoon/evening + restaurant (name+dish+price)\n'          +'**Discount expand**: specific card names + estimated savings + early bird timing\n')
+    : 'Below is [Option '+opt+' - '+optLabel+'] from DAL AI plan:\n---\n'+optionBase+'\n---\n\n'
+      +'Expand naturally based on above. English only. No ** labels or section markers. Write [DONE] at end.\n\n'
+      +'[First line] Option '+opt+'('+optLabel+') total: $XXX~$XXX\n\n'
+      +(isWeekTrip
+        ? 'Week 1~'+weeks+' each: key places with details + 2 restaurants (name+dish+price). Flight/hotel reasons + 1 alternative. Discounts: card names+savings.\n'
+        : 'Day 1~'+nights+' each: morning/afternoon/evening + restaurant (name+dish+price). Flight/hotel reasons + 1 alternative. Discounts: card names+savings.\n')
       +'[DONE]';
 
   try{
     var r=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
+      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
     if(r.ok){
       var data=await r.json();
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
@@ -3199,7 +3206,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
               ?'아래 내용에 이어서 계속 작성해줘. 절대 중복 없이 이어서만. 마지막에 [완료] 표시:\n---\n'+lastChunk
               :'Continue exactly from below. No repetition at all. Write [DONE] at end:\n---\n'+lastChunk;
             var rc=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-              body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:continuePrompt}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
+              body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:continuePrompt}]}],generationConfig:{maxOutputTokens:3000,temperature:0.7}})});
             if(rc.ok){
               var dc=await rc.json();
               var pc=(dc.candidates&&dc.candidates[0]&&dc.candidates[0].content&&dc.candidates[0].content.parts)||[];
