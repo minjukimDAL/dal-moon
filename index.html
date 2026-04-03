@@ -798,6 +798,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
+    <div id="socialFeed" style="margin-bottom:10px;"></div>
     <div class="feed-card">
       <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="2시간 전 · 싱가포르" data-en="2h ago · Singapore">2시간 전 · 싱가포르</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
       <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇸🇬 싱가포르 10월 꿀팁! F1 그랑프리(10/17-19) 피해서 10/20 이후 예약하면 호텔 40% 저렴. 마리나베이샌즈 뷰룸 1박 35만원에 잡았어요 🎉 DAL Full 모드로 비교하고 바로 예약!</div>
@@ -2204,7 +2205,7 @@ async function saveToTrip(){
     addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
     setTimeout(function(){goPage('trips');},800);
   } else {
-    halfTrips.unshift({
+    var newTrip={
       route:newRoute,
       dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
       nights:(j&&j.nights)||null,
@@ -2213,9 +2214,16 @@ async function saveToTrip(){
       B:(j&&j.B)||null,
       C:(j&&j.C)||null,
       text:newText,
-      id:Date.now()
-    });
+      id:'local_'+Date.now()  // 임시 ID
+    };
+    halfTrips.unshift(newTrip);
     renderHalfTripsList();
+    // 서버 저장 (로그인 상태일 때)
+    if(_currentToken){
+      saveTripToServer(newTrip).then(function(serverId){
+        if(serverId) halfTrips[0].id=serverId;
+      });
+    }
   }
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
@@ -2281,6 +2289,11 @@ function hideMyPage(){
 var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
+  // 로그인 상태면 0.8초 후 서버 저장 (연속 차감 중복 방지)
+  if(_currentToken){
+    if(_coinSaveTimer) clearTimeout(_coinSaveTimer);
+    _coinSaveTimer=setTimeout(saveCoinsToServer, 800);
+  }
   var coinEl=document.getElementById('coinCount');
   if(coinEl) coinEl.textContent=isLoggedIn?coins:'—';
   var pc=document.getElementById('profileCoins'); if(pc)pc.textContent=coins+' 🪙';
@@ -2498,6 +2511,7 @@ function checkWeight(){
 // 소셜 R2-2
 // ══════════════════════════════════════════════
 function showSocialTab(tab,btn){
+  if(tab==='feed') loadPostsFromServer();
   var infoEl=document.getElementById('social-info');if(infoEl)infoEl.style.display=tab==='info'?'block':'none';
   if(tab==='info'){renderInfoEvents();var ic=document.getElementById('infoChecklist'),ck=document.getElementById('checklistItems');if(ic&&ck)ic.innerHTML=ck.innerHTML;return;}
   ['msg','feed','follow'].forEach(function(t){var el=document.getElementById('social-'+t);if(el)el.style.display=t===tab?'block':'none';});
@@ -2542,7 +2556,16 @@ function searchUsers(q){
 }
 function openNewPost(){
   var text=prompt(lang==='ko'?'여행 정보를 공유해주세요 (🪙 5코인 적립)':'Share your travel tip (Earn 🪙 5 coins)');
-  if(text&&text.trim()){earnCoinAmt+=5;updateCoinUI();alert(lang==='ko'?'🪙 5코인 적립! 피드에 게시되었습니다.':'🪙 5 coins earned! Posted to feed.');}
+  if(text&&text.trim()){
+    earnCoinAmt+=5; updateCoinUI();
+    var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+    if(_currentToken){
+      savePostToServer(text, myNick).then(function(ok){
+        if(ok) loadPostsFromServer();
+      });
+    }
+    alert(lang==='ko'?'🪙 5코인 적립! 피드에 게시되었습니다.':'🪙 5 coins earned! Posted to feed.');
+  }
 }
 function openShareFeed(btn){
   var card=btn.closest('.feed-card');
@@ -2593,6 +2616,130 @@ async function _sf(path, body, token){
   var r=await fetch(SUPA_URL+path,{method:'POST',headers:hdrs,body:JSON.stringify(body)});
   return r.json();
 }
+async function _sfGet(path,token){
+  var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(token||SUPA_KEY)};
+  var r=await fetch(SUPA_URL+path,{method:'GET',headers:hdrs});
+  return r.json();
+}
+async function _sfPatch(path,body,token){
+  var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(token||SUPA_KEY),'Prefer':'return=minimal'};
+  await fetch(SUPA_URL+path,{method:'PATCH',headers:hdrs,body:JSON.stringify(body)});
+}
+async function _sfDel(path,token){
+  var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(token||SUPA_KEY)};
+  await fetch(SUPA_URL+path,{method:'DELETE',headers:hdrs});
+}
+
+// ══ 서버 연동 전역 변수 ══
+var _currentToken=null, _currentUserId=null, _coinSaveTimer=null;
+
+// ══ 코인 ══
+async function loadCoinsFromServer(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    var d=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins,bonus_coins',_currentToken);
+    if(d&&d[0]){
+      paidCoinAmt=d[0].coins||0;
+      bonusCoinAmt=d[0].bonus_coins||0;
+      coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
+      updateCoinUI();
+      console.log('[Coin] 불러옴 bonus:'+bonusCoinAmt+' paid:'+paidCoinAmt);
+    }
+  }catch(e){console.warn('[Coin] 불러오기 실패',e);}
+}
+async function saveCoinsToServer(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    await _sfPatch('/rest/v1/profiles?id=eq.'+_currentUserId,{coins:paidCoinAmt,bonus_coins:bonusCoinAmt},_currentToken);
+    console.log('[Coin] 저장 bonus:'+bonusCoinAmt+' paid:'+paidCoinAmt);
+  }catch(e){console.warn('[Coin] 저장 실패',e);}
+}
+
+// ══ 여행 ══
+async function loadTripsFromServer(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    var d=await _sfGet('/rest/v1/trips?user_id=eq.'+_currentUserId+'&order=created_at.desc&select=*',_currentToken);
+    if(d&&Array.isArray(d)){
+      halfTrips=d.map(function(t){return{id:t.id,route:t.route||'',dates:t.dates||'',nights:t.nights||null,pax:t.pax||null,text:t.text||''};});
+      await loadUnlockedFromServer();
+      renderHalfTripsList();
+      console.log('[Trips] 불러옴:'+halfTrips.length+'개');
+    }
+  }catch(e){console.warn('[Trips] 불러오기 실패',e);}
+}
+async function saveTripToServer(trip){
+  if(!_currentToken||!_currentUserId) return null;
+  try{
+    var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Prefer':'return=representation'};
+    var r=await fetch(SUPA_URL+'/rest/v1/trips',{method:'POST',headers:hdrs,body:JSON.stringify({
+      user_id:_currentUserId,route:trip.route||'',nights:trip.nights||null,pax:trip.pax||null,dates:trip.dates||'',text:trip.text||''
+    })});
+    var d=await r.json();
+    if(d&&d[0]&&d[0].id){console.log('[Trips] 저장:'+d[0].id);return d[0].id;}
+  }catch(e){console.warn('[Trips] 저장 실패',e);}
+  return null;
+}
+async function deleteTripFromServer(tripId){
+  if(!_currentToken||!tripId) return;
+  try{
+    await _sfDel('/rest/v1/unlocked?trip_id=eq.'+tripId,_currentToken);
+    await _sfDel('/rest/v1/trips?id=eq.'+tripId,_currentToken);
+    console.log('[Trips] 삭제:'+tripId);
+  }catch(e){console.warn('[Trips] 삭제 실패',e);}
+}
+
+// ══ 잠금해제 ══
+async function loadUnlockedFromServer(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    var d=await _sfGet('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&select=trip_id,opt,content',_currentToken);
+    if(d&&Array.isArray(d)){
+      _unlockedOptions={};
+      d.forEach(function(u){
+        var idx=halfTrips.findIndex(function(t){return t.id===u.trip_id;});
+        if(idx>=0){if(!_unlockedOptions[idx])_unlockedOptions[idx]={};_unlockedOptions[idx][u.opt]=u.content;}
+      });
+      console.log('[Unlocked] 불러옴');
+    }
+  }catch(e){console.warn('[Unlocked] 불러오기 실패',e);}
+}
+async function saveUnlockedToServer(tripIdx,opt,content){
+  if(!_currentToken||!_currentUserId) return;
+  var trip=halfTrips[tripIdx]; if(!trip||!trip.id) return;
+  try{
+    var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Prefer':'resolution=merge-duplicates'};
+    await fetch(SUPA_URL+'/rest/v1/unlocked',{method:'POST',headers:hdrs,body:JSON.stringify({
+      user_id:_currentUserId,trip_id:trip.id,opt:opt,content:content
+    })});
+    console.log('[Unlocked] 저장:'+opt);
+  }catch(e){console.warn('[Unlocked] 저장 실패',e);}
+}
+
+// ══ 소셜 ══
+async function loadPostsFromServer(){
+  try{
+    var d=await _sfGet('/rest/v1/posts?order=created_at.desc&limit=50&select=*',_currentToken||null);
+    if(d&&Array.isArray(d)&&d.length>0){
+      var feed=document.getElementById('socialFeed');
+      if(feed){
+        feed.innerHTML=d.map(function(p){
+          var ago=Math.round((Date.now()-new Date(p.created_at).getTime())/60000);
+          var agoStr=ago<60?ago+'분 전':Math.round(ago/60)+'시간 전';
+          return '<div style="padding:14px 0;border-bottom:1px solid var(--b1);">'            +'<div style="font-size:10px;color:var(--gold);margin-bottom:4px;">'+( p.nickname||'DAL User')+'<span style="color:var(--m);margin-left:8px;">'+agoStr+'</span></div>'            +'<div style="font-size:11px;color:var(--m);line-height:1.8;">'+p.content+'</div>'            +'</div>';
+        }).join('');
+      }
+    }
+  }catch(e){console.warn('[Posts] 불러오기 실패',e);}
+}
+async function savePostToServer(content,nickname){
+  if(!_currentToken||!_currentUserId) return false;
+  try{
+    var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Prefer':'return=minimal'};
+    await fetch(SUPA_URL+'/rest/v1/posts',{method:'POST',headers:hdrs,body:JSON.stringify({user_id:_currentUserId,nickname:nickname||'DAL User',content:content})});
+    return true;
+  }catch(e){console.warn('[Posts] 저장 실패',e);return false;}
+}
 
 // 세션 저장/복구
 function _saveSession(data){
@@ -2611,6 +2758,12 @@ function initSupabase(){
 function onLoginSuccess(user, token){
   if(!user) return;
   isLoggedIn=true;
+  _currentToken=token;
+  _currentUserId=user.id;
+  // 서버에서 데이터 불러오기
+  loadCoinsFromServer();
+  loadTripsFromServer();
+  loadPostsFromServer();
   // 로그인 전 시도한 액션 자동 실행
   setTimeout(function(){
     if(_pendingAction){
@@ -2618,8 +2771,8 @@ function onLoginSuccess(user, token){
       _pendingAction=null;
       try{ action(); }catch(e){ console.warn('pendingAction 실행 오류:',e); }
     }
-  },500);
-  // D옵션: 코인 배지 활성화 + 유저 아이콘 골드 테두리
+  },800);
+  // 코인 배지 활성화 + 유저 아이콘 골드 테두리
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='1';coinBadge.style.borderColor='rgba(196,175,135,.5)';}
   var userBtn=document.getElementById('headerUserBtn');
@@ -2637,11 +2790,17 @@ function onLoginSuccess(user, token){
 
 function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
-  // D옵션: 코인 배지 비활성화 + 유저 아이콘 원복
+  _currentToken=null; _currentUserId=null;
+  // 데이터 초기화
+  halfTrips=[]; _unlockedOptions={};
+  bonusCoinAmt=0; paidCoinAmt=0; earnCoinAmt=0;
+  renderHalfTripsList();
+  // 코인 배지 비활성화 + 유저 아이콘 원복
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='0.4';coinBadge.style.borderColor='rgba(196,175,135,.15)';}
   var coinCount=document.getElementById('coinCount');
   if(coinCount) coinCount.textContent='—';
+  updateCoinUI();
   var userBtn=document.getElementById('headerUserBtn');
   if(userBtn){userBtn.style.borderColor='var(--b2)';userBtn.style.background='transparent';}
   var lv=document.getElementById('loginView'); if(lv) lv.style.display='flex';
@@ -2907,10 +3066,9 @@ function deleteTripConfirm(idx){
   var t=halfTrips[idx]; if(!t) return;
   var msg=lang==='ko'?'"'+(t.route||'여행')+'" 여행을 삭제하겠습니까?':'Delete "' +(t.route||'trip')+'"?';
   if(confirm(msg)){
+    var deletedId=halfTrips[idx].id;
     halfTrips.splice(idx,1);
-    // 해당 idx의 unlocked 데이터도 삭제
     delete _unlockedOptions[idx];
-    // idx 재정렬
     var newUnlocked={};
     Object.keys(_unlockedOptions).forEach(function(k){
       var ki=parseInt(k);
@@ -2919,6 +3077,10 @@ function deleteTripConfirm(idx){
     });
     _unlockedOptions=newUnlocked;
     renderHalfTripsList();
+    // 서버 삭제
+    if(_currentToken&&deletedId&&!String(deletedId).startsWith('local_')){
+      deleteTripFromServer(deletedId);
+    }
   }
 }
 window.deleteTripConfirm=deleteTripConfirm;
@@ -3226,6 +3388,8 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
       _unlockedOptions[tripIdx][opt]=final;
       showUnlockedOption(opt, tripIdx);
+      // 서버 저장
+      saveUnlockedToServer(tripIdx, opt, final);
       return;
     }
     _unlockCount++;
@@ -3269,6 +3433,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
         if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
         _unlockedOptions[tripIdx][opt]=partial;
         showUnlockedOption(opt, tripIdx);
+        saveUnlockedToServer(tripIdx, opt, partial);
       } else {
         earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
         if(btn){ btn.disabled=false; btn.onclick=function(){requestUnlockOption(opt);};
