@@ -778,23 +778,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 메신저 -->
   <div id="social-msg" style="padding:14px 18px;">
-    <div class="msg-room" onclick="openChat('김민지','👩')">
-      <div class="room-avatar">👩</div>
-      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">김민지</div><div style="font-size:10px;color:var(--m);">싱가포르 F1 피하는 팁 알려줄게요!</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);margin-bottom:4px;"><span data-ko="방금" data-en="now">방금</span></div><div class="room-badge">2</div></div>
+    <div style="padding:10px;margin-bottom:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">
+      <div style="font-size:10px;color:var(--gold);margin-bottom:3px;">🌙 DAL 메신저 안내</div>
+      <div style="font-size:9px;color:var(--m);line-height:1.7;">대화는 <strong style="color:var(--sb);">48시간 후 자동 삭제</strong>됩니다.<br>개인정보 보호를 위해 민감한 정보는 공유하지 마세요.</div>
     </div>
-    <div class="msg-room" onclick="openChat('DAL 여행그룹','🌍')">
-      <div class="room-avatar">🌍</div>
-      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">DAL 여행그룹</div><div style="font-size:10px;color:var(--m);">10월 싱가포르 동행 구합니다</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="1시간" data-en="1h ago">1시간</span></div></div>
+    <div id="msgRoomList" style="font-size:11px;color:var(--m);text-align:center;padding:20px 0;line-height:2;">
+      아직 대화가 없어요.<br>팔로우 중인 여행자와 메시지를 시작해보세요 🌙
     </div>
-    <div class="msg-room" onclick="openChat('박준혁','🧑')">
-      <div class="room-avatar">🧑</div>
-      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">박준혁</div><div style="font-size:10px;color:var(--m);">도쿄 맛집 리스트 공유!</div></div>
-      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="어제" data-en="Yesterday">어제</span></div></div>
-    </div>
-    <button class="action-btn btn-gold" style="margin-top:14px;" onclick="openNewChat()" id="t-new-msg">+ 새 메시지</button>
-    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:8px;padding:6px;background:rgba(91,143,255,.05);border-radius:2px;border:1px solid rgba(91,143,255,.1);"><span id='t-beta-msg'>Beta · 실제 메시지 전송 기능 테스트 중</span></div>
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
@@ -806,10 +796,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
     <div class="feed-card">
       <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="어제 · 도쿄" data-en="Yesterday · Tokyo">어제 · 도쿄</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
-      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br>DAL Full 모드 검색 → 🪙 5코인 적립!</div>
+      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br></div>
       <div class="feed-actions"><button class="feed-btn">❤️ 41</button><button class="feed-btn">💬 12</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
     </div>
-    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기 · 🪙 5코인 적립</button>
+    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기</button>
   </div>
   <!-- 팔로잉 -->
   <div id="social-follow" style="padding:14px 18px;display:none;">
@@ -819,7 +809,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="도쿄·오사카 전문 · 팔로워 189" data-en="Tokyo·Osaka expert · 189 followers">도쿄·오사카 전문 · 팔로워 189</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
     <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);"><span data-ko="파리·바르셀로나 전문 · 팔로워 312" data-en="Paris·Barcelona expert · 312 followers">파리·바르셀로나 전문 · 팔로워 312</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
     <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);"><span data-ko="동남아 가성비 · 팔로워 521" data-en="SE Asia value expert · 521 followers">동남아 가성비 · 팔로워 521</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;"><span data-ko="팔로워 100명 달성 시 🪙 50코인 지급" data-en="Reach 100 followers · Earn 🪙 50 coins">팔로워 100명 달성 시 🪙 50코인 지급</span></div>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;"><span data-ko="팔로우 중인 여행자의 새 여행 정보를 받아보세요" data-en="Get updates from travelers you follow">팔로우 중인 여행자의 새 여행 정보를 받아보세요</span></div>
   </div>
   <div id="social-info" style="display:none;padding:14px 18px;">
     <div style="margin-bottom:14px;">
@@ -1373,7 +1363,7 @@ ko:{
   'optA-name':'풀 프리미엄','optB-name':'스마트 프리미엄','optC-name':'가성비 프리미엄',
   'tab-msg':'메신저','tab-feed':'피드','tab-follow':'팔로잉',
   'follow-sub':'팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.',
-  'suggested':'추천 여행자','new-msg':'+ 새 메시지','new-post':'+ 여행 정보 공유하기 · 🪙 5코인 적립',
+  'suggested':'추천 여행자','new-msg':'+ 새 메시지','new-post':'+ 여행 정보 공유하기',
   'login-sub':'로그인하고 여행 기록과<br>코인을 관리하세요.',
   'google':'Google로 계속하기','kakao':'카카오로 계속하기','apple':'Apple로 계속하기','email-login':'이메일로 계속하기',
   'terms':'계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.',
@@ -2260,7 +2250,12 @@ function goPage(id){
     if(bn) bn.classList.toggle('active',p===id);
   });
   if(id==='my') hideMyPage();
-  if(id==='trips') setTripsTab(currentTripsTab||'half');
+  if(id==='trips'){
+    setTripsTab(currentTripsTab||'half');
+    // 서버에서 최신 데이터 로드 (로그인 상태일 때)
+    if(_currentToken) loadTripsFromServer();
+  }
+  if(id==='social') loadPostsFromServer();
 }
 
 // ══════════════════════════════════════════════
@@ -2289,10 +2284,11 @@ function hideMyPage(){
 var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
-  // 로그인 상태면 0.8초 후 서버 저장 (연속 차감 중복 방지)
-  if(_currentToken){
+  console.log('[Coin] 현재 코인:', coins, '(보너스:'+bonusCoinAmt+' 적립:'+earnCoinAmt+' 유료:'+paidCoinAmt+')');
+  // 로그인 상태면 1초 후 서버 저장 (연속 차감 중복 방지)
+  if(_currentToken&&_currentUserId){
     if(_coinSaveTimer) clearTimeout(_coinSaveTimer);
-    _coinSaveTimer=setTimeout(saveCoinsToServer, 800);
+    _coinSaveTimer=setTimeout(saveCoinsToServer, 1000);
   }
   var coinEl=document.getElementById('coinCount');
   if(coinEl) coinEl.textContent=isLoggedIn?coins:'—';
@@ -2555,16 +2551,18 @@ function searchUsers(q){
   }).join('');
 }
 function openNewPost(){
-  var text=prompt(lang==='ko'?'여행 정보를 공유해주세요 (🪙 5코인 적립)':'Share your travel tip (Earn 🪙 5 coins)');
+  if(!requireLogin(function(){ openNewPost(); })) return;
+  var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip');
   if(text&&text.trim()){
-    earnCoinAmt+=5; updateCoinUI();
     var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
-    if(_currentToken){
-      savePostToServer(text, myNick).then(function(ok){
-        if(ok) loadPostsFromServer();
-      });
-    }
-    alert(lang==='ko'?'🪙 5코인 적립! 피드에 게시되었습니다.':'🪙 5 coins earned! Posted to feed.');
+    savePostToServer(text, myNick).then(function(ok){
+      if(ok){
+        loadPostsFromServer();
+        alert(lang==='ko'?'✅ 피드에 게시되었습니다!':'✅ Posted to feed!');
+      } else {
+        alert(lang==='ko'?'게시 중 오류가 발생했습니다.':'Failed to post.');
+      }
+    });
   }
 }
 function openShareFeed(btn){
