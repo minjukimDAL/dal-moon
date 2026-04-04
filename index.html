@@ -430,24 +430,78 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div id="eventList" style="max-height:160px;overflow-y:auto;"></div>
       </div>
 
-      <!-- ③ 목적지 + 인원 + 박 -->
+      <!-- ③ 출발지 · 목적지 · 인원 · 일정 -->
       <div style="padding:10px 14px 0;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">③ 목적지 · 인원 · 일정</div>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;" id="t-step-dest">③ 출발지 · 목적지 · 인원 · 일정</div>
+        <!-- 출발지 -->
+        <div style="margin-bottom:6px;">
+          <select id="planOrigin" onchange="updatePlanInput()" style="width:100%;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
+            <option value="kr" data-ko="🇰🇷 인천 (한국)" data-en="🇰🇷 Incheon (Korea)">🇰🇷 인천 (한국)</option>
+            <optgroup label="🌏 아시아 / Asia">
+              <option value="jp_dep" data-ko="🇯🇵 도쿄/오사카 (일본)" data-en="🇯🇵 Tokyo/Osaka (Japan)">🇯🇵 도쿄/오사카 (일본)</option>
+              <option value="sg_dep" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
+              <option value="th_dep" data-ko="🇹🇭 방콕 (태국)" data-en="🇹🇭 Bangkok (Thailand)">🇹🇭 방콕 (태국)</option>
+              <option value="tw_dep" data-ko="🇹🇼 타이베이 (대만)" data-en="🇹🇼 Taipei (Taiwan)">🇹🇼 타이베이 (대만)</option>
+            </optgroup>
+            <optgroup label="🌍 유럽 / Europe">
+              <option value="uk_dep" data-ko="🇬🇧 런던 (영국)" data-en="🇬🇧 London (UK)">🇬🇧 런던 (영국)</option>
+              <option value="fr_dep" data-ko="🇫🇷 파리 (프랑스)" data-en="🇫🇷 Paris (France)">🇫🇷 파리 (프랑스)</option>
+            </optgroup>
+            <optgroup label="🌎 미주·오세아니아">
+              <option value="us_dep" data-ko="🇺🇸 뉴욕/LA (미국)" data-en="🇺🇸 New York/LA (USA)">🇺🇸 뉴욕/LA (미국)</option>
+              <option value="au_dep" data-ko="🇦🇺 시드니 (호주)" data-en="🇦🇺 Sydney (Australia)">🇦🇺 시드니 (호주)</option>
+            </optgroup>
+          </select>
+        </div>
+        <!-- 목적지 + 인원 + 박/주 -->
         <div style="display:flex;gap:6px;align-items:center;">
           <select id="planDest" onchange="updatePlanInput()" style="flex:2;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
-            <option value="">목적지 선택</option>
-            <option value="jp">🇯🇵 일본</option>
-            <option value="th">🇹🇭 태국</option>
-            <option value="sg">🇸🇬 싱가포르</option>
-            <option value="fr">🇫🇷 프랑스</option>
-            <option value="bali">🇮🇩 발리</option>
-            <option value="us">🇺🇸 미국</option>
-            <option value="sp">🇪🇸 스페인</option>
-            <option value="kr">🇰🇷 한국</option>
-            <option value="jeju">🇰🇷 제주</option>
+            <option value="" data-ko="목적지 선택" data-en="Select Destination">목적지 선택</option>
+            <optgroup label="🌏 아시아 / Asia">
+              <option value="jp" data-ko="🇯🇵 일본 (도쿄/교토/오사카)" data-en="🇯🇵 Japan (Tokyo/Kyoto/Osaka)">🇯🇵 일본 (도쿄/교토/오사카)</option>
+              <option value="th" data-ko="🇹🇭 태국 (방콕/치앙마이)" data-en="🇹🇭 Thailand (Bangkok/Chiang Mai)">🇹🇭 태국 (방콕/치앙마이)</option>
+              <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
+              <option value="bali" data-ko="🇮🇩 발리 (인도네시아)" data-en="🇮🇩 Bali (Indonesia)">🇮🇩 발리 (인도네시아)</option>
+              <option value="vn" data-ko="🇻🇳 베트남 (다낭/하노이/호치민)" data-en="🇻🇳 Vietnam (Da Nang/Hanoi/HCMC)">🇻🇳 베트남 (다낭/하노이/호치민)</option>
+              <option value="ph" data-ko="🇵🇭 필리핀 (세부/보라카이)" data-en="🇵🇭 Philippines (Cebu/Boracay)">🇵🇭 필리핀 (세부/보라카이)</option>
+              <option value="tw" data-ko="🇹🇼 대만 (타이베이)" data-en="🇹🇼 Taiwan (Taipei)">🇹🇼 대만 (타이베이)</option>
+              <option value="hk" data-ko="🇭🇰 홍콩" data-en="🇭🇰 Hong Kong">🇭🇰 홍콩</option>
+              <option value="my" data-ko="🇲🇾 말레이시아 (쿠알라룸푸르)" data-en="🇲🇾 Malaysia (Kuala Lumpur)">🇲🇾 말레이시아 (쿠알라룸푸르)</option>
+              <option value="kr" data-ko="🇰🇷 한국 (서울/부산)" data-en="🇰🇷 Korea (Seoul/Busan)">🇰🇷 한국 (서울/부산)</option>
+              <option value="jeju" data-ko="🇰🇷 제주도" data-en="🇰🇷 Jeju Island">🇰🇷 제주도</option>
+            </optgroup>
+            <optgroup label="🌍 유럽 / Europe">
+              <option value="fr" data-ko="🇫🇷 프랑스 (파리)" data-en="🇫🇷 France (Paris)">🇫🇷 프랑스 (파리)</option>
+              <option value="sp" data-ko="🇪🇸 스페인 (바르셀로나/마드리드)" data-en="🇪🇸 Spain (Barcelona/Madrid)">🇪🇸 스페인 (바르셀로나/마드리드)</option>
+              <option value="it" data-ko="🇮🇹 이탈리아 (로마/피렌체)" data-en="🇮🇹 Italy (Rome/Florence)">🇮🇹 이탈리아 (로마/피렌체)</option>
+              <option value="uk" data-ko="🇬🇧 영국 (런던)" data-en="🇬🇧 UK (London)">🇬🇧 영국 (런던)</option>
+              <option value="de" data-ko="🇩🇪 독일 (베를린/뮌헨)" data-en="🇩🇪 Germany (Berlin/Munich)">🇩🇪 독일 (베를린/뮌헨)</option>
+              <option value="gr" data-ko="🇬🇷 그리스 (아테네/산토리니)" data-en="🇬🇷 Greece (Athens/Santorini)">🇬🇷 그리스 (아테네/산토리니)</option>
+              <option value="pt" data-ko="🇵🇹 포르투갈 (리스본/포르투)" data-en="🇵🇹 Portugal (Lisbon/Porto)">🇵🇹 포르투갈 (리스본/포르투)</option>
+              <option value="ch" data-ko="🇨🇭 스위스 (취리히/루체른)" data-en="🇨🇭 Switzerland (Zurich/Lucerne)">🇨🇭 스위스 (취리히/루체른)</option>
+            </optgroup>
+            <optgroup label="🌎 미주·오세아니아 / Americas & Oceania">
+              <option value="us" data-ko="🇺🇸 미국 (뉴욕/LA/라스베가스)" data-en="🇺🇸 USA (New York/LA/Las Vegas)">🇺🇸 미국 (뉴욕/LA/라스베가스)</option>
+              <option value="ca" data-ko="🇨🇦 캐나다 (토론토/밴쿠버)" data-en="🇨🇦 Canada (Toronto/Vancouver)">🇨🇦 캐나다 (토론토/밴쿠버)</option>
+              <option value="au" data-ko="🇦🇺 호주 (시드니/멜버른)" data-en="🇦🇺 Australia (Sydney/Melbourne)">🇦🇺 호주 (시드니/멜버른)</option>
+              <option value="nz" data-ko="🇳🇿 뉴질랜드 (오클랜드/퀸스타운)" data-en="🇳🇿 New Zealand (Auckland/Queenstown)">🇳🇿 뉴질랜드 (오클랜드/퀸스타운)</option>
+            </optgroup>
+            <optgroup label="🌺 기타 / Others">
+              <option value="ae" data-ko="🇦🇪 두바이 (UAE)" data-en="🇦🇪 Dubai (UAE)">🇦🇪 두바이 (UAE)</option>
+              <option value="ma" data-ko="🇲🇦 모로코 (마라케시/페스)" data-en="🇲🇦 Morocco (Marrakech/Fes)">🇲🇦 모로코 (마라케시/페스)</option>
+              <option value="tr" data-ko="🇹🇷 튀르키예 (이스탄불/카파도키아)" data-en="🇹🇷 Turkey (Istanbul/Cappadocia)">🇹🇷 튀르키예 (이스탄불/카파도키아)</option>
+            </optgroup>
           </select>
           <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
-          <input id="planNights" type="number" min="1" max="30" value="5" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="박">
+          <!-- 박/주 토글 -->
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
+            <input id="planNights" type="number" min="1" max="6" value="5" onchange="onNightsChange()" style="padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;width:100%;" placeholder="박">
+            <select id="planWeeks" onchange="updatePlanInput()" style="display:none;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;width:100%;">
+              <option value="1">1주</option><option value="2">2주</option><option value="3">3주</option>
+              <option value="4">4주</option><option value="5">5주</option><option value="6">6주</option>
+            </select>
+            <div id="nightsToggle" style="font-size:8px;color:var(--ac);text-align:center;cursor:pointer;" onclick="toggleNightsMode()">7박+ → 주 단위</div>
+          </div>
         </div>
       </div>
 
@@ -1230,7 +1284,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 // GEMINI 설정 (작동 확정)
 // ══════════════════════════════════════════════
 const GEMINI_API_KEY = '';
-const GEMINI_MODEL   = 'gemini-2.0-flash';
+const GEMINI_MODEL   = 'gemini-2.5-flash';
 const GEMINI_URL = '/.netlify/functions/gemini';
 const HALF_DAILY_MAX = 10;
 const FULL_COIN_COST = 0; // Phase 2에서 실제 예약 시 사용
@@ -2949,32 +3003,60 @@ function selectEventDest(dest, eventName){
 
 // ══ 플래닝 입력 자동 업데이트 ══
 var DEST_LABELS = {
-  jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)',
-  sg:'싱가포르', fr:'프랑스(파리)', bali:'발리',
-  us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도'
+  ko:{ jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)', sg:'싱가포르', bali:'발리(인도네시아)', vn:'베트남(다낭/하노이)', ph:'필리핀(세부/보라카이)', tw:'대만(타이베이)', hk:'홍콩', my:'말레이시아(쿠알라룸푸르)', kr:'한국(서울/부산)', jeju:'제주도', fr:'프랑스(파리)', sp:'스페인(바르셀로나)', it:'이탈리아(로마/피렌체)', uk:'영국(런던)', de:'독일(베를린/뮌헨)', gr:'그리스(산토리니)', pt:'포르투갈(리스본)', ch:'스위스(루체른)', us:'미국(뉴욕/LA)', ca:'캐나다(밴쿠버)', au:'호주(시드니)', nz:'뉴질랜드(퀸스타운)', ae:'두바이(UAE)', ma:'모로코(마라케시)', tr:'튀르키예(이스탄불)' },
+  en:{ jp:'Japan(Tokyo/Kyoto/Osaka)', th:'Thailand(Bangkok/Chiang Mai)', sg:'Singapore', bali:'Bali', vn:'Vietnam(Da Nang/Hanoi)', ph:'Philippines(Cebu/Boracay)', tw:'Taiwan(Taipei)', hk:'Hong Kong', my:'Malaysia(KL)', kr:'Korea(Seoul/Busan)', jeju:'Jeju Island', fr:'France(Paris)', sp:'Spain(Barcelona)', it:'Italy(Rome/Florence)', uk:'UK(London)', de:'Germany(Berlin/Munich)', gr:'Greece(Santorini)', pt:'Portugal(Lisbon)', ch:'Switzerland(Lucerne)', us:'USA(New York/LA)', ca:'Canada(Vancouver)', au:'Australia(Sydney)', nz:'New Zealand(Queenstown)', ae:'Dubai(UAE)', ma:'Morocco(Marrakech)', tr:'Turkey(Istanbul)' }
 };
 
 function updatePlanInput(){
   var dest = (document.getElementById('planDest')||{value:''}).value;
   var ppl  = (document.getElementById('planPeople')||{value:'2'}).value || '2';
-  var nts  = (document.getElementById('planNights')||{value:'5'}).value || '5';
   var style = STYLES[travelStyle] && STYLES[travelStyle][lang];
   var styleLabel = style ? style.name : '';
-  var destLabel = DEST_LABELS[dest] || '';
+  var subStyleLabel = travelSubStyle || '';
+  var destLabel = (DEST_LABELS[lang]&&DEST_LABELS[lang][dest]) || (DEST_LABELS[dest]) || '';
+
+  // 출발지
+  var originVal = (document.getElementById('planOrigin')||{value:'kr'}).value || 'kr';
+  var originLabel = (ORIGIN_LABELS&&ORIGIN_LABELS[lang]&&ORIGIN_LABELS[lang][originVal]) || '인천(ICN)';
+
+  // 박수 또는 주수
+  var nts, durationLabel;
+  if(typeof _nightsMode!=='undefined'&&_nightsMode==='weeks'){
+    var wks=(document.getElementById('planWeeks')||{value:'1'}).value||'1';
+    nts=parseInt(wks)*7;
+    durationLabel=wks+(lang==='ko'?'주 여행':' week trip');
+  } else {
+    nts=(document.getElementById('planNights')||{value:'5'}).value||'5';
+    durationLabel=nts+(lang==='ko'?'박':' nights');
+  }
+
+  // 월 정보
+  var monthEl = document.getElementById('eventMonthFilter');
+  var monthVal = monthEl ? monthEl.value : 'all';
+  var monthNames = {1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월'};
+  var monthNamesEn = {1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'};
+  var monthLabel = (monthVal && monthVal!=='all') ? (lang==='ko'?monthNames[parseInt(monthVal)]:monthNamesEn[parseInt(monthVal)]) : '';
 
   var inp = document.getElementById('chatInput');
   if(!inp) return;
 
   if(!destLabel){
-    inp.placeholder = '위에서 선택하거나 직접 입력하세요';
+    inp.placeholder = lang==='ko'?'위에서 선택하거나 직접 입력하세요':'Select above or type directly';
     inp.value = '';
     return;
   }
 
-  var txt = destLabel + ' ' + nts + '박 ' + ppl + '인';
-  if(styleLabel) txt += ' ' + styleLabel;
-  txt += (lang==='ko' ? ' 여행 — Option A/B/C 플랜 만들어줘' : ' trip — create Option A/B/C plan');
-  inp.value = txt;
+  var parts = [];
+  parts.push(originLabel+(lang==='ko'?' 출발 →':' →'));
+  parts.push(destLabel);
+  if(monthLabel) parts.push(monthLabel);
+  if(window._selectedEventName) parts.push(window._selectedEventName);
+  parts.push(durationLabel);
+  parts.push(ppl + (lang==='ko'?'인':' pax'));
+  if(styleLabel) parts.push(styleLabel);
+  if(subStyleLabel) parts.push(subStyleLabel);
+  parts.push(lang==='ko'?'— Option A/B/C 플랜 만들어줘':'— create Option A/B/C plan');
+  inp.value = parts.join(' ');
 
   // 예산 계산기 연동
   var cd = document.getElementById('calcDest');
@@ -2983,7 +3065,7 @@ function updatePlanInput(){
   if(cd) cd.value = dest;
   if(cp) cp.value = ppl;
   if(cn) cn.value = nts;
-  calcBudget();
+  if(typeof calcBudget==='function') calcBudget();
 }
 
 // ══ 이벤트 클릭 → 목적지 자동 선택 (수정) ══
@@ -3176,7 +3258,43 @@ function showUnlockedDetail(opt,tripIdx){
 }
 
 
-window.saveToTrip=saveToTrip; window.deleteTripConfirm=deleteTripConfirm; window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail; window.toggleFollow=toggleFollow;
+
+// ══ 박/주 모드 토글 ══
+var _nightsMode = 'nights';
+function toggleNightsMode(){
+  _nightsMode = _nightsMode==='nights'?'weeks':'nights';
+  var ni=document.getElementById('planNights');
+  var wi=document.getElementById('planWeeks');
+  var tg=document.getElementById('nightsToggle');
+  if(_nightsMode==='weeks'){
+    if(ni) ni.style.display='none';
+    if(wi) wi.style.display='block';
+    if(tg) tg.textContent=lang==='ko'?'← 박 단위로':'← nights mode';
+  } else {
+    if(ni) ni.style.display='block';
+    if(wi) wi.style.display='none';
+    if(tg) tg.textContent=lang==='ko'?'7박+ → 주 단위':'7+ nights → weeks';
+  }
+  updatePlanInput();
+}
+function onNightsChange(){
+  var ni=document.getElementById('planNights');
+  var val=parseInt(ni&&ni.value)||5;
+  if(val>6&&_nightsMode==='nights'){
+    ni.value=6;
+    toggleNightsMode();
+    return;
+  }
+  updatePlanInput();
+}
+
+// ══ 출발지 레이블 ══
+var ORIGIN_LABELS = {
+  ko:{ kr:'인천(ICN)', jp_dep:'도쿄/오사카', sg_dep:'싱가포르', th_dep:'방콕', tw_dep:'타이베이', uk_dep:'런던', fr_dep:'파리', us_dep:'뉴욕/LA', au_dep:'시드니' },
+  en:{ kr:'Incheon(ICN)', jp_dep:'Tokyo/Osaka', sg_dep:'Singapore', th_dep:'Bangkok', tw_dep:'Taipei', uk_dep:'London', fr_dep:'Paris', us_dep:'New York/LA', au_dep:'Sydney' }
+};
+
+window.toggleNightsMode=toggleNightsMode; window.onNightsChange=onNightsChange; window.saveToTrip=saveToTrip; window.deleteTripConfirm=deleteTripConfirm; window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
 window.searchUsers=searchUsers; window.openNewPost=openNewPost;
