@@ -381,10 +381,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   <div class="tn-logo" onclick="goPage('home')">DAL</div>
   <div class="tn-right">
     <button class="lang-btn" onclick="toggleLang()" id="langBtn">EN</button>
-    <div id="headerCoinBadge" class="coin-badge" onclick="openCoinModal()" style="opacity:0.4;border-color:rgba(196,175,135,.15);transition:opacity 0.3s,border-color 0.3s;">
-      <span>🪙</span><span id="coinCount">—</span><span id="t-coin-label" style="color:var(--m);font-size:10px">코인</span>
+    <div class="coin-badge" onclick="openCoinModal()">
+      <span>🪙</span><span id="coinCount">50</span><span id="t-coin-label" style="color:var(--m);font-size:10px">코인</span>
     </div>
-    <div id="headerUserBtn" style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:border-color 0.3s,background 0.3s;" onclick="goPage('my')">👤</div>
+    <div style="width:32px;height:32px;border-radius:50%;background:transparent;border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;" onclick="goPage('my')">👤</div>
   </div>
 </div>
 
@@ -393,8 +393,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-home" class="page active">
   <div class="home-wrap">
-    <div style="padding:10px 14px 0;">
-      <div style="font-size:11px;font-weight:500;color:var(--ac);padding:6px 0;">🌙 <span id='t-homeTabHalf'>AI 플래닝 · 무료</span></div>
+    <div style="display:flex;gap:6px;padding:10px 14px 0;">
+      <button id="homeTabHalf" onclick="setHomeTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">🌙 AI 플래닝 · 무료</button>
+      <button id="homeTabFull" onclick="setHomeTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">🌕 맞춤 플래닝 · 10🪙</button>
     </div>
     <div id="homeHalf" style="display:block;">
 
@@ -402,12 +403,12 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div style="padding:10px 14px 0;">
         <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">① 여행 스타일</div>
         <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          <button onclick="selectStyleChip(this,'couple')" class="style-chip active" data-ko="💑 커플" data-en="💑 Couple">💑 커플</button>
-          <button onclick="selectStyleChip(this,'family')" class="style-chip" data-ko="👨‍👩‍👧‍👦 가족" data-en="👨‍👩‍👧‍👦 Family">👨‍👩‍👧‍👦 가족</button>
-          <button onclick="selectStyleChip(this,'solo')" class="style-chip" data-ko="🧘 혼자" data-en="🧘 Solo">🧘 혼자</button>
-          <button onclick="selectStyleChip(this,'premium')" class="style-chip" data-ko="💎 프리미엄" data-en="💎 Premium">💎 프리미엄</button>
-          <button onclick="selectStyleChip(this,'value')" class="style-chip" data-ko="🎯 가성비" data-en="🎯 Value">🎯 가성비</button>
-          <button onclick="selectStyleChip(this,'backpacker')" class="style-chip" data-ko="🎒 배낭" data-en="🎒 Backpacker">🎒 배낭</button>
+          <button onclick="selectStyleChip(this,'couple')" class="style-chip active">💑 커플</button>
+          <button onclick="selectStyleChip(this,'family')" class="style-chip">👨‍👩‍👧‍👦 가족</button>
+          <button onclick="selectStyleChip(this,'solo')" class="style-chip">🧘 혼자</button>
+          <button onclick="selectStyleChip(this,'premium')" class="style-chip">💎 프리미엄</button>
+          <button onclick="selectStyleChip(this,'value')" class="style-chip">🎯 가성비</button>
+          <button onclick="selectStyleChip(this,'backpacker')" class="style-chip">🎒 배낭</button>
         </div>
         <div id="subStyleArea" style="display:none;margin-top:6px;">
           <div class="sub-style-row" id="subStyleBtns"></div>
@@ -417,13 +418,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <!-- ② 월별 이벤트 선택 -->
       <div style="padding:10px 14px 0;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;"><span id='t-step-event'>② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span></span></div>
-          <select id="eventMonthFilter" onchange="renderEvents();updatePlanInput();" style="font-size:9px;padding:2px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-            <option value="all" data-ko="전체" data-en="All">전체</option>
-            <option value="1" data-ko="1월" data-en="Jan">1월</option><option value="2" data-ko="2월" data-en="Feb">2월</option><option value="3" data-ko="3월" data-en="Mar">3월</option>
-            <option value="4" data-ko="4월" data-en="Apr">4월</option><option value="5" data-ko="5월" data-en="May">5월</option><option value="6" data-ko="6월" data-en="Jun">6월</option>
-            <option value="7" data-ko="7월" data-en="Jul">7월</option><option value="8" data-ko="8월" data-en="Aug">8월</option><option value="9" data-ko="9월" data-en="Sep">9월</option>
-            <option value="10" data-ko="10월" data-en="Oct">10월</option><option value="11" data-ko="11월" data-en="Nov">11월</option><option value="12" data-ko="12월" data-en="Dec">12월</option>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;">② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span></div>
+          <select id="eventMonthFilter" onchange="renderEvents()" style="font-size:9px;padding:2px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
+            <option value="all">전체</option>
+            <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option>
+            <option value="4">4월</option><option value="5">5월</option><option value="6">6월</option>
+            <option value="7">7월</option><option value="8">8월</option><option value="9">9월</option>
+            <option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
           </select>
         </div>
         <div id="eventList" style="max-height:160px;overflow-y:auto;"></div>
@@ -431,95 +432,30 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
       <!-- ③ 목적지 + 인원 + 박 -->
       <div style="padding:10px 14px 0;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;"><span id='t-step-dest'>③ 출발지 · 목적지 · 인원 · 일정</span></div>
-        <!-- 출발지 -->
-        <div style="margin-bottom:6px;">
-          <select id="planOrigin" onchange="updatePlanInput()" style="width:100%;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
-            <option value="kr" data-ko="🇰🇷 인천 (한국)" data-en="🇰🇷 Incheon (Korea)">🇰🇷 인천 (한국)</option>
-            <optgroup label="🌏 아시아 / Asia">
-            <option value="jp_dep" data-ko="🇯🇵 도쿄/오사카 (일본)" data-en="🇯🇵 Tokyo/Osaka (Japan)">🇯🇵 도쿄/오사카 (일본)</option>
-            <option value="cn_dep" data-ko="🇨🇳 베이징/상하이 (중국)" data-en="🇨🇳 Beijing/Shanghai (China)">🇨🇳 베이징/상하이 (중국)</option>
-            <option value="sg_dep" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
-            <option value="hk_dep" data-ko="🇭🇰 홍콩" data-en="🇭🇰 Hong Kong">🇭🇰 홍콩</option>
-            <option value="th_dep" data-ko="🇹🇭 방콕 (태국)" data-en="🇹🇭 Bangkok (Thailand)">🇹🇭 방콕 (태국)</option>
-            <option value="tw_dep" data-ko="🇹🇼 타이베이 (대만)" data-en="🇹🇼 Taipei (Taiwan)">🇹🇼 타이베이 (대만)</option>
-            </optgroup>
-            <optgroup label="🌍 유럽 / Europe">
-            <option value="uk_dep" data-ko="🇬🇧 런던 (영국)" data-en="🇬🇧 London (UK)">🇬🇧 런던 (영국)</option>
-            <option value="fr_dep" data-ko="🇫🇷 파리 (프랑스)" data-en="🇫🇷 Paris (France)">🇫🇷 파리 (프랑스)</option>
-            <option value="de_dep" data-ko="🇩🇪 프랑크푸르트 (독일)" data-en="🇩🇪 Frankfurt (Germany)">🇩🇪 프랑크푸르트 (독일)</option>
-            </optgroup>
-            <optgroup label="🌎 미주·오세아니아">
-            <option value="us_dep" data-ko="🇺🇸 뉴욕/LA (미국)" data-en="🇺🇸 New York/LA (USA)">🇺🇸 뉴욕/LA (미국)</option>
-            <option value="au_dep" data-ko="🇦🇺 시드니 (호주)" data-en="🇦🇺 Sydney (Australia)">🇦🇺 시드니 (호주)</option>
-            </optgroup>
-          </select>
-        </div>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">③ 목적지 · 인원 · 일정</div>
         <div style="display:flex;gap:6px;align-items:center;">
           <select id="planDest" onchange="updatePlanInput()" style="flex:2;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;">
-            <option value="" data-ko="목적지 선택" data-en="Select Destination">목적지 선택</option>
-            <optgroup label="🌏 아시아 / Asia">
-            <option value="jp" data-ko="🇯🇵 일본 (도쿄/교토/오사카)" data-en="🇯🇵 Japan (Tokyo/Kyoto/Osaka)">🇯🇵 일본 (도쿄/교토/오사카)</option>
-            <option value="th" data-ko="🇹🇭 태국 (방콕/치앙마이)" data-en="🇹🇭 Thailand (Bangkok/Chiang Mai)">🇹🇭 태국 (방콕/치앙마이)</option>
-            <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
-            <option value="bali" data-ko="🇮🇩 발리 (인도네시아)" data-en="🇮🇩 Bali (Indonesia)">🇮🇩 발리 (인도네시아)</option>
-            <option value="vn" data-ko="🇻🇳 베트남 (다낭/하노이/호치민)" data-en="🇻🇳 Vietnam (Da Nang/Hanoi/HCMC)">🇻🇳 베트남 (다낭/하노이/호치민)</option>
-            <option value="ph" data-ko="🇵🇭 필리핀 (세부/보라카이)" data-en="🇵🇭 Philippines (Cebu/Boracay)">🇵🇭 필리핀 (세부/보라카이)</option>
-            <option value="tw" data-ko="🇹🇼 대만 (타이베이)" data-en="🇹🇼 Taiwan (Taipei)">🇹🇼 대만 (타이베이)</option>
-            <option value="hk" data-ko="🇭🇰 홍콩" data-en="🇭🇰 Hong Kong">🇭🇰 홍콩</option>
-            <option value="my" data-ko="🇲🇾 말레이시아 (쿠알라룸푸르)" data-en="🇲🇾 Malaysia (Kuala Lumpur)">🇲🇾 말레이시아 (쿠알라룸푸르)</option>
-            <option value="in" data-ko="🇮🇳 인도 (델리/뭄바이/고아)" data-en="🇮🇳 India (Delhi/Mumbai/Goa)">🇮🇳 인도 (델리/뭄바이/고아)</option>
-            <option value="kr" data-ko="🇰🇷 한국 (서울/부산)" data-en="🇰🇷 Korea (Seoul/Busan)">🇰🇷 한국 (서울/부산)</option>
-            <option value="jeju" data-ko="🇰🇷 제주도" data-en="🇰🇷 Jeju Island">🇰🇷 제주도</option>
-            </optgroup>
-            <optgroup label="🌍 유럽 / Europe">
-            <option value="fr" data-ko="🇫🇷 프랑스 (파리)" data-en="🇫🇷 France (Paris)">🇫🇷 프랑스 (파리)</option>
-            <option value="sp" data-ko="🇪🇸 스페인 (바르셀로나/마드리드)" data-en="🇪🇸 Spain (Barcelona/Madrid)">🇪🇸 스페인 (바르셀로나/마드리드)</option>
-            <option value="it" data-ko="🇮🇹 이탈리아 (로마/피렌체/밀라노)" data-en="🇮🇹 Italy (Rome/Florence/Milan)">🇮🇹 이탈리아 (로마/피렌체/밀라노)</option>
-            <option value="uk" data-ko="🇬🇧 영국 (런던)" data-en="🇬🇧 UK (London)">🇬🇧 영국 (런던)</option>
-            <option value="de" data-ko="🇩🇪 독일 (베를린/뮌헨)" data-en="🇩🇪 Germany (Berlin/Munich)">🇩🇪 독일 (베를린/뮌헨)</option>
-            <option value="gr" data-ko="🇬🇷 그리스 (아테네/산토리니)" data-en="🇬🇷 Greece (Athens/Santorini)">🇬🇷 그리스 (아테네/산토리니)</option>
-            <option value="pt" data-ko="🇵🇹 포르투갈 (리스본/포르투)" data-en="🇵🇹 Portugal (Lisbon/Porto)">🇵🇹 포르투갈 (리스본/포르투)</option>
-            <option value="ch" data-ko="🇨🇭 스위스 (취리히/루체른)" data-en="🇨🇭 Switzerland (Zurich/Lucerne)">🇨🇭 스위스 (취리히/루체른)</option>
-            <option value="nl" data-ko="🇳🇱 네덜란드 (암스테르담)" data-en="🇳🇱 Netherlands (Amsterdam)">🇳🇱 네덜란드 (암스테르담)</option>
-            <option value="tr" data-ko="🇹🇷 튀르키예 (이스탄불/카파도키아)" data-en="🇹🇷 Turkey (Istanbul/Cappadocia)">🇹🇷 튀르키예 (이스탄불/카파도키아)</option>
-            </optgroup>
-            <optgroup label="🌎 미주·오세아니아 / Americas & Oceania">
-            <option value="us" data-ko="🇺🇸 미국 (뉴욕/LA/라스베가스)" data-en="🇺🇸 USA (New York/LA/Las Vegas)">🇺🇸 미국 (뉴욕/LA/라스베가스)</option>
-            <option value="ca" data-ko="🇨🇦 캐나다 (토론토/밴쿠버)" data-en="🇨🇦 Canada (Toronto/Vancouver)">🇨🇦 캐나다 (토론토/밴쿠버)</option>
-            <option value="mx" data-ko="🇲🇽 멕시코 (칸쿤/멕시코시티)" data-en="🇲🇽 Mexico (Cancun/Mexico City)">🇲🇽 멕시코 (칸쿤/멕시코시티)</option>
-            <option value="au" data-ko="🇦🇺 호주 (시드니/멜버른)" data-en="🇦🇺 Australia (Sydney/Melbourne)">🇦🇺 호주 (시드니/멜버른)</option>
-            <option value="nz" data-ko="🇳🇿 뉴질랜드 (오클랜드/퀸스타운)" data-en="🇳🇿 New Zealand (Auckland/Queenstown)">🇳🇿 뉴질랜드 (오클랜드/퀸스타운)</option>
-            </optgroup>
-            <optgroup label="🌺 기타 / Others">
-            <option value="ae" data-ko="🇦🇪 두바이 (UAE)" data-en="🇦🇪 Dubai (UAE)">🇦🇪 두바이 (UAE)</option>
-            <option value="ma" data-ko="🇲🇦 모로코 (마라케시/페스)" data-en="🇲🇦 Morocco (Marrakech/Fes)">🇲🇦 모로코 (마라케시/페스)</option>
-            <option value="za" data-ko="🇿🇦 남아프리카 (케이프타운)" data-en="🇿🇦 South Africa (Cape Town)">🇿🇦 남아프리카 (케이프타운)</option>
-            <option value="eg" data-ko="🇪🇬 이집트 (카이로/룩소르)" data-en="🇪🇬 Egypt (Cairo/Luxor)">🇪🇬 이집트 (카이로/룩소르)</option>
-            </optgroup>
+            <option value="">목적지 선택</option>
+            <option value="jp">🇯🇵 일본</option>
+            <option value="th">🇹🇭 태국</option>
+            <option value="sg">🇸🇬 싱가포르</option>
+            <option value="fr">🇫🇷 프랑스</option>
+            <option value="bali">🇮🇩 발리</option>
+            <option value="us">🇺🇸 미국</option>
+            <option value="sp">🇪🇸 스페인</option>
+            <option value="kr">🇰🇷 한국</option>
+            <option value="jeju">🇰🇷 제주</option>
           </select>
           <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
-          <!-- 박수(1-6) / 주(1-6주) 전환 -->
-          <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
-            <input id="planNights" type="number" min="1" max="6" value="5" onchange="onNightsChange()" style="padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;width:100%;" placeholder="박">
-            <select id="planWeeks" onchange="updatePlanInput()" style="display:none;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;width:100%;">
-              <option value="1">1주</option>
-              <option value="2">2주</option>
-              <option value="3">3주</option>
-              <option value="4">4주</option>
-              <option value="5">5주</option>
-              <option value="6">6주</option>
-            </select>
-            <div id="nightsToggle" style="font-size:8px;color:var(--ac);text-align:center;cursor:pointer;" onclick="toggleNightsMode()">7박+ → 주 단위</div>
-          </div>
+          <input id="planNights" type="number" min="1" max="30" value="5" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="박">
         </div>
       </div>
 
       <!-- ④ AI 입력창 (자동 채워짐 + 직접 수정 가능) -->
       <div style="padding:10px 14px 6px;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;"><span id='t-step-ai'>④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span></span></div>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span></div>
         <div style="display:flex;gap:6px;align-items:flex-end;">
-          <textarea id="chatInput" rows="2" onkeydown="handleKey(event)" style="flex:1;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;" placeholder="Select above or type · e.g. Bangkok 5 nights 2 pax couple"></textarea>
+          <textarea id="chatInput" rows="2" onkeydown="handleKey(event)" style="flex:1;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;" placeholder="위에서 선택하거나 직접 입력하세요&#10;예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘"></textarea>
           <button onclick="sendMsg()" style="padding:10px 14px;background:var(--ac);border:none;border-radius:2px;color:#fff;font-size:16px;cursor:pointer;height:52px;flex-shrink:0;">↑</button>
         </div>
         <div class="limit-bar" id="limitBar" style="margin-top:6px;">
@@ -547,76 +483,76 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             <div style="font-size:11px;color:var(--sb);font-weight:500;" id="dailyStreakText">🔥 연속 접속 1일째</div>
             <div style="font-size:9px;color:var(--m);margin-top:1px;" id="dailyStreakSub">맞춤 플래닝 이용 시 출석 체크</div>
           </div>
-          <button id="dailyCheckInBtn" onclick="doDailyCheckIn()" style="background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:2px;padding:5px 12px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🪙 출석 체크" data-en="🪙 Check In">🪙 출석 체크</button>
+          <button id="dailyCheckInBtn" onclick="doDailyCheckIn()" style="background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:2px;padding:5px 12px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🪙 출석 체크</button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;" id="streakCalendar"></div>
       </div>
       <div id="fullInputArea" style="padding:14px;">
-        <div style="font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;"><span id='t-full-input-label'>맞춤 플래닝 조건 입력</span></div>
+        <div style="font-size:9px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;">맞춤 플래닝 조건 입력</div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 1 · 여행자 구성" data-en="STEP 1 · Travelers">STEP 1 · 여행자 구성</span></div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 1 · 여행자 구성</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="혼자" data-en="Solo">혼자</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="2인" data-en="2 pax">2인</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="3인" data-en="3 pax">3인</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="4인+" data-en="4+ pax">4인+</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="커플" data-en="Couple">커플</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="가족" data-en="Family">가족</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="친구" data-en="Friends">친구</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="아이 동반" data-en="With Kids">아이 동반</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="알레르기/특이사항" data-en="Allergies/Special needs">알레르기/특이사항</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">혼자</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">2인</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">3인</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">4인+</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">커플</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">가족</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">친구</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">아이 동반</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid">알레르기/특이사항</button>
           </div>
         </div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 2 · 여행 목표 &amp; 피하고 싶은 것" data-en="STEP 2 · Travel Goals &amp; Avoids">STEP 2 · 여행 목표 &amp; 피하고 싶은 것</span></div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 2 · 여행 목표 &amp; 피하고 싶은 것</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="휴식" data-en="Relaxation">휴식</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="미식" data-en="Dining">미식</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="쇼핑" data-en="Shopping">쇼핑</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="자연" data-en="Nature">자연</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="문화/역사" data-en="Culture/History">문화/역사</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="액티비티" data-en="Activities">액티비티</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="붐비는 곳 피함" data-en="Avoid crowded spots">붐비는 곳 피함</button>
-            <button onclick="toggleFullChip(this)" class="full-chip avoid" data-ko="장거리 이동 피함" data-en="Avoid long travel">장거리 이동 피함</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">휴식</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">미식</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">쇼핑</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">자연</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">문화/역사</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">액티비티</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid">붐비는 곳 피함</button>
+            <button onclick="toggleFullChip(this)" class="full-chip avoid">장거리 이동 피함</button>
           </div>
         </div>
         <div style="margin-bottom:10px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 3 · 예산 &amp; 조건" data-en="STEP 3 · Budget &amp; Conditions">STEP 3 · 예산 &amp; 조건</span></div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 3 · 예산 &amp; 조건</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="100만원대" data-en="Under $1000">100만원대</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget active" data-ko="200-300만원" data-en="$1500-2500">200-300만원</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="400-500만원" data-en="$3000-4000">400-500만원</button>
-            <button onclick="toggleFullBudget(this)" class="full-chip budget" data-ko="500만원+" data-en="$4000+">500만원+</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget">100만원대</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget active">200-300만원</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget">400-500만원</button>
+            <button onclick="toggleFullBudget(this)" class="full-chip budget">500만원+</button>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="직항" data-en="Direct flight">직항</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="경유 가능" data-en="Stopover ok">경유 가능</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="호텔" data-en="Hotel">호텔</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="리조트" data-en="Resort">리조트</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="에어비앤비" data-en="Airbnb">에어비앤비</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">직항</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">경유 가능</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">호텔</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">리조트</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">에어비앤비</button>
           </div>
         </div>
         <div style="margin-bottom:12px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;"><span data-ko="STEP 4 · AI 심화 분석" data-en="STEP 4 · AI Deep Analysis">STEP 4 · AI 심화 분석</span></div>
+          <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:5px;">STEP 4 · AI 심화 분석</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="현지 이벤트 체크" data-en="Check local events">현지 이벤트 체크</button>
-            <button onclick="toggleFullChip(this)" class="full-chip active" data-ko="카드 할인 최적화" data-en="Card discount opt.">카드 할인 최적화</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="환율/가성비 타이밍" data-en="FX/value timing">환율/가성비 타이밍</button>
-            <button onclick="toggleFullChip(this)" class="full-chip" data-ko="현지인 숨겨진 팁" data-en="Local hidden tips">현지인 숨겨진 팁</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">현지 이벤트 체크</button>
+            <button onclick="toggleFullChip(this)" class="full-chip active">카드 할인 최적화</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">환율/가성비 타이밍</button>
+            <button onclick="toggleFullChip(this)" class="full-chip">현지인 숨겨진 팁</button>
           </div>
         </div>
-        <textarea id="fullDestInput" rows="2" placeholder="Destination, duration, special requests" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;margin-bottom:10px;"></textarea>
-        <button onclick="startFullAnalysis()" style="width:100%;padding:13px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:5px;"><span id='t-full-start-btn'>🌕 맞춤 플래닝 시작 →</span></button>
-        <div style="font-size:9px;color:var(--m);text-align:center;"><span id="t-full-coin-info">10🪙 차감 · 잔액 <span id="fullCoinBalance">50</span>🪙 · 완료 후 +5🪙 적립</span></div>
+        <textarea id="fullDestInput" rows="2" placeholder="목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;resize:none;margin-bottom:10px;"></textarea>
+        <button onclick="startFullAnalysis()" style="width:100%;padding:13px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:5px;">🌕 맞춤 플래닝 시작 →</button>
+        <div style="font-size:9px;color:var(--m);text-align:center;">10🪙 차감 · 잔액 <span id="fullCoinBalance">50</span>🪙 · 완료 후 +5🪙 적립</div>
       </div>
       <div id="fullResultArea" style="display:none;padding:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <button onclick="backToFullInput()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0;" id="t-back-input">← 다시 입력</button>
-          <div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);padding:3px 10px;border-radius:10px;" id="t-full-badge">🌕 맞춤 플래닝</div>
+          <button onclick="backToFullInput()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0;">← 다시 입력</button>
+          <div style="font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);padding:3px 10px;border-radius:10px;">🌕 맞춤 플래닝</div>
         </div>
         <div class="chat-area" id="fullChatArea" style="max-height:55vh;overflow-y:auto;margin-bottom:10px;"></div>
         <div id="fullSaveBtnArea" style="display:none;">
-          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-full-save-btn">✓ 내 여행에 저장 · 🪙 5코인 적립</button>
+          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">✓ 내 여행에 저장 · 🪙 5코인 적립</button>
         </div>
       </div>
     </div>
@@ -651,8 +587,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
     <div class="sec-label" id="t-svc-select">서비스 선택</div>
     <div class="lug-cards">
-      <div class="lug-card" onclick="bookLuggage('공항 수화물 픽업',30)"><div style="font-size:20px;margin-bottom:6px;">🤖</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l1">공항 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l1s">로봇이 직접 픽업. 인천 T1.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin1'>🪙 30코인</span></div><span class="badge b-ok">Beta</span></div>
-      <div class="lug-card" onclick="bookLuggage('수화물 보관',20)"><div style="font-size:20px;margin-bottom:6px;">🗄️</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l2s">위탁 전 안전 보관.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin2'>🪙 20코인/6h</span></div><span class="badge b-ok">Beta</span></div>
+      <div class="lug-card" onclick="bookLuggage('공항 수화물 픽업',30)"><div style="font-size:20px;margin-bottom:6px;">🤖</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l1">공항 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l1s">로봇이 직접 픽업. 인천 T1.</div><div style="font-size:11px;color:var(--gold);">🪙 30코인</div><span class="badge b-ok">Beta</span></div>
+      <div class="lug-card" onclick="bookLuggage('수화물 보관',20)"><div style="font-size:20px;margin-bottom:6px;">🗄️</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l2s">위탁 전 안전 보관.</div><div style="font-size:11px;color:var(--gold);">🪙 20코인/6h</div><span class="badge b-ok">Beta</span></div>
       <div class="lug-card disabled"><div class="coming-badge">2027+</div><div style="font-size:20px;margin-bottom:6px;">🏨</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l3">호텔→공항</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l3s">호텔에서 자동 배송.</div><div style="font-size:11px;color:var(--m);">Coming Soon</div></div>
       <div class="lug-card" onclick="bookLuggage('안마의자 라운지',50)"><div style="font-size:20px;margin-bottom:6px;">💺</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l4">안마의자 라운지</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l4s">짐 없이 편안한 휴식.</div><div style="font-size:11px;color:var(--gold);">🪙 50코인/1h</div><span class="badge b-warn">준비중</span></div>
     </div>
@@ -671,11 +607,11 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- PAGE: TRIPS — R2-7 폴더트리, R2-8 할인토글, R2-9 공유 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div id="page-trips" class="page" style="touch-action:pan-y;">
-  <!-- 목록 영역 -->
-  <div id="tripsListWrap" class="page-wrap">
-    <div style="margin-bottom:14px;">
-      <div style="font-size:11px;font-weight:500;color:var(--ac);padding:4px 0;">🌙 <span id='t-tripsTabHalf'>플래닝 기록</span></div>
+<div id="page-trips" class="page">
+  <div class="page-wrap">
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <button id="tripsTabHalf" onclick="setTripsTab('half')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.08);color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">🌙 플래닝 기록</button>
+      <button id="tripsTabFull" onclick="setTripsTab('full')" style="flex:1;padding:8px 4px;font-size:11px;border-radius:4px;border:1px solid rgba(196,175,135,.2);background:transparent;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">🌕 맞춤 플래닝 기록</button>
     </div>
     <div id="tripsHalf" style="display:block;">
       <div id="halfTripsList"></div>
@@ -688,73 +624,46 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div id="fullTripsList"></div>
       <div class="trip-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;gap:8px;cursor:pointer;" onclick="setHomeTab('full');goPage('home')">
         <div style="font-size:22px;color:var(--gold)">+</div>
-        <div style="font-size:11px;color:var(--gold)"><span data-ko="🌕 맞춤 플래닝 새로 시작 · 10🪙" data-en="🌕 Start Custom Planning · 10🪙">🌕 맞춤 플래닝 새로 시작 · 10🪙</span></div>
+        <div style="font-size:11px;color:var(--gold)">🌕 맞춤 플래닝 새로 시작 · 10🪙</div>
       </div>
     </div>
-  </div>
-  <!-- 상세 영역 (page-wrap 밖, page 직속으로 스크롤) -->
-  <div id="halfTripDetail" style="display:none;padding:20px 18px 40px;">
-      <!-- 헤더 -->
+    <div id="halfTripDetail" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <button onclick="closeHalfDetail()" style="background:transparent;border:none;color:var(--m);font-size:20px;cursor:pointer;padding:0;">←</button>
         <div style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);padding:3px 10px;border-radius:10px;">AI 플래닝</div>
       </div>
-
-      <!-- 숨겨진 ID 유지 (JS 호환) -->
-      <div id="optA" style="display:none;"></div>
-      <div id="optB" style="display:none;"></div>
-      <div id="optC" style="display:none;"></div>
-      <div id="t-optA-name" style="display:none;"></div>
-      <div id="t-optB-name" style="display:none;"></div>
-      <div id="t-optC-name" style="display:none;"></div>
-      <div id="t-optA-price" style="display:none;"></div>
-      <div id="t-optB-price" style="display:none;"></div>
-      <div id="t-optC-price" style="display:none;"></div>
-
-      <!-- 여행 제목/날짜 -->
-      <div style="margin-bottom:14px;">
-        <div class="tc-route" id="tripRoute" style="font-size:16px;font-weight:500;margin-bottom:4px;">ICN → SIN</div>
-        <div style="font-size:10px;color:var(--m);" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
+      <div class="option-tabs">
+        <div class="opt-tab" id="optA" onclick="selectOption('A')"><div style="font-size:8px;color:var(--gold);margin-bottom:2px;">OPTION A</div><div id="t-optA-name">풀 프리미엄</div><div id="t-optA-price" style="font-size:11px;margin-top:2px;">₩14.2M</div></div>
+        <div class="opt-tab sel-b" id="optB" onclick="selectOption('B')"><div style="font-size:8px;color:var(--ac);margin-bottom:2px;">OPTION B ⭐</div><div id="t-optB-name">스마트 추천</div><div id="t-optB-price" style="font-size:11px;margin-top:2px;">₩8.3M</div></div>
+        <div class="opt-tab" id="optC" onclick="selectOption('C')"><div style="font-size:8px;color:var(--ok);margin-bottom:2px;">OPTION C</div><div id="t-optC-name">가성비</div><div id="t-optC-price" style="font-size:11px;margin-top:2px;">₩5.9M</div></div>
       </div>
-
-      <!-- 1. 잠금 해제 버튼 (최상단) -->
-      <div id="optionUnlockArea" style="margin-bottom:14px;background:rgba(196,175,135,.04);border:1px solid rgba(196,175,135,.15);border-radius:4px;padding:12px;">
-        <div style="font-size:10px;color:var(--gold);margin-bottom:6px;text-align:center;" id="t-unlock-title">🌕 옵션 상세 잠금 해제 · 각 5🪙</div>
-        <div id="unlockNotice" style="font-size:9px;color:var(--m);text-align:center;margin-bottom:8px;padding:4px 8px;background:rgba(91,143,255,.04);border-radius:4px;line-height:1.6;display:none;"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-          <button id="unlockBtnA" onclick="requestUnlockOption('A')" style="padding:10px 4px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option A<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-          <button id="unlockBtnB" onclick="requestUnlockOption('B')" style="padding:10px 4px;background:rgba(91,143,255,.1);border:1px solid rgba(91,143,255,.3);border-radius:4px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option B<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-          <button id="unlockBtnC" onclick="requestUnlockOption('C')" style="padding:10px 4px;background:rgba(0,200,100,.06);border:1px solid rgba(0,200,100,.2);border-radius:4px;font-size:10px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;">🔒 Option C<br><span style="font-size:9px;color:var(--m);">5🪙</span></button>
-        </div>
-        <div style="font-size:9px;color:var(--m);text-align:center;margin-top:6px;" id="t-unlock-desc">식당명 · 시간대별 동선 · 카드할인 확정 제공</div>
-      </div>
-
-      <!-- 2. 최저가 링크 -->
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
-        <div class="sec-label" style="margin-bottom:8px;" id="t-cheapest">🔗 최저가 바로가기</div>
+        <div class="tc-route" id="tripRoute">ICN → SIN</div>
+        <div style="font-size:10px;color:var(--m);margin-bottom:10px;" id="tripDate">2026.10.15 — 10.24 · 10박 · 4인</div>
+        <div id="treeBreakdown"></div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
+        <div class="sec-label" style="margin-bottom:8px;">🔗 최저가 바로가기</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
           <button onclick="openLink('https://flight.naver.com')" class="link-btn" style="padding:8px 4px;">✈️ 네이버항공</button>
           <button onclick="openLink('https://www.agoda.com')" class="link-btn" style="padding:8px 4px;">🏨 아고다</button>
           <button onclick="openLink('https://www.klook.com')" class="link-btn" style="padding:8px 4px;">🎫 클룩</button>
         </div>
       </div>
-
-      <!-- 숨겨진 호환 ID (JS 오류 방지) -->
-      <div id="discountToggles" style="display:none;"></div>
-      <div id="t-discounts" style="display:none;"></div>
-
-      <!-- 4. 상세 내역 영역 (잠금 해제 시 아래로 추가, 높이 제한 없음) -->
-      <div id="unlockedDetailsArea" style="margin-bottom:20px;"></div>
-
-      <!-- 공유 버튼 제거 (각 옵션 블록 내부로 통합) -->
-
-      <!-- 숨겨진 호환 ID -->
-      <div id="treeBreakdown" style="display:none;"></div>
-      <div id="finalPrice" style="display:none;"></div>
-      <div id="finalEarn" style="display:none;"></div>
-      <div id="t-final-label" style="display:none;"></div>
-
-
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:13px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div class="sec-label" style="margin-bottom:0;" id="t-discounts">적용 할인</div>
+          <div style="font-size:9px;color:var(--m);">on/off 로 선택</div>
+        </div>
+        <div id="discountToggles"></div>
+      </div>
+      <div class="final-price-box">
+        <div class="final-label" id="t-final-label">최종 결제 금액</div>
+        <div class="final-price" id="finalPrice">₩7,627,040</div>
+        <div class="final-earn" id="finalEarn">+🪙 221코인 적립 예정</div>
+      </div>
+      <button onclick="startUpgradeFromTrip(currentHalfTripIdx)" class="action-btn btn-dim" style="margin-top:10px;border-color:rgba(196,175,135,.3);color:var(--gold);">🌕 맞춤 플래닝으로 업그레이드 · 10🪙</button>
+      <button class="action-btn btn-dim" onclick="openShareModal()" id="t-share-btn">✉️ 플랜 공유하기</button>
     </div>
     <div id="fullTripDetail" style="display:none;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
@@ -774,7 +683,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <button class="tab-btn active" onclick="showSocialTab('msg',this)" id="t-tab-msg">메신저</button>
     <button class="tab-btn" onclick="showSocialTab('feed',this)" id="t-tab-feed">피드</button>
     <button class="tab-btn" onclick="showSocialTab('follow',this)" id="t-tab-follow">팔로잉</button>
-    <button class="tab-btn" onclick="showSocialTab('info',this)" id="t-tab-info"><span id='t-tab-info-label'>정보</span></button>
+    <button class="tab-btn" onclick="showSocialTab('info',this)" id="t-tab-info">정보</button>
   </div>
   <!-- 메신저 -->
   <div id="social-msg" style="padding:14px 18px;">
@@ -785,17 +694,18 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div id="msgRoomList" style="font-size:11px;color:var(--m);text-align:center;padding:20px 0;line-height:2;">
       아직 대화가 없어요.<br>팔로우 중인 여행자와 메시지를 시작해보세요 🌙
     </div>
+    <button class="action-btn btn-gold" style="margin-top:14px;" onclick="openNewChat()" id="t-new-msg">+ 새 메시지</button>
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
     <div id="socialFeed" style="margin-bottom:10px;"></div>
     <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="2시간 전 · 싱가포르" data-en="2h ago · Singapore">2시간 전 · 싱가포르</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);">2시간 전 · 싱가포르</div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
       <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇸🇬 싱가포르 10월 꿀팁! F1 그랑프리(10/17-19) 피해서 10/20 이후 예약하면 호텔 40% 저렴. 마리나베이샌즈 뷰룸 1박 35만원에 잡았어요 🎉 DAL Full 모드로 비교하고 바로 예약!</div>
-      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)"><span data-ko="🔗 공유" data-en="🔗 Share">🔗 공유</span></button></div>
+      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
     </div>
     <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="어제 · 도쿄" data-en="Yesterday · Tokyo">어제 · 도쿄</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
+      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);">어제 · 도쿄</div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
       <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br></div>
       <div class="feed-actions"><button class="feed-btn">❤️ 41</button><button class="feed-btn">💬 12</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
     </div>
@@ -805,34 +715,34 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   <div id="social-follow" style="padding:14px 18px;display:none;">
     <div style="font-size:10px;color:var(--m);margin-bottom:12px;line-height:1.8;" id="t-follow-sub">팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.</div>
     <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:8px;" id="t-suggested">추천 여행자</div>
-    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="싱가포르·발리 전문 · 팔로워 234" data-en="Singapore·Bali expert · 234 followers">싱가포르·발리 전문 · 팔로워 234</span></div></div><button class="follow-btn following"><span data-ko="팔로잉 ✓" data-en="Following ✓">팔로잉 ✓</span></button></div>
-    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="도쿄·오사카 전문 · 팔로워 189" data-en="Tokyo·Osaka expert · 189 followers">도쿄·오사카 전문 · 팔로워 189</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);"><span data-ko="파리·바르셀로나 전문 · 팔로워 312" data-en="Paris·Barcelona expert · 312 followers">파리·바르셀로나 전문 · 팔로워 312</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);"><span data-ko="동남아 가성비 · 팔로워 521" data-en="SE Asia value expert · 521 followers">동남아 가성비 · 팔로워 521</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;"><span data-ko="팔로우 중인 여행자의 새 여행 정보를 받아보세요" data-en="Get updates from travelers you follow">팔로우 중인 여행자의 새 여행 정보를 받아보세요</span></div>
+    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);">싱가포르·발리 전문 · 팔로워 234</div></div><button class="follow-btn following">팔로잉 ✓</button></div>
+    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);">도쿄·오사카 전문 · 팔로워 189</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
+    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);">파리·바르셀로나 전문 · 팔로워 312</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
+    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);">동남아 가성비 · 팔로워 521</div></div><button class="follow-btn" onclick="toggleFollow(this)">팔로우</button></div>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;">팔로우 중인 여행자의 새 여행 정보를 받아보세요</div>
   </div>
   <div id="social-info" style="display:none;padding:14px 18px;">
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="font-size:12px;color:var(--sb);font-weight:500;">🎉 Local Main Events</div>
         <select id="infoEventFilter" onchange="renderInfoEvents()" style="font-size:9px;padding:3px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-          <option value="all" data-ko="전체" data-en="All">전체</option>
-          <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option><option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
-          <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option><option value="fr" data-ko="🇫🇷 프랑스" data-en="🇫🇷 France">🇫🇷 프랑스</option>
-          <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option><option value="us" data-ko="🇺🇸 미국" data-en="🇺🇸 USA">🇺🇸 미국</option>
-          <option value="sp" data-ko="🇪🇸 스페인" data-en="🇪🇸 Spain">🇪🇸 스페인</option><option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
+          <option value="all">전체</option>
+          <option value="jp">🇯🇵 일본</option><option value="th">🇹🇭 태국</option>
+          <option value="sg">🇸🇬 싱가포르</option><option value="fr">🇫🇷 프랑스</option>
+          <option value="bali">🇮🇩 발리</option><option value="us">🇺🇸 미국</option>
+          <option value="sp">🇪🇸 스페인</option><option value="kr">🇰🇷 한국</option>
         </select>
       </div>
       <div id="infoEventList"></div>
     </div>
     <div style="margin-bottom:14px;">
-      <div style="font-size:12px;color:var(--sb);font-weight:500;margin-bottom:10px;" id="t-checklist-title">✅ 여행 준비 체크리스트</div>
+      <div style="font-size:12px;color:var(--sb);font-weight:500;margin-bottom:10px;">✅ 여행 준비 체크리스트</div>
       <div class="checklist" id="infoChecklist"></div>
     </div>
     <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;">
-      <div style="font-size:11px;color:var(--sb);margin-bottom:4px;" id="t-safety-title">⚠️ 안전 정보</div>
-      <div style="font-size:10px;color:var(--m);margin-bottom:8px;" id="t-safety-desc">전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.</div>
-      <button onclick="openLink('https://www.0404.go.kr')" style="width:100%;padding:8px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-safety-btn">외교부 해외안전여행 바로가기 →</button>
+      <div style="font-size:11px;color:var(--sb);margin-bottom:4px;">⚠️ 안전 정보</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;">전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.</div>
+      <button onclick="openLink('https://www.0404.go.kr')" style="width:100%;padding:8px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;">외교부 해외안전여행 바로가기 →</button>
     </div>
   </div>
   <!-- 채팅방 (서브) -->
@@ -859,13 +769,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <button class="social-btn" onclick="doLogin('google')"><span style="font-size:18px;width:22px;text-align:center;">🟡</span><span id="t-google">Google로 계속하기</span></button>
       <button class="social-btn" onclick="doLogin('kakao')"><span style="font-size:18px;width:22px;text-align:center;">💬</span><span id="t-kakao">카카오로 계속하기</span></button>
       <button class="social-btn" onclick="doLogin('apple')"><span style="font-size:18px;width:22px;text-align:center;">🍎</span><span id="t-apple">Apple로 계속하기</span></button>
-      <div style="font-size:10px;color:var(--m);text-align:center;padding:4px 0" id="t-or-email">— 또는 이메일로 —</div>
-      <input id="loginEmailInput" type="email" id="loginEmailPlaceholder" placeholder="이메일" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
-      <input id="loginPwInput" type="password" id="loginPwPlaceholder" placeholder="비밀번호 (6자 이상)" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
+      <div style="font-size:10px;color:var(--m);text-align:center;padding:4px 0">— 또는 이메일로 —</div>
+      <input id="loginEmailInput" type="email" placeholder="이메일" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
+      <input id="loginPwInput" type="password" placeholder="비밀번호 (6자 이상)" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
       <div id="loginErrMsg" style="font-size:10px;color:#ff6b6b;text-align:center;min-height:16px;margin-bottom:4px;"></div>
       <div style="display:flex;gap:6px;">
-        <button class="social-btn" onclick="doEmailLogin()" style="flex:1;" id="t-email-login-btn">✉️ 로그인</button>
-        <button class="social-btn" onclick="doEmailSignup()" style="flex:1;" id="t-email-signup-btn">✨ 회원가입</button>
+        <button class="social-btn" onclick="doEmailLogin()" style="flex:1;">✉️ 로그인</button>
+        <button class="social-btn" onclick="doEmailSignup()" style="flex:1;">✨ 회원가입</button>
       </div>
     </div>
     <div style="font-size:9px;color:var(--m);text-align:center;line-height:1.9;max-width:280px;" id="t-terms">계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.</div>
@@ -879,7 +789,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div>
           <div style="font-size:14px;color:var(--sb);margin-bottom:2px;" id="profileName">사용자</div>
           <div style="font-size:10px;color:var(--m);" id="profileEmail">—</div>
-          <div style="font-size:9px;color:var(--ok);margin-top:3px;" id="profileProvider"><span id='t-provider-status'>● 로그인됨</span></div>
+          <div style="font-size:9px;color:var(--ok);margin-top:3px;" id="profileProvider">● 로그인됨</div>
         </div>
       </div>
       <!-- 코인 -->
@@ -889,9 +799,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button style="padding:8px 14px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openCoinModal()" id="t-charge">충전하기</button>
         </div>
         <div class="coin-types">
-          <div class="coin-type"><div class="ct-amount" id="bonusCoin">50</div><div class="ct-label"><span id='t-coin-type1'>가입<br>보너스</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund1'>환불불가</span></div></div>
-          <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label"><span id='t-coin-type2'>앱사용<br>적립</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund2'>환불불가</span></div></div>
-          <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label"><span id='t-coin-type3'>개인<br>충전</span></div><div style="font-size:7px;color:var(--ok);margin-top:3px;"><span id='t-coin-refund'>환불가능</span></div></div>
+          <div class="coin-type"><div class="ct-amount" id="bonusCoin">50</div><div class="ct-label">가입<br>보너스</div><div style="font-size:7px;color:var(--red);margin-top:3px;">환불불가</div></div>
+          <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label">앱사용<br>적립</div><div style="font-size:7px;color:var(--red);margin-top:3px;">환불불가</div></div>
+          <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label">개인<br>충전</div><div style="font-size:7px;color:var(--ok);margin-top:3px;">환불가능</div></div>
         </div>
       </div>
       <!-- 카드 & 혜택 — R2-2 활성화 -->
@@ -1288,19 +1198,6 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
   </div>
 </div>
-<!-- 옵션 잠금해제 확인 팝업 -->
-<div id="unlockConfirmModal" class="modal-bg" onclick="closeModalBg('unlockConfirmModal',event)" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:24px;max-width:320px;width:90%;margin:auto;">
-    <div style="font-size:16px;color:var(--sb);font-weight:500;margin-bottom:8px;text-align:center;" id="unlockConfirmTitle">🌕 Option A 상세 잠금 해제</div>
-    <div style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:16px;text-align:center;" id="unlockConfirmDesc">5🪙 코인을 사용해 Option A의 상세 정보를 열겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정</div>
-    <div style="font-size:11px;color:var(--m);text-align:center;margin-bottom:16px;">현재 보유: <span id="unlockCoinBalance" style="color:var(--gold);font-weight:500;">50🪙</span></div>
-    <div style="display:flex;gap:8px;">
-      <button onclick="document.getElementById('unlockConfirmModal').style.display='none';" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);border-radius:4px;font-size:12px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-unlock-cancel">취소</button>
-      <button onclick="confirmUnlockOption()" style="flex:1;padding:10px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.4);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-unlock-confirm">5🪙 사용 · 잠금 해제</button>
-    </div>
-  </div>
-</div>
-
 <!-- 여행 공유 모달 R2-9 -->
 <div class="modal-bg" id="shareModal" onclick="closeModalBg('shareModal',event)">
   <div class="modal-sheet">
@@ -1333,7 +1230,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 // GEMINI 설정 (작동 확정)
 // ══════════════════════════════════════════════
 const GEMINI_API_KEY = '';
-const GEMINI_MODEL   = 'gemini-2.5-flash';
+const GEMINI_MODEL   = 'gemini-2.0-flash';
 const GEMINI_URL = '/.netlify/functions/gemini';
 const HALF_DAILY_MAX = 10;
 const FULL_COIN_COST = 0; // Phase 2에서 실제 예약 시 사용
@@ -1499,73 +1396,6 @@ function applyLang(){
     var el=document.getElementById('t-'+k);
     if(el) el.innerHTML=t[k];
   });
-  // 하드코딩된 한국어 요소들 번역
-  var isEn=lang==='en';
-  var el;
-  el=document.getElementById('t-homeTabHalf'); if(el) el.innerHTML=isEn?'🌙 AI Planning · Free':'🌙 AI 플래닝 · 무료';
-  el=document.getElementById('t-homeTabFull'); if(el) el.innerHTML=isEn?'🌕 Custom Planning · 10🪙':'🌕 맞춤 플래닝 · 10🪙';
-  el=document.getElementById('t-step-event'); if(el) el.innerHTML=isEn?'② Monthly Travel Events <span style="color:var(--m);font-size:8px;">(auto-fills destination)</span>':'② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span>';
-  el=document.getElementById('t-step-dest'); if(el) el.innerHTML=isEn?'③ Destination · Travelers · Nights':'③ 목적지 · 인원 · 일정';
-  el=document.getElementById('t-step-ai'); if(el) el.innerHTML=isEn?'④ AI Planning Request <span style="color:var(--m);font-size:8px;">(edit freely)</span>':'④ AI 플래닝 요청 <span style="color:var(--m);font-size:8px;">(직접 수정 가능)</span>';
-  el=document.getElementById('t-full-input-label'); if(el) el.innerHTML=isEn?'Custom Planning Input':'맞춤 플래닝 조건 입력';
-  el=document.getElementById('t-full-start-btn'); if(el) el.innerHTML=isEn?'🌕 Start Custom Planning →':'🌕 맞춤 플래닝 시작 →';
-  el=document.getElementById('t-tripsTabHalf'); if(el) el.innerHTML=isEn?'🌙 Planning History':'🌙 플래닝 기록';
-  el=document.getElementById('t-tripsTabFull'); if(el) el.innerHTML=isEn?'🌕 Custom Planning History':'🌕 맞춤 플래닝 기록';
-  el=document.getElementById('t-tab-info-label'); if(el) el.innerHTML=isEn?'Info':'정보';
-  el=document.getElementById('t-beta-msg'); if(el) el.innerHTML=isEn?'Beta · messaging feature in test':'Beta · 실제 메시지 전송 기능 테스트 중';
-  el=document.getElementById('t-lug-coin1'); if(el) el.innerHTML=isEn?'🪙 30 coins':'🪙 30코인';
-  el=document.getElementById('t-lug-coin2'); if(el) el.innerHTML=isEn?'🪙 20 coins/6h':'🪙 20코인/6h';
-  el=document.getElementById('t-coin-type1'); if(el) el.innerHTML=isEn?'Sign-up<br>Bonus':'가입<br>보너스';
-  el=document.getElementById('t-coin-type2'); if(el) el.innerHTML=isEn?'App<br>Earned':'앱사용<br>적립';
-  el=document.getElementById('t-coin-type3'); if(el) el.innerHTML=isEn?'Personal<br>Charged':'개인<br>충전';
-  el=document.getElementById('t-coin-no-refund1'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
-  el=document.getElementById('t-coin-no-refund2'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
-  el=document.getElementById('t-coin-refund'); if(el) el.innerHTML=isEn?'Refundable':'환불가능';
-  el=document.getElementById('t-provider-status'); if(el && el.textContent) el.innerHTML=el.innerHTML.replace('● 로그인됨','● Connected').replace('● email 연동','● email connected');
-  // data-ko/data-en 속성 가진 모든 요소 일괄 번역
-  document.querySelectorAll('[data-ko][data-en]').forEach(function(el){
-    el.innerHTML=isEn?el.getAttribute('data-en'):el.getAttribute('data-ko');
-  });
-  // select option 번역
-  document.querySelectorAll('option[data-ko][data-en]').forEach(function(opt){
-    opt.textContent=isEn?opt.getAttribute('data-en'):opt.getAttribute('data-ko');
-  });
-  // placeholder 번역
-  var ciEl=document.getElementById('chatInput');
-  if(ciEl) ciEl.placeholder=isEn?'e.g. Bangkok 5 nights 2 pax couple — create Option A/B/C plan':'위에서 선택하거나 직접 입력하세요\n예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘';
-  var fdEl=document.getElementById('fullDestInput-field');
-  if(fdEl) fdEl.placeholder=isEn?'Destination, duration, special requests (e.g. Bangkok 5 nights honeymoon)':'목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)';
-  var emEl=document.getElementById('loginEmailInput');
-  if(emEl) emEl.placeholder=isEn?'Email':'이메일';
-  var pwEl=document.getElementById('loginPwInput');
-  if(pwEl) pwEl.placeholder=isEn?'Password (min 6 chars)':'비밀번호 (6자 이상)';
-  var orEl=document.getElementById('t-or-email');
-  if(orEl) orEl.textContent=isEn?'— or continue with email —':'— 또는 이메일로 —';
-  var lbEl=document.getElementById('t-email-login-btn');
-  if(lbEl) lbEl.innerHTML=isEn?'✉️ Sign In':'✉️ 로그인';
-  var sbEl=document.getElementById('t-email-signup-btn');
-  if(sbEl) sbEl.innerHTML=isEn?'✨ Sign Up':'✨ 회원가입';
-  // 체크리스트/안전정보/코인안내
-  el=document.getElementById('t-checklist-title'); if(el) el.innerHTML=isEn?'✅ Trip Preparation Checklist':'✅ 여행 준비 체크리스트';
-  el=document.getElementById('t-safety-title'); if(el) el.innerHTML=isEn?'⚠️ Safety Info':'⚠️ 안전 정보';
-  el=document.getElementById('t-safety-desc'); if(el) el.innerHTML=isEn?'Check official government travel advisories for the latest safety updates.':'전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.';
-  el=document.getElementById('t-safety-btn'); if(el) el.innerHTML=isEn?'Korea Travel Advisory (0404.go.kr) →':'외교부 해외안전여행 바로가기 →';
-  el=document.getElementById('t-full-coin-info'); if(el){var cb=document.getElementById('fullCoinBalance');var cval=cb?cb.textContent:'50';el.innerHTML='10🪙 '+(isEn?'deducted · Balance ':'차감 · 잔액 ')+'<span id="fullCoinBalance">'+cval+'</span>🪙 · '+(isEn?'Earn +5🪙 on completion':'완료 후 +5🪙 적립');}
-  // fullDestInput placeholder
-  var fdEl2=document.getElementById('fullDestInput'); if(fdEl2) fdEl2.placeholder=isEn?'Destination, duration, special requests (e.g. Bangkok 5 nights honeymoon)':'목적지, 기간, 특별 요청 (예: 방콕 5박 허니문)';
-  // renderDailyUI 재실행으로 언어 업데이트
-  var dd=getDailyData(); if(dd) renderDailyUI(dd,new Date().toDateString());
-  // 결과 화면 버튼들
-  el=document.getElementById('t-back-input'); if(el) el.innerHTML=isEn?'← Back':'← 다시 입력';
-  el=document.getElementById('t-full-badge'); if(el) el.innerHTML=isEn?'🌕 Custom Planning':'🌕 맞춤 플래닝';
-  el=document.getElementById('t-full-save-btn'); if(el) el.innerHTML=isEn?'✓ Save to My Trip · Earn 🪙 5 coins':'✓ 내 여행에 저장 · 🪙 5코인 적립';
-  // 옵션 잠금 해제 버튼
-  el=document.getElementById('t-unlock-title'); if(el) el.textContent=isEn?'🌕 Unlock Option Details · 5🪙 each':'🌕 옵션 상세 잠금 해제 · 각 5🪙';
-  el=document.getElementById('t-unlock-desc'); if(el) el.textContent=isEn?'Restaurant names · Hourly itinerary · Card discounts':'식당명 · 시간대별 동선 · 카드할인 확정';
-  el=document.getElementById('t-unlock-cancel'); if(el) el.textContent=isEn?'Cancel':'취소';
-  el=document.getElementById('t-unlock-confirm'); if(el) el.textContent=isEn?'Use 5🪙 · Unlock':'5🪙 사용 · 잠금 해제';
-  // ① 여행 스타일 레이블
-  var s1=document.querySelector('[data-step-label]');
   // 동적 콘텐츠 재생성
   renderChips();
   renderRanking();
@@ -1582,15 +1412,11 @@ function applyLang(){
 }
 function toggleLang(){
   lang = lang==='ko'?'en':'ko';
-  document.getElementById('langBtn').textContent = lang==='ko'?'EN':'KR';
+  document.getElementById('langBtn').textContent = lang==='ko'?'EN':'한';
   document.getElementById('htmlRoot').lang = lang;
   applyLang();
   setMode(currentMode);
   updateLimitBar();
-  // 채팅 초기 메시지 언어 업데이트
-  var area=document.getElementById('chatArea');
-  if(area && area.children.length>0){ area.innerHTML=''; initChat(); }
-  updatePlanInput();
 }
 function t(key){ return (TR[lang]&&TR[lang][key])||TR['ko'][key]||key; }
 
@@ -1753,16 +1579,6 @@ function calcBudget(){
 // ══════════════════════════════════════════════
 var OPTIONS = {
   A:{
-    ko:{name:'Option A',price:0,
-      flight:{label:'항공',price:0,details:[]},
-      hotel:{label:'호텔',price:0,details:[]},
-      tour:{label:'투어·교통',price:0,details:[]}},
-    en:{name:'Option A',price:0,
-      flight:{label:'Flight',price:0,details:[]},
-      hotel:{label:'Hotel',price:0,details:[]},
-      tour:{label:'Tours',price:0,details:[]}}
-  },
-  _A_ORIG:{
     ko:{name:'풀 프리미엄',price:14200000,
       flight:{label:'항공 (KE, Business)',price:6800000,details:['대한항공 KE643 · 직항','비즈니스 클래스 · 플랫베드','수화물 32kg 2개 포함','라운지 이용 포함']},
       hotel:{label:'호텔 (마리나베이샌즈 스위트)',price:6400000,details:['마리나베이샌즈 5성','스위트룸 · 무한수영장 뷰','조식 2인 포함 · 아동 무료','얼리체크인 + 레이트체크아웃']},
@@ -1773,16 +1589,6 @@ var OPTIONS = {
       tour:{label:'Tours & Transport',price:1000000,details:['Day1: MBS Infinity Pool → Gardens by the Bay → Supertree Show','Day2: Universal Studios Singapore','Day3: Chinatown → Little India','Day4: Sentosa Siloso Beach','Food: Jumbo Seafood(Chili Crab!) · Rasapura · Makansutra']}}
   },
   B:{
-    ko:{name:'Option B',price:0,
-      flight:{label:'항공',price:0,details:[]},
-      hotel:{label:'호텔',price:0,details:[]},
-      tour:{label:'투어·교통',price:0,details:[]}},
-    en:{name:'Option B',price:0,
-      flight:{label:'Flight',price:0,details:[]},
-      hotel:{label:'Hotel',price:0,details:[]},
-      tour:{label:'Tours',price:0,details:[]}}
-  },
-  _B_ORIG:{
     ko:{name:'스마트 프리미엄',price:8300000,
       flight:{label:'항공 (SQ, Economy+)',price:3200000,details:['싱가포르항공 SQ601 · 직항','이코노미 플러스 · 좌석 넓음','수화물 30kg 1개 포함','기내식 퀄리티 세계 1위']},
       hotel:{label:'호텔 (마리나베이샌즈 디럭스)',price:4800000,details:['마리나베이샌즈 5성','디럭스 시티뷰','조식 2인 포함 · 10세 이하 아동 무료','인피니티풀 이용 가능']},
@@ -1793,16 +1599,6 @@ var OPTIONS = {
       tour:{label:'Tours & Transport',price:300000,details:['Day1: Clarke Quay → Boat Quay sunset','Day2: Chinatown → Newton Food Centre(must: satay·bak kut teh·fish ball noodle)','Day3: Orchard Road shopping','Day4: Sentosa Cable Car','Food: Newton FC · Tian Tian Chicken Rice · Hawker 18']}}
   },
   C:{
-    ko:{name:'Option C',price:0,
-      flight:{label:'항공',price:0,details:[]},
-      hotel:{label:'호텔',price:0,details:[]},
-      tour:{label:'투어·교통',price:0,details:[]}},
-    en:{name:'Option C',price:0,
-      flight:{label:'Flight',price:0,details:[]},
-      hotel:{label:'Hotel',price:0,details:[]},
-      tour:{label:'Tours',price:0,details:[]}}
-  },
-  _C_ORIG:{
     ko:{name:'가성비 프리미엄',price:5900000,
       flight:{label:'항공 (SQ/OZ, Economy)',price:2100000,details:['제주항공 7C or 아시아나 경유','이코노미 · 일반석','수화물 23kg 1개 포함','경유 대기 약 2-3시간']},
       hotel:{label:'호텔 (파크로얄 마리나베이)',price:3500000,details:['파크로얄 마리나베이 4성','슈페리어 시티뷰','조식 2인 포함','마리나베이 도보 5분']},
@@ -1816,37 +1612,7 @@ var OPTIONS = {
 
 var selectedOpt = 'B';
 var discountToggles = [];
-// userCards: 마이탭 카드 + 기본 카드 통합
-var _defaultCards=[{name:'얼리버드 60일+',benefit:lang==='ko'?'15% 할인':'15% off',rate:15,on:true,isDefault:true}];
-var userCards=_defaultCards.slice();
-// 마이탭 카드와 동기화
-function syncUserCards(){
-  var myCards=userCards.filter(function(c){return !c.isDefault;});
-  userCards=_defaultCards.slice().concat(myCards);
-  renderDiscountToggles(); calcFinalPrice();
-}
-function suggestCardsForTrip(trip){
-  // 항공사 기반 카드 추천 (중복 제거)
-  var existing=userCards.map(function(c){return c.name;});
-  var suggestions=[];
-  var flight=(trip&&trip.B&&trip.B.flight)||'';
-  var route=(trip&&trip.route)||'';
-  // 대한항공 → SKYPASS 추천
-  if((flight.indexOf('대한항공')>=0||flight.indexOf('Korean Air')>=0||flight.indexOf('KE')>=0) && existing.indexOf('대한항공 SKYPASS')<0)
-    suggestions.push({name:'대한항공 SKYPASS',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
-  // 아시아나 → 아시아나 클럽
-  if((flight.indexOf('아시아나')>=0||flight.indexOf('Asiana')>=0||flight.indexOf('OZ')>=0) && existing.indexOf('아시아나 클럽')<0)
-    suggestions.push({name:'아시아나 클럽',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
-  // 해외여행 → 신한 Deep Dream (해외 3%)
-  if(route.indexOf('ICN')>=0 && existing.indexOf('신한카드 Deep Dream')<0)
-    suggestions.push({name:'신한카드 Deep Dream',benefit:lang==='ko'?'해외결제 3%':'Overseas 3%',rate:3,on:true,isDefault:false,isSuggested:true});
-  // 싱가포르항공 → KrisFlyer
-  if((flight.indexOf('싱가포르항공')>=0||flight.indexOf('Singapore Airlines')>=0||flight.indexOf('SQ')>=0) && existing.indexOf('Singapore Airlines KrisFlyer')<0)
-    suggestions.push({name:'Singapore Airlines KrisFlyer',benefit:'Miles Earned',rate:1,on:true,isDefault:false,isSuggested:true});
-  // 추천 카드 적용
-  suggestions.forEach(function(s){ userCards.push(s); });
-  if(suggestions.length>0){ renderDiscountToggles(); calcFinalPrice(); }
-}
+var userCards = [{name:'신한카드 Deep Dream',benefit:lang==='ko'?'해외 3%':'Overseas 3%',rate:3,on:true},{name:'대한항공 SKYPASS',benefit:lang==='ko'?'마일리지 적립':'Miles Earned',rate:1,on:true},{name:'얼리버드 60일 전',benefit:lang==='ko'?'15% 할인':'15% off',rate:15,on:true}];
 
 function selectOption(opt){
   selectedOpt=opt;
@@ -1999,13 +1765,13 @@ function setMode(m){
 }
 function updateChatPlaceholder(){
   var el=document.getElementById('chatInput'); if(!el) return;
-  el.placeholder=lang==='ko'?'위에서 선택하거나 직접 입력하세요\n예: 방콕 5박 2인 커플 — A/B/C 플랜 만들어줘':'Select above or type directly\ne.g. Bangkok 5 nights 2 pax couple — create A/B/C plan';
+  el.placeholder=lang==='ko'?'예: 방콕 5박 2인 커플여행 — AI가 무료로 Option A/B/C 플랜을 만들어드립니다':'e.g. Bangkok 5 nights 2 people — AI creates Option A/B/C plan for free';
 }
 function initChat(){
   var area=document.getElementById('chatArea'); if(!area||area.children.length>0) return;
   var msg=lang==='ko'
-    ?'안녕하세요! DAL AI 플래너입니다 🌙<br><br>여행 스타일과 목적지·기간을 입력하시면 <strong>Option A·B·C 3가지 비교</strong>를 드립니다.<br><br><em style="color:var(--m);font-size:11px">예: "방콕 5박 2인 커플 — A/B/C 플랜 만들어줘"</em>'
-    :'Hello! I\'m DAL AI Planner 🌙<br><br>Enter your travel style, destination & duration for a <strong>3-option comparison (A·B·C)</strong>.<br><br><em style="color:var(--m);font-size:11px">e.g. "Bangkok 5 nights 2 people — create A/B/C plan"</em>';
+    ?'안녕하세요! DAL Full 플래너입니다 🌕<br><br>여행 스타일과 목적지·기간을 입력하시면 <strong>Option A·B·C 3가지 상세 비교</strong>를 드립니다.<br><br><em style="color:var(--m);font-size:11px">예: "4인가족, 싱가포르, 10월, 10박"</em>'
+    :'Hello! I\'m DAL Full Planner 🌕<br><br>Enter your travel style, destination & duration for a detailed <strong>3-option comparison (A·B·C)</strong>.<br><br><em style="color:var(--m);font-size:11px">e.g. "Family 4, Singapore, October, 10 nights"</em>';
   addDalMsg(msg);
 }
 function updateLimitBar(){
@@ -2039,14 +1805,6 @@ function expandHero(){
 async function sendMsg(){
   var input=document.getElementById('chatInput');
   var text=input.value.trim(); if(!text) return;
-  // 비로그인 시 로그인 유도
-  if(!requireLogin(function(){
-    goPage('home');
-    setTimeout(function(){
-      var inp=document.getElementById('chatInput');
-      if(inp){ inp.value=text; sendMsg(); }
-    },400);
-  })) return;
   var usage=getUsage();
   // Half/Full 모두 AI 사용 가능 — Half는 일일 한도 체크
   if(usage.count>=HALF_DAILY_MAX){
@@ -2059,31 +1817,16 @@ async function sendMsg(){
   addMsg('user',text); input.value='';
   usage.count++;
   updateLimitBar();
-  // 새 검색 시작 시 이전 데이터 초기화
-  window._lastTripText=null; window._lastTripJson=null; window._lastTripQuery=null;
   var thinkId='tk'+Date.now();
   addDalMsg('<span style="color:var(--m)">Gemini 2.5 Flash ✨</span>',thinkId);
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
-  var styleName=style?style.name:'';
-  var subStyle=travelSubStyle||'';
-  // 유저 선택값 구조적으로 조합
-  var userCtx='';
-  if(styleName) userCtx+=(lang==='ko'?'[여행자 스타일] ':'[Traveler style] ')+styleName+(subStyle?' > '+subStyle:'')+' \n';
-  // 월/이벤트 정보 포함
-  var monthEl=document.getElementById('eventMonthFilter');
-  var monthVal=monthEl&&monthEl.value!=='all'?monthEl.value:'';
-  var monthNames={1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월'};
-  var monthNamesEn={1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'};
-  if(monthVal) userCtx+=(lang==='ko'?'[여행 시기] ':'[Travel month] ')+(lang==='ko'?monthNames[parseInt(monthVal)]:monthNamesEn[parseInt(monthVal)])+'\n';
-  if(window._selectedEventName) userCtx+=(lang==='ko'?'[현지 이벤트] ':'[Local event] ')+window._selectedEventName+'\n';
-  // text 변수 직접 사용 (input.value는 이미 초기화됨)
-  userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+text+'\n';
+  var styleCtx=style?((lang==='ko'?'여행 스타일: ':'Travel style: ')+style.name+(travelSubStyle?' > '+travelSubStyle:'')+'\n'):'';
   var sysPrompt=lang==='ko'
-    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우:\n'+'  - 절대 daily 일정을 주지 말 것. 반드시 주차별(Week 1, Week 2...) 요약만 제공.\n'+'  - 각 주차: 핵심 테마 + 추천 장소 3~4개 + 숙소 타입 + 이동 팁 (3~5줄)\n'+'  - 토큰 절약을 위해 간결하게. 전체 주차를 빠짐없이 완성할 것.\n'+'[일반] "X박 여행"인 경우: Day별 오전/오후/저녁 키워드로 간결하게.\n'+'1. 즉시 상세 추천. 추가질문 금지.\n'+'2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n'+'   - 항공: 항공사명 + 직항여부 + 좌석등급\n'+'   - 숙소: 호텔명 + 등급 + 위치\n'+'   - 박여행: Day별 키워드 / 주여행: Week별 핵심 테마+장소\n'+'3. 금액 대신 할인 인사이트:\n'+'   - 출발 요일별 가격 차이 / 얼리버드 시점 / 카드 혜택 (카드사명 명시)\n'+'4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
-    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip":\n'+'  - NEVER give daily schedules. Provide ONLY weekly summaries (Week 1, Week 2...).\n'+'  - Each week: core theme + 3-4 key places + accommodation type + transport tip (3-5 lines).\n'+'  - Be concise to fit all weeks. Complete ALL weeks without stopping.\n'+'[NORMAL] If "X nights": Day-by-day morning/afternoon/evening keywords, concise.\n'+'1. Immediate recommendations, no follow-up questions.\n'+'2. Compare Option A(Premium) B(Smart Pick) C(Value):\n'+'   - Flight: airline + direct/stop + class\n'+'   - Hotel: name + stars + location\n'+'   - Nights trip: daily keywords / Week trip: weekly theme+places\n'+'3. Discount insights (no fixed prices):\n'+'   - Best departure days / Early bird timing / Card benefits (card name)\n'+'4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
+    ?styleCtx+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n1. 즉시 상세 추천. 추가질문 금지.\n2. 현지 이벤트 파악해서 최저가 날짜 먼저 제안.\n3. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n   - 항공사 편명 직항여부 좌석등급 수화물kg\n   - 호텔명 등급 룸타입 조식 아동정책\n   - Day별 동선 맛집 각 3곳(꼭 먹어야 할 메뉴 명시)\n   - 카드할인 적용 최종금액'
+    :styleCtx+'You are DAL AI Travel Planner. Reply in English.\n1. Immediate detailed recommendations, no follow-up questions.\n2. Check local events, suggest cheapest dates first.\n3. Compare Option A(Premium) B(Smart Recommended) C(Value):\n   - Airline flight direct/stop class baggage\n   - Hotel stars room breakfast kids policy\n   - Day-by-day itinerary 3 restaurants per day\n   - Final price with card discounts';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:1800,temperature:0.7}})});
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     if(res.status===429){
       if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}
@@ -2098,32 +1841,10 @@ async function sendMsg(){
     var reply=parts.map(function(p){return p.text||'';}).join('').trim()||(lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.');
     if(!reply) reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
     // JSON 블록 파싱 후 제거 (채팅에는 표시 안 함)
-    // 전체 텍스트 저장 (JSON 마커 방식 제거 — 토큰 절약)
-    var displayText=reply;
-    var parsedJson=null;
-    // JSON 파싱 실패 시 텍스트에서 기본값 추출
-    if(!parsedJson){
-      var routeMatch=displayText.match(/ICN[→\-][^\s,，。]+/);
-      var nightMatch=displayText.match(/(\d+)박/);
-      var paxMatch=displayText.match(/(\d+)인/);
-      // 목적지 추출 개선 — 입력 text에서 직접 추출
-      var destFromText=text.replace(/[\d]박.*$/,'').replace(/Option.*$/,'').replace(/플랜.*$/,'').trim();
-      destFromText=destFromText.substring(0,30);
-      if(routeMatch||nightMatch||paxMatch||destFromText){
-        parsedJson={
-          route:routeMatch?routeMatch[0]:(destFromText||text.split(' ')[0]||'여행'),
-          dates:new Date().toLocaleDateString('ko-KR'),
-          nights:nightMatch?parseInt(nightMatch[1]):null,
-          pax:paxMatch?parseInt(paxMatch[1]):null,
-          A:null, B:null, C:null
-        };
-      }
-    }
-    window._lastTripText=displayText;
+    window._lastTripText=reply;
     window._lastTripQuery=text;
-    window._lastTripJson=parsedJson;
-    window._selectedEventName=null; // 전송 후 이벤트 초기화
-    addMsgFull(displayText); earnCoinAmt+=5; updateCoinUI();
+    window._lastTripJson=null;
+    addMsgFull(reply); earnCoinAmt+=5; updateCoinUI();
   }catch(e){
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     var errMsg=e.message||String(e);
@@ -2142,18 +1863,60 @@ function addMsgFull(text){
   var area=document.getElementById('chatArea'); if(!area) return;
   var div=document.createElement('div'); div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
-  var rendered=text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  div.innerHTML='<div class="msg-bubble">'+rendered
+  div.innerHTML='<div class="msg-bubble">'+text.replace(/\n/g,'<br>')
     +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
     +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
-    +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
+    +(lang==='ko'?'✓ 내 여행에 저장 · 🪙 30코인 적립':'✓ Save to My Trip · Earn 🪙 30 coins')+'</button>'
+    +'<div style="font-size:9px;color:var(--ok);text-align:center;margin-top:6px;">+🪙 5'+(lang==='ko'?' 코인 적립완료':' coins earned')+'</div>'
     +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div); area.scrollTop=area.scrollHeight;
 }
 async function saveToTrip(){
-  if(!requireLogin(function(){ saveToTrip(); })) return;
-  addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
-  // sendMsg에서 이미 파싱된 JSON 바로 사용 (2차 호출 없음)
+  addDalMsg(lang==='ko'?'✨ 여행 데이터 정리 중...':'✨ Organizing trip data...');
+  var tripText=window._lastTripText||'';
+  var tripQuery=window._lastTripQuery||'';
+  if(tripText){
+    // Gemini에게 JSON 구조 추출 요청
+    var extractPrompt='아래 여행 추천글에서 A/B/C 옵션 정보를 추출해 JSON으로만 답해. 설명 없이 JSON만. 모든 값 반드시 채울것.\n'+
+      '{"route":"ICN→목적지","dates":"출발~귀국","nights":5,"pax":1,'+
+      '"A":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1요약","Day2요약","Day3요약"]},'+
+      '"B":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]},'+
+      '"C":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]}}\n\n추천글:\n'+tripText.substring(0,3000);
+    try{
+      var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:[{text:extractPrompt}]}],generationConfig:{maxOutputTokens:3500,temperature:0.1}})});
+      if(res.ok){
+        var data=await res.json();
+        var raw=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text)||'';
+        raw=raw.replace(/```json/gi,'').replace(/```/g,'').trim();
+        // 방법1: 전체 raw 직접 파싱
+        var j=null;
+        try{ j=JSON.parse(raw); }catch(e1){
+          // 방법2: 첫{~마지막} 추출
+          var s=raw.indexOf('{'), e2=raw.lastIndexOf('}');
+          if(s>=0&&e2>s){
+            try{ j=JSON.parse(raw.substring(s,e2+1)); }catch(e3){
+              // 방법3: 잘린 JSON 복구 - 마지막 완전한 필드까지만
+              var partial=raw.substring(s);
+              // 열린 괄호 수 세서 닫기
+              var depth=0, cutIdx=partial.length;
+              for(var ci=0;ci<partial.length;ci++){
+                if(partial[ci]==='{')depth++;
+                else if(partial[ci]==='}'){depth--;if(depth===0){cutIdx=ci+1;break;}}
+              }
+              try{ j=JSON.parse(partial.substring(0,cutIdx)); }catch(e4){
+                addDalMsg('⚠️ JSON파싱실패(디버그): '+partial.substring(0,150));
+              }
+            }
+          } else {
+            addDalMsg('⚠️ JSON구조없음(디버그): '+raw.substring(0,150));
+          }
+        }
+        if(j) window._lastTripJson=j;
+      }
+    }catch(e){ console.warn('saveToTrip fetch:',e); }
+  }
+  // OPTIONS 업데이트
   var j=window._lastTripJson;
   if(j){
     ['A','B','C'].forEach(function(o){
@@ -2182,37 +1945,18 @@ async function saveToTrip(){
     selectOption('B');
     addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
   } else {
-    addDalMsg(lang==='ko'?'✅ 저장됐습니다. (상세 내역은 플래닝 기록에서 확인하세요)':'✅ Saved. (View details in Planning History)');
+    addDalMsg(lang==='ko'?'✅ 저장됐습니다. (데이터 파싱 실패 - 기본 화면 표시)':'✅ Saved. (Could not parse trip data)');
   }
-  // halfTrips 배열에 저장
+  // halfTrips에 저장 + 서버 저장
   var newRoute=(j&&j.route)||window._lastTripQuery||'여행';
   var newText=window._lastTripText||'';
-  // 중복 저장 방지 — 같은 route + text 앞 50자가 같으면 저장 안 함
-  var isDup=halfTrips.some(function(t){
-    return t.route===newRoute && (t.text||'').substring(0,50)===(newText).substring(0,50);
-  });
-  if(isDup){
-    addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
-    setTimeout(function(){goPage('trips');},800);
-  } else {
-    var newTrip={
-      route:newRoute,
-      dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-      nights:(j&&j.nights)||null,
-      pax:(j&&j.pax)||null,
-      A:(j&&j.A)||null,
-      B:(j&&j.B)||null,
-      C:(j&&j.C)||null,
-      text:newText,
-      id:'local_'+Date.now()  // 임시 ID
-    };
+  var isDup=halfTrips.some(function(t){return t.route===newRoute&&(t.text||'').substring(0,50)===(newText).substring(0,50);});
+  if(!isDup){
+    var newTrip={route:newRoute,dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),nights:(j&&j.nights)||null,pax:(j&&j.pax)||null,A:(j&&j.A)||null,B:(j&&j.B)||null,C:(j&&j.C)||null,text:newText,id:'local_'+Date.now()};
     halfTrips.unshift(newTrip);
     renderHalfTripsList();
-    // 서버 저장 (로그인 상태일 때)
-    if(_currentToken){
-      saveTripToServer(newTrip).then(function(serverId){
-        if(serverId) halfTrips[0].id=serverId;
-      });
+    if(typeof saveTripToServer==='function'&&typeof _currentToken!=='undefined'&&_currentToken){
+      saveTripToServer(newTrip).then(function(serverId){if(serverId)halfTrips[0].id=serverId;});
     }
   }
   window._lastTripJson=null; window._lastTripText=null;
@@ -2252,10 +1996,9 @@ function goPage(id){
   if(id==='my') hideMyPage();
   if(id==='trips'){
     setTripsTab(currentTripsTab||'half');
-    // 서버에서 최신 데이터 로드 (로그인 상태일 때)
-    if(_currentToken) loadTripsFromServer();
+    if(typeof _currentToken!=='undefined'&&_currentToken&&typeof loadTripsFromServer==='function') loadTripsFromServer();
   }
-  if(id==='social') loadPostsFromServer();
+  if(id==='social'&&typeof loadPostsFromServer==='function') loadPostsFromServer();
 }
 
 // ══════════════════════════════════════════════
@@ -2282,16 +2025,15 @@ function hideMyPage(){
 // 코인 UI
 // ══════════════════════════════════════════════
 var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
+var _coinSaveTimer=null;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
   console.log('[Coin] 현재 코인:', coins, '(보너스:'+bonusCoinAmt+' 적립:'+earnCoinAmt+' 유료:'+paidCoinAmt+')');
-  // 로그인 상태면 1초 후 서버 저장 (연속 차감 중복 방지)
-  if(_currentToken&&_currentUserId){
+  if(typeof _currentToken!=='undefined'&&_currentToken&&typeof _currentUserId!=='undefined'&&_currentUserId&&typeof saveCoinsToServer==='function'){
     if(_coinSaveTimer) clearTimeout(_coinSaveTimer);
     _coinSaveTimer=setTimeout(saveCoinsToServer, 1000);
   }
-  var coinEl=document.getElementById('coinCount');
-  if(coinEl) coinEl.textContent=isLoggedIn?coins:'—';
+  document.getElementById('coinCount').textContent=coins;
   var pc=document.getElementById('profileCoins'); if(pc)pc.textContent=coins+' 🪙';
   var bc=document.getElementById('bonusCoin'); if(bc)bc.textContent=bonusCoinAmt;
   var ec=document.getElementById('earnCoin'); if(ec)ec.textContent=earnCoinAmt;
@@ -2317,20 +2059,6 @@ function doCharge(){
 // 로그인
 // ══════════════════════════════════════════════
 var isLoggedIn=false;
-var _pendingAction=null; // 로그인 후 실행할 액션
-
-function requireLogin(action){
-  if(isLoggedIn) return true; // 로그인됨 → 통과
-  // 액션 저장 후 로그인 페이지로
-  _pendingAction=action||null;
-  goPage('my');
-  // 안내 메시지
-  setTimeout(function(){
-    var err=document.getElementById('loginErrMsg');
-    if(err) err.innerHTML='<span style="color:var(--gold);">'+(lang==='ko'?'🔑 로그인 후 이용 가능합니다.':'🔑 Please sign in to continue.')+'</span>';
-  },300);
-  return false; // 로그인 필요
-}
 function confirmWithdraw(){
   var el=document.getElementById('withdrawCoinInfo');
   if(el){
@@ -2349,12 +2077,12 @@ async function doWithdraw(){
   var email=document.getElementById('profileEmail')?document.getElementById('profileEmail').textContent:'';
   var pw=document.getElementById('withdrawPwInput').value;
   var err=document.getElementById('withdrawErrMsg');
-  if(!pw){err.textContent=lang==='en'?'Please enter your password.':'비밀번호를 입력해주세요.';return;}
+  if(!pw){err.textContent='비밀번호를 입력해주세요.';return;}
   err.textContent='확인 중...';
   // 1단계: 비밀번호 재확인 (로그인 시도)
   try{
     var r2=await _sf('/auth/v1/token?grant_type=password',{email:email,password:pw});
-    if(r2.error||r2.error_description){err.textContent=lang==='en'?'Incorrect password.':'비밀번호가 틀렸습니다.';return;}
+    if(r2.error||r2.error_description){err.textContent='비밀번호가 틀렸습니다.';return;}
   }catch(e){err.textContent='오류: '+e.message;return;}
   // 2단계: 환불 안내
   err.textContent='';
@@ -2384,7 +2112,7 @@ function addCard(){
   var benefit=document.getElementById('newCardBenefit').value;
   var rate=parseFloat(document.getElementById('newCardRate').value)||0;
   if(!name){alert(lang==='ko'?'카드 이름을 입력해주세요.':'Please enter card name.');return;}
-  userCards.push({name:name,benefit:benefit||rate+'%',rate:rate,on:true,isDefault:false});
+  userCards.push({name:name,benefit:benefit||rate+'%',rate:rate,on:true});
   document.getElementById('addCardModal').classList.remove('open');
   renderCardList(); renderDiscountToggles(); calcFinalPrice();
   document.getElementById('newCardName').value='';
@@ -2507,7 +2235,7 @@ function checkWeight(){
 // 소셜 R2-2
 // ══════════════════════════════════════════════
 function showSocialTab(tab,btn){
-  if(tab==='feed') loadPostsFromServer();
+  if(tab==='feed'&&typeof loadPostsFromServer==='function') loadPostsFromServer();
   var infoEl=document.getElementById('social-info');if(infoEl)infoEl.style.display=tab==='info'?'block':'none';
   if(tab==='info'){renderInfoEvents();var ic=document.getElementById('infoChecklist'),ck=document.getElementById('checklistItems');if(ic&&ck)ic.innerHTML=ck.innerHTML;return;}
   ['msg','feed','follow'].forEach(function(t){var el=document.getElementById('social-'+t);if(el)el.style.display=t===tab?'block':'none';});
@@ -2555,14 +2283,12 @@ function openNewPost(){
   var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip');
   if(text&&text.trim()){
     var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
-    savePostToServer(text, myNick).then(function(ok){
-      if(ok){
-        loadPostsFromServer();
-        alert(lang==='ko'?'✅ 피드에 게시되었습니다!':'✅ Posted to feed!');
-      } else {
-        alert(lang==='ko'?'게시 중 오류가 발생했습니다.':'Failed to post.');
-      }
-    });
+    if(typeof savePostToServer==='function'){
+      savePostToServer(text, myNick).then(function(ok){
+        if(ok){ if(typeof loadPostsFromServer==='function') loadPostsFromServer(); alert(lang==='ko'?'✅ 피드에 게시되었습니다!':'✅ Posted to feed!'); }
+        else { alert(lang==='ko'?'게시 중 오류가 발생했습니다.':'Failed to post.'); }
+      });
+    } else { alert(lang==='ko'?'✅ 게시되었습니다!':'✅ Posted!'); }
   }
 }
 function openShareFeed(btn){
@@ -2629,18 +2355,16 @@ async function _sfDel(path,token){
 }
 
 // ══ 서버 연동 전역 변수 ══
-var _currentToken=null, _currentUserId=null, _coinSaveTimer=null;
+var _currentToken=null, _currentUserId=null;
 
-// ══ 코인 ══
+// ══ 코인 서버 저장/불러오기 ══
 async function loadCoinsFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
     var d=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins,bonus_coins',_currentToken);
     if(d&&d[0]){
-      paidCoinAmt=d[0].coins||0;
-      bonusCoinAmt=d[0].bonus_coins||0;
-      coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
-      updateCoinUI();
+      paidCoinAmt=d[0].coins||0; bonusCoinAmt=d[0].bonus_coins||0;
+      coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt; updateCoinUI();
       console.log('[Coin] 불러옴 bonus:'+bonusCoinAmt+' paid:'+paidCoinAmt);
     }
   }catch(e){console.warn('[Coin] 불러오기 실패',e);}
@@ -2653,7 +2377,7 @@ async function saveCoinsToServer(){
   }catch(e){console.warn('[Coin] 저장 실패',e);}
 }
 
-// ══ 여행 ══
+// ══ 여행 서버 저장/불러오기 ══
 async function loadTripsFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
@@ -2687,7 +2411,7 @@ async function deleteTripFromServer(tripId){
   }catch(e){console.warn('[Trips] 삭제 실패',e);}
 }
 
-// ══ 잠금해제 ══
+// ══ 잠금해제 서버 저장/불러오기 ══
 async function loadUnlockedFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
@@ -2714,7 +2438,7 @@ async function saveUnlockedToServer(tripIdx,opt,content){
   }catch(e){console.warn('[Unlocked] 저장 실패',e);}
 }
 
-// ══ 소셜 ══
+// ══ 소셜 피드 서버 저장/불러오기 ══
 async function loadPostsFromServer(){
   try{
     var d=await _sfGet('/rest/v1/posts?order=created_at.desc&limit=50&select=*',_currentToken||null);
@@ -2724,7 +2448,10 @@ async function loadPostsFromServer(){
         feed.innerHTML=d.map(function(p){
           var ago=Math.round((Date.now()-new Date(p.created_at).getTime())/60000);
           var agoStr=ago<60?ago+'분 전':Math.round(ago/60)+'시간 전';
-          return '<div style="padding:14px 0;border-bottom:1px solid var(--b1);">'            +'<div style="font-size:10px;color:var(--gold);margin-bottom:4px;">'+( p.nickname||'DAL User')+'<span style="color:var(--m);margin-left:8px;">'+agoStr+'</span></div>'            +'<div style="font-size:11px;color:var(--m);line-height:1.8;">'+p.content+'</div>'            +'</div>';
+          return '<div style="padding:14px 0;border-bottom:1px solid var(--b1);">'
+            +'<div style="font-size:10px;color:var(--gold);margin-bottom:4px;">'+(p.nickname||'DAL User')+'<span style="color:var(--m);margin-left:8px;">'+agoStr+'</span></div>'
+            +'<div style="font-size:11px;color:var(--m);line-height:1.8;">'+p.content+'</div>'
+            +'</div>';
         }).join('');
       }
     }
@@ -2758,7 +2485,7 @@ function onLoginSuccess(user, token){
   isLoggedIn=true;
   _currentToken=token;
   _currentUserId=user.id;
-  // 서버에서 데이터 불러오기
+  // 서버 데이터 불러오기
   loadCoinsFromServer();
   loadTripsFromServer();
   loadPostsFromServer();
@@ -2770,7 +2497,7 @@ function onLoginSuccess(user, token){
       try{ action(); }catch(e){ console.warn('pendingAction 실행 오류:',e); }
     }
   },800);
-  // 코인 배지 활성화 + 유저 아이콘 골드 테두리
+  // 코인 배지 활성화
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='1';coinBadge.style.borderColor='rgba(196,175,135,.5)';}
   var userBtn=document.getElementById('headerUserBtn');
@@ -2789,16 +2516,14 @@ function onLoginSuccess(user, token){
 function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
   _currentToken=null; _currentUserId=null;
-  // 데이터 초기화
-  halfTrips=[]; _unlockedOptions={};
+  halfTrips=[]; if(typeof _unlockedOptions!=='undefined') _unlockedOptions={};
   bonusCoinAmt=0; paidCoinAmt=0; earnCoinAmt=0;
-  renderHalfTripsList();
-  // 코인 배지 비활성화 + 유저 아이콘 원복
+  if(typeof renderHalfTripsList==='function') renderHalfTripsList();
+  // 코인 배지 비활성화
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='0.4';coinBadge.style.borderColor='rgba(196,175,135,.15)';}
   var coinCount=document.getElementById('coinCount');
   if(coinCount) coinCount.textContent='—';
-  updateCoinUI();
   var userBtn=document.getElementById('headerUserBtn');
   if(userBtn){userBtn.style.borderColor='var(--b2)';userBtn.style.background='transparent';}
   var lv=document.getElementById('loginView'); if(lv) lv.style.display='flex';
@@ -2809,28 +2534,28 @@ async function doEmailSignup(){
   var email=document.getElementById('loginEmailInput').value.trim();
   var pw=document.getElementById('loginPwInput').value;
   var err=document.getElementById('loginErrMsg');
-  if(!email||!pw){err.textContent=lang==='en'?'Please enter email and password.':'이메일과 비밀번호를 입력해주세요.';return;}
+  if(!email||!pw){err.textContent='이메일과 비밀번호를 입력해주세요.';return;}
   if(pw.length<6){err.textContent='비밀번호는 6자 이상이어야 합니다.';return;}
-  err.textContent=lang==='en'?'Signing up...':'가입 중...';
+  err.textContent='가입 중...';
   try{
     var r=await _sf('/auth/v1/signup',{email:email,password:pw});
     if(r.error||r.error_description){err.textContent=r.error_description||r.error;}
-    else{err.textContent=lang==='en'?'✅ Sign up complete! Check your email.':'✅ 가입완료! 이메일을 확인해주세요.';}
-  }catch(e){err.textContent=(lang==='en'?'Error: ':'오류: ')+e.message;}
+    else{err.textContent='✅ 가입완료! 이메일을 확인해주세요.';}
+  }catch(e){err.textContent='오류: '+e.message;}
 }
 
 async function doEmailLogin(){
   var email=document.getElementById('loginEmailInput').value.trim();
   var pw=document.getElementById('loginPwInput').value;
   var err=document.getElementById('loginErrMsg');
-  if(!email||!pw){err.textContent=lang==='en'?'Please enter email and password.':'이메일과 비밀번호를 입력해주세요.';return;}
-  err.textContent=lang==='en'?'Signing in...':'로그인 중...';
+  if(!email||!pw){err.textContent='이메일과 비밀번호를 입력해주세요.';return;}
+  err.textContent='로그인 중...';
   try{
     var r=await _sf('/auth/v1/token?grant_type=password',{email:email,password:pw});
     if(r.error||r.error_description){
       var msg=r.error_description||r.error||'';
-      err.textContent=msg==='Invalid login credentials'?(lang==='en'?'Invalid email or password.':'이메일 또는 비밀번호가 틀렸습니다.'):
-                      msg.includes('not confirmed')?(lang==='en'?'Email verification required.':'이메일 인증이 필요합니다.'):(msg||( lang==='en'?'Login failed':'로그인 실패'));
+      err.textContent=msg==='Invalid login credentials'?'이메일 또는 비밀번호가 틀렸습니다.':
+                      msg.includes('not confirmed')?'이메일 인증이 필요합니다.':msg||'로그인 실패';
     }else if(r.access_token){
       _saveSession(r); err.textContent=''; onLoginSuccess(r.user,r.access_token);
     }
@@ -2906,66 +2631,31 @@ async function doWithdraw(){
 // ══ 홈 탭 전환 ══
 var currentHomeTab='half';
 function setHomeTab(tab){
-  // 홈은 AI 플래닝(half)만 사용 — 맞춤 플래닝 탭 제거됨
-  currentHomeTab='half'; currentMode='half';
-  var hh=document.getElementById('homeHalf');if(hh)hh.style.display='block';
-  var hf=document.getElementById('homeFull');if(hf)hf.style.display='none';
-  setMode('half');
-  initDailyReward();
+  currentHomeTab=tab;
+  var hh=document.getElementById('homeHalf');if(hh)hh.style.display=tab==='half'?'block':'none';
+  var hf=document.getElementById('homeFull');if(hf)hf.style.display=tab==='full'?'block':'none';
+  var bH=document.getElementById('homeTabHalf'),bF=document.getElementById('homeTabFull');
+  if(bH){bH.style.background=tab==='half'?'rgba(91,143,255,.08)':'transparent';bH.style.borderColor=tab==='half'?'rgba(91,143,255,.3)':'rgba(91,143,255,.1)';bH.style.color=tab==='half'?'var(--ac)':'var(--m)';}
+  if(bF){bF.style.background=tab==='full'?'rgba(196,175,135,.08)':'transparent';bF.style.borderColor=tab==='full'?'rgba(196,175,135,.3)':'rgba(196,175,135,.15)';bF.style.color=tab==='full'?'var(--gold)':'var(--m)';}
+  if(tab==='full'){var cb=document.getElementById('fullCoinBalance');if(cb)cb.textContent=coins;initDailyReward();}
+  if(tab==='half')setMode('half');
 }
 function selectStyleChip(el,style){
   document.querySelectorAll('.style-chip').forEach(function(c){c.classList.remove('active');});
   el.classList.add('active');travelStyle=style;
-  travelSubStyle=''; // 스타일 바뀌면 서브스타일 초기화
   var data=STYLES[style]&&STYLES[style][lang];
   var area=document.getElementById('subStyleArea'),btns=document.getElementById('subStyleBtns');
   if(data&&data.subs&&data.subs.length>0){
     area.style.display='block';btns.innerHTML='';
-    data.subs.forEach(function(s){
-      var b=document.createElement('button');b.className='sub-style-btn';b.textContent=s;
-      b.onclick=function(){
-        document.querySelectorAll('.sub-style-btn').forEach(function(x){x.classList.remove('sel');});
-        b.classList.add('sel');travelSubStyle=s;
-        renderChips();
-        updatePlanInput(); // ← 서브스타일 클릭 시 AI 입력창 즉시 갱신
-      };
-      btns.appendChild(b);
-    });
+    data.subs.forEach(function(s){var b=document.createElement('button');b.className='sub-style-btn';b.textContent=s;b.onclick=function(){document.querySelectorAll('.sub-style-btn').forEach(function(x){x.classList.remove('sel');});b.classList.add('sel');travelSubStyle=s;renderChips();};btns.appendChild(b);});
   }else{area.style.display='none';}
   renderChips();
-  updatePlanInput(); // ← 스타일 클릭 시 AI 입력창 즉시 갱신
 }
 function toggleFullChip(el){el.classList.toggle('active');}
 function toggleFullBudget(el){el.parentElement.querySelectorAll('.full-chip.budget').forEach(function(s){s.classList.remove('active');});el.classList.add('active');}
 
 // ══ 이벤트 데이터 ══
 function getEventsData(){
-  if(lang==='en') return [
-    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[3,4],monthStr:'Mar-Apr',name:'Cherry Blossom Season',desc:'Nationwide bloom in Tokyo, Kyoto & Osaka.',type:'Nature',hot:true},
-    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[7],monthStr:'Jul',name:'Gion Matsuri',desc:'Kyoto 1,100-year-old traditional festival.',type:'Culture'},
-    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[8],monthStr:'Aug',name:'Obon & Fireworks',desc:'Sumida River fireworks — Japans largest.',type:'Festival'},
-    {dest:'jp',flag:'🇯🇵',country:'Japan',months:[11],monthStr:'Nov',name:'Autumn Foliage',desc:'Golden leaves in Kyoto, Nikko & Hakone.',type:'Nature',hot:true},
-    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[4],monthStr:'Apr 13-15',name:'Songkran (Water Festival)',desc:'Nationwide water fight. Bangkok & Chiang Mai.',type:'Festival',hot:true,warn:'Hotels 2-3x price surge'},
-    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[11],monthStr:'Nov',name:'Loy Krathong (Lantern Festival)',desc:'Thousands of lanterns fill Chiang Mai sky.',type:'Festival',hot:true},
-    {dest:'th',flag:'🇹🇭',country:'Thailand',months:[11,12,1,2],monthStr:'Nov–Feb',name:'Dry Season',desc:'Best time to visit Thailand.',type:'Season'},
-    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[10],monthStr:'Oct',name:'F1 Singapore Grand Prix',desc:'Night race at Marina Bay. Global fans converge.',type:'Sports',hot:true,warn:'Hotels 4-5x price surge'},
-    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[1,2],monthStr:'Jan-Feb',name:'Chinese New Year',desc:'Chinatown decorations and performances.',type:'Festival'},
-    {dest:'sg',flag:'🇸🇬',country:'Singapore',months:[8],monthStr:'Aug 9',name:'Singapore National Day',desc:'Fireworks & airshow at Marina Bay.',type:'Holiday'},
-    {dest:'fr',flag:'🇫🇷',country:'France',months:[5,6],monthStr:'May-Jun',name:'Cannes Film Festival',desc:'World top film festival. Red carpet & stars.',type:'Culture'},
-    {dest:'fr',flag:'🇫🇷',country:'France',months:[7],monthStr:'Jul',name:'Bastille Day & Tour de France',desc:'Eiffel Tower fireworks and cycling finale.',type:'Holiday',hot:true},
-    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[3,4],monthStr:'Mar-Apr',name:'Nyepi (Day of Silence)',desc:'24-hour island-wide silence. Unique experience.',type:'Culture'},
-    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[6,7,8],monthStr:'Jun-Aug',name:'Dry Season',desc:'Golden season for Bali. Best for surfing and trekking.',type:'Season',hot:true},
-    {dest:'bali',flag:'🇮🇩',country:'Bali',months:[6],monthStr:'Jun',name:'Bali Arts Festival',desc:'Traditional dance, music and sculpture. Ubud Palace.',type:'Culture'},
-    {dest:'us',flag:'🇺🇸',country:'USA',months:[2],monthStr:'Feb',name:'Super Bowl',desc:'America biggest sports event.',type:'Sports',hot:true,warn:'Hotels 3-5x price surge'},
-    {dest:'us',flag:'🇺🇸',country:'USA',months:[10],monthStr:'Oct',name:'Halloween',desc:'Parades in New York & New Orleans.',type:'Festival'},
-    {dest:'us',flag:'🇺🇸',country:'USA',months:[11],monthStr:'Nov',name:'Thanksgiving & Black Friday',desc:'Shopping heaven. NYC Macys Parade.',type:'Festival'},
-    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[7],monthStr:'Jul',name:'San Fermín (Bull Run)',desc:'Running of the bulls in Pamplona.',type:'Festival',hot:true},
-    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[8],monthStr:'Aug',name:'La Tomatina',desc:'Tomato fight festival in Buñol.',type:'Festival'},
-    {dest:'sp',flag:'🇪🇸',country:'Spain',months:[3],monthStr:'Mar',name:'Las Fallas',desc:'Valencia fireworks. UNESCO Intangible Heritage.',type:'Culture'},
-    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[4],monthStr:'Apr',name:'Cherry Blossom Season',desc:'Yeouido, Gyeongju & Jinhae nationwide.',type:'Nature',hot:true},
-    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[10],monthStr:'Oct',name:'Busan Intl Film Festival BIFF',desc:'Asias largest film festival.',type:'Culture'},
-    {dest:'kr',flag:'🇰🇷',country:'Korea',months:[10,11],monthStr:'Oct-Nov',name:'Autumn Foliage',desc:'Seoraksan, Naejangsan & Jirisan.',type:'Nature'},
-  ];
   return [
     {dest:'jp',flag:'🇯🇵',country:'일본',months:[3,4],monthStr:'3-4월',name:'벚꽃 시즌',desc:'도쿄·교토·오사카 전국 개화.',type:'자연',hot:true},
     {dest:'jp',flag:'🇯🇵',country:'일본',months:[7],monthStr:'7월',name:'기온 마쓰리',desc:'교토 1,100년 전통 축제.',type:'문화'},
@@ -2999,10 +2689,8 @@ function renderEventList(el,destFilter,monthFilter){
   if(destFilter&&destFilter!=='all')filtered=filtered.filter(function(e){return e.dest===destFilter;});
   if(monthFilter&&monthFilter!=='all'){var m=parseInt(monthFilter);filtered=filtered.filter(function(e){return e.months.indexOf(m)>=0;});}
   filtered.sort(function(a,b){return (b.hot?1:0)-(a.hot?1:0);});
-  if(filtered.length===0){el.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:12px;">'+(lang==='en'?'No events for selected period':'해당 조건의 이벤트가 없습니다')+'</div>';return;}
-  var tc=lang==='en'
-    ?{Nature:'var(--ok)',Festival:'var(--gold)',Sports:'var(--ac)',Culture:'#b08aff',Season:'var(--m)',Holiday:'var(--red)'}
-    :{자연:'var(--ok)',축제:'var(--gold)',스포츠:'var(--ac)',문화:'#b08aff',시즌:'var(--m)',국경일:'var(--red)'};
+  if(filtered.length===0){el.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:12px;">해당 조건의 이벤트가 없습니다</div>';return;}
+  var tc={자연:'var(--ok)',축제:'var(--gold)',스포츠:'var(--ac)',문화:'#b08aff',시즌:'var(--m)',국경일:'var(--red)'};
   var _evCache=[]; el.innerHTML=filtered.map(function(e,_eIdx){
     return '<div style="padding:10px 0;border-bottom:1px solid var(--b1);cursor:pointer;" onclick="selectEventByIdx('+_eIdx+')">' 
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px;">'
@@ -3027,65 +2715,52 @@ function renderInfoEvents(){
 // ══ 내여행 탭 ══
 var currentTripsTab='half',halfTrips=[],fullTrips=[],currentHalfTripIdx=-1;
 function setTripsTab(tab){
-  // 내 여행은 플래닝 기록(half)만 사용 — 맞춤 플래닝 기록 탭 제거됨
-  currentTripsTab='half';
+  currentTripsTab=tab;
   var th=document.getElementById('tripsHalf'),tf=document.getElementById('tripsFull');
   var hd=document.getElementById('halfTripDetail'),fd=document.getElementById('fullTripDetail');
-  if(th)th.style.display='block';
-  if(tf)tf.style.display='none';
-  if(hd)hd.style.display='none';
-  if(fd)fd.style.display='none';
-  renderHalfTripsList();
-}
-function renderHalfTripsList(){
-  var el=document.getElementById('halfTripsList');if(!el)return;
-  if(halfTrips.length===0){
-    el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'
-      +(lang==='ko'?'아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙':'No saved trips yet.<br>Start AI Planning from Home 🌙')
-      +'</div>';
-    return;
-  }
-  var html='';
-  for(var i=0;i<halfTrips.length;i++){
-    var t=halfTrips[i];
-    var btnLabel=lang==='ko'?'← 홈으로':'← Home';
-    html+='<div class="trip-record-card" onclick="showHalfDetail('+i+')" style="position:relative;">'
-      +'<button onclick="event.stopPropagation();deleteTripConfirm('+i+')" style="position:absolute;top:8px;right:8px;background:transparent;border:none;font-size:13px;color:var(--m);cursor:pointer;padding:2px 4px;" title="삭제">🗑</button>'
-      +'<div class="trc-head"><div class="trc-dest" style="max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
-      +'<div class="trc-sub">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</div>'
-      +(t.B?'<div class="trc-row"><span>\u2708\ufe0f '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>\ud83c\udfe8 '+(t.B.hotel||'-')+'</span></div>':'')
-      +(t.B&&t.B.price?'<div class="trc-total"><span>'+(lang==='ko'?'예상 총액':'Est. Total')+'</span><span>'+formatWon(t.B.price)+'</span></div>':'')
-      +'<button onclick="event.stopPropagation();goPage(\'home\')" class="upg-btn-small" style="border-color:rgba(91,143,255,.3);color:var(--ac);">'+btnLabel+'</button>'
-      +'</div>';
-  }
-  el.innerHTML=html;
+  if(th)th.style.display=tab==='half'?'block':'none';
+  if(tf)tf.style.display=tab==='full'?'block':'none';
+  if(hd)hd.style.display='none';if(fd)fd.style.display='none';
+  var bH=document.getElementById('tripsTabHalf'),bF=document.getElementById('tripsTabFull');
+  if(bH){bH.style.background=tab==='half'?'rgba(91,143,255,.08)':'transparent';bH.style.borderColor=tab==='half'?'rgba(91,143,255,.3)':'rgba(91,143,255,.1)';bH.style.color=tab==='half'?'var(--ac)':'var(--m)';}
+  if(bF){bF.style.background=tab==='full'?'rgba(196,175,135,.08)':'transparent';bF.style.borderColor=tab==='full'?'rgba(196,175,135,.3)':'rgba(196,175,135,.15)';bF.style.color=tab==='full'?'var(--gold)':'var(--m)';}
+  if(tab==='half')renderHalfTripsList();else renderFullTripsList();
 }
 function deleteTripConfirm(idx){
   var t=halfTrips[idx]; if(!t) return;
-  var msg=lang==='ko'?'"'+(t.route||'여행')+'" 여행을 삭제하겠습니까?':'Delete "' +(t.route||'trip')+'"?';
+  var msg=lang==='ko'?'"'+(t.route||'여행')+'" 여행을 삭제하겠습니까?':'Delete "'+(t.route||'trip')+'"?';
   if(confirm(msg)){
-    var deletedId=halfTrips[idx].id;
+    var deletedId=t.id;
     halfTrips.splice(idx,1);
-    delete _unlockedOptions[idx];
-    var newUnlocked={};
-    Object.keys(_unlockedOptions).forEach(function(k){
-      var ki=parseInt(k);
-      if(ki<idx) newUnlocked[ki]=_unlockedOptions[k];
-      else if(ki>idx) newUnlocked[ki-1]=_unlockedOptions[k];
-    });
-    _unlockedOptions=newUnlocked;
+    if(typeof _unlockedOptions!=='undefined'){
+      delete _unlockedOptions[idx];
+      var newUnlocked={};
+      Object.keys(_unlockedOptions).forEach(function(k){var ki=parseInt(k);if(ki<idx)newUnlocked[ki]=_unlockedOptions[k];else if(ki>idx)newUnlocked[ki-1]=_unlockedOptions[k];});
+      _unlockedOptions=newUnlocked;
+    }
     renderHalfTripsList();
-    // 서버 삭제
-    if(_currentToken&&deletedId&&!String(deletedId).startsWith('local_')){
+    if(typeof deleteTripFromServer==='function'&&deletedId&&!String(deletedId).startsWith('local_')){
       deleteTripFromServer(deletedId);
     }
   }
 }
-window.deleteTripConfirm=deleteTripConfirm;
-
+function renderHalfTripsList(){
+  var el=document.getElementById('halfTripsList');if(!el)return;
+  if(halfTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">아직 저장된 여행이 없어요.<br>홈에서 AI 플래닝을 시작해보세요 🌙</div>';return;}
+  el.innerHTML=halfTrips.map(function(t,i){
+    return '<div class="trip-record-card" onclick="showHalfDetail('+i+')" style="position:relative;">'
+      +'<button onclick="event.stopPropagation();deleteTripConfirm('+i+')" style="position:absolute;top:8px;right:8px;background:transparent;border:none;font-size:13px;color:var(--m);cursor:pointer;padding:2px 4px;" title="삭제">🗑</button>'
+      +'<div class="trc-head"><div class="trc-dest" style="max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
+      +'<div class="trc-sub">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</div>'
+      +(t.B?'<div class="trc-row"><span>✈️ '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>🏨 '+(t.B.hotel||'-')+'</span></div>':'')
+      +(t.B&&t.B.price?'<div class="trc-total"><span>'+(lang==='ko'?'예상 총액':'Est. Total')+'</span><span>'+formatWon(t.B.price)+'</span></div>':'')
+      +'<button onclick="event.stopPropagation();goPage(\'home\')" class="upg-btn-small" style="border-color:rgba(91,143,255,.3);color:var(--ac);">'+(lang==='ko'?'← 홈으로':'← Home')+'</button>'
+      +'</div>';
+  }).join('');
+}
 function renderFullTripsList(){
   var el=document.getElementById('fullTripsList');if(!el)return;
-  if(fullTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 맞춤 플래닝 결과가 없어요.<br>홈 🌕 맞춤 플래닝 탭에서 시작하거나<br>AI 플래닝 기록에서 업그레이드하세요':'No custom planning yet.<br>Start from 🌕 Custom Planning tab<br>or upgrade from AI Planning history')+'</div>';return;}
+  if(fullTrips.length===0){el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">아직 맞춤 플래닝 결과가 없어요.<br>홈 🌕 맞춤 플래닝 탭에서 시작하거나<br>AI 플래닝 기록에서 업그레이드하세요</div>';return;}
   el.innerHTML=fullTrips.map(function(t,i){
     return '<div class="trip-record-card" onclick="showFullDetail('+i+')">'
       +'<div class="trc-head"><div class="trc-dest">'+(t.route||'여행')+'</div><span class="trc-badge full">맞춤 플래닝</span></div>'
@@ -3101,125 +2776,28 @@ function renderFullTripsList(){
 function showHalfDetail(idx){
   currentHalfTripIdx=idx;
   var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');
-  var listWrap=document.getElementById('tripsListWrap');
-  if(listWrap)listWrap.style.display='none';
-  if(hd){
-    hd.style.display='block';
-    // 페이지 스크롤 최상단으로 리셋
-    var pageEl=document.getElementById('page-trips');
-    if(pageEl) pageEl.scrollTop=0;
-  }
+  if(th)th.style.display='none';if(hd)hd.style.display='block';
   var t=halfTrips[idx];if(!t)return;
-
-  // 1. 경로/날짜 표시
-  var r=document.getElementById('tripRoute');if(r)r.textContent=t.route||'?';
-  var d=document.getElementById('tripDate');if(d)d.textContent=(t.dates||new Date().toLocaleDateString('ko-KR'))+(t.nights?' · '+t.nights+(lang==='ko'?'박':' nights'):'')+(t.pax?' · '+t.pax+(lang==='ko'?'인':' pax'):'');
-
-  // 2. OPTIONS 항상 초기화 (싱가포르 기본값 제거)
-  var hasData=t.A||t.B||t.C;
-  ['A','B','C'].forEach(function(o){
-    var data=t[o];
-    var emptyOpt={name:o,price:0,flight:{label:lang==='ko'?'항공':'Flight',price:0,details:[]},hotel:{label:lang==='ko'?'호텔':'Hotel',price:0,details:[]},tour:{label:lang==='ko'?'투어·교통':'Tours',price:0,details:[]}};
-    if(data){
-      var totalP=typeof data.price==='number'?data.price:parseInt((data.price||'0').toString().replace(/[^0-9]/g,''))||0;
-      var fp=Math.round(totalP*0.45), hp=Math.round(totalP*0.40), tp=totalP-fp-hp;
-      emptyOpt={
-        name:data.name||o, price:totalP,
-        flight:{label:data.flight||(lang==='ko'?'항공':'Flight'),price:fp,details:data.days||[]},
-        hotel:{label:data.hotel||(lang==='ko'?'호텔':'Hotel'),price:hp,details:[]},
-        tour:{label:lang==='ko'?'투어·교통':'Tours',price:tp,details:data.days||[]}
-      };
-    }
-    OPTIONS[o].ko=emptyOpt; OPTIONS[o].en=emptyOpt;
-    var n=document.getElementById('t-opt'+o+'-name');if(n)n.textContent=data?(data.name||o):(lang==='ko'?'분석 중...':'Analyzing...');
-    var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=data?formatWon(emptyOpt.price):(lang==='ko'?'저장된 가격 없음':'No price data');
-  });
-
+  var r=document.getElementById('tripRoute');if(r)r.textContent=t.route||'ICN→?';
+  var d=document.getElementById('tripDate');if(d)d.textContent=(t.dates||'')+(t.nights?' · '+t.nights+'박':'')+(t.pax?' · '+t.pax+'인':'');
+  ['A','B','C'].forEach(function(o){var data=t[o];if(!data)return;var p=Math.round((data.price||0)*.45);OPTIONS[o].ko={name:data.name||o,price:data.price||0,flight:{label:data.flight||'항공',price:p,details:data.days||[]},hotel:{label:data.hotel||'호텔',price:Math.round((data.price||0)*.4),details:[]},tour:{label:'투어',price:(data.price||0)-p-Math.round((data.price||0)*.4),details:[]}};OPTIONS[o].en=OPTIONS[o].ko;var n=document.getElementById('t-opt'+o+'-name');if(n)n.textContent=data.name||o;var pr=document.getElementById('t-opt'+o+'-price');if(pr)pr.textContent=formatWon(data.price||0);});
   selectOption('B');
-  updateTripLinks(t);
-  suggestCardsForTrip(t);
-
-  // 박수 기반 공지 표시
-  var noticeEl = document.getElementById('unlockNotice');
-  if(noticeEl){
-    var nights = parseInt(t.nights)||5;
-    if(nights >= 7){
-      noticeEl.style.display = 'block';
-      noticeEl.innerHTML = lang==='ko'
-        ? '⚠️ '+nights+'박 이상: 시간표 대신 <strong style="color:var(--sb);">전체 일정 핵심 동선</strong>으로 제공됩니다'
-        : '⚠️ '+nights+'+ nights: Provided as <strong style="color:var(--sb);">daily key highlights</strong> (not hourly schedule)';
-    } else {
-      noticeEl.style.display = 'none';
-    }
-  }
-
-  // unlockedDetailsArea 초기화 먼저
-  var uda=document.getElementById('unlockedDetailsArea');
-  if(uda) uda.innerHTML='';
-
-  // 이미 잠금 해제된 옵션 복원 (있으면 다시 표시)
-  // → 아래 forEach에서 처리
-
-  // 원본 AI 텍스트 미리보기 (잠금해제 내역 없을 때만)
-  if(t.text && !(_unlockedOptions[idx] && Object.keys(_unlockedOptions[idx]).length>0)){
-    var uda2=document.getElementById('unlockedDetailsArea');
-    if(uda2){
-      var preR=t.text
-        .replace(/\r\n/g,'\n')
-        .replace(/\n{3,}/g,'\n\n')
-        .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:6px 0;">')
-        .replace(/^#+\s*(.+)$/gm,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:8px;">$1</strong>')
-        .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--w);">$1</strong>')
-        .replace(/^\|(.+)$/gm,function(m){return '<div style="font-size:10px;color:var(--m);border-bottom:1px solid var(--b1);padding:2px 0;">'+m+'</div>';})
-        .replace(/\n\n/g,'<br>').replace(/\n/g,'<br>')
-        .replace(/(<br>){3,}/g,'<br><br>');
-      uda2.innerHTML='<div style="font-size:11px;color:var(--m);line-height:1.9;padding-bottom:10px;">'+preR+'</div>';
-    }
-  }
-
-  // 이미 잠금 해제된 옵션 복원
-  ['A','B','C'].forEach(function(o){
-    var btn=document.getElementById('unlockBtn'+o);
-    if(!btn) return;
-    if(_unlockedOptions[idx]&&_unlockedOptions[idx][o]){
-      btn.disabled=false;
-      btn.style.background=o==='A'?'rgba(196,175,135,.2)':o==='B'?'rgba(91,143,255,.2)':'rgba(0,200,100,.15)';
-      btn.innerHTML='✅ Option '+o+'<br><span style="font-size:9px;color:var(--m);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
-      btn.onclick=(function(opt,tidx){return function(){showUnlockedDetail(opt,tidx);};})(o,idx);
-      // showUnlockedOption 통해 표시 (중복 방지)
-      showUnlockedOption(o, idx);
-    } else {
-      btn.disabled=false;
-      btn.style.background=o==='A'?'rgba(196,175,135,.1)':o==='B'?'rgba(91,143,255,.1)':'rgba(0,200,100,.06)';
-      btn.style.borderColor=o==='A'?'rgba(196,175,135,.3)':o==='B'?'rgba(91,143,255,.3)':'rgba(0,200,100,.2)';
-      btn.style.color=o==='A'?'var(--gold)':o==='B'?'var(--ac)':'var(--ok)';
-      btn.innerHTML='🔒 Option '+o+'<br><span style="font-size:9px;color:var(--m);">5🪙</span>';
-      btn.onclick=(function(opt){return function(){requestUnlockOption(opt);};})(o);
-    }
-  });
 }
-function closeHalfDetail(){var hd=document.getElementById('halfTripDetail');var listWrap=document.getElementById('tripsListWrap');if(hd)hd.style.display='none';if(listWrap)listWrap.style.display='block';renderHalfTripsList();}
+function closeHalfDetail(){var th=document.getElementById('tripsHalf'),hd=document.getElementById('halfTripDetail');if(hd)hd.style.display='none';if(th)th.style.display='block';}
 function showFullDetail(idx){
   var t=fullTrips[idx],tf=document.getElementById('tripsFull'),fd=document.getElementById('fullTripDetail');
   if(tf)tf.style.display='none';if(fd)fd.style.display='block';
   var el=document.getElementById('fullDetailContent');if(!el||!t)return;
   var ins=(t.insights||[]).map(function(i){return '<div class="trc-insight"><span>'+i.icon+'</span> '+i.text+'</div>';}).join('');
-  el.innerHTML=(function(){
-    var rendered=(t.text||'').replace(/\n/g,'<br>').replace(/#{1,4} (.+?)(<br>|$)/g,'<strong style="color:var(--sb);font-size:12px;">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-    var dlinks=buildDeepLinks(t);
-    var naverLabel=lang==='ko'?'네이버항공':'Naver Flight';
-    var linkLabel=lang==='ko'?'🔗 최저가 바로가기 (목적지 자동 검색)':'🔗 Best Price Links (auto-search)';
-    return '<div style="font-size:14px;color:var(--sb);font-weight:500;margin-bottom:4px;">'+(t.route||'여행')+'</div>'
-      +'<div style="font-size:10px;color:var(--m);margin-bottom:12px;">'+(t.dates||'')+'</div>'
-      +(rendered?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:14px;margin-bottom:10px;font-size:11px;color:var(--m);line-height:2;">'+rendered+'</div>':'')
-      +(ins?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;">'+ins+'</div>':'')
-      +'<div style="font-size:9px;color:var(--m);margin-bottom:6px;">'+linkLabel+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
-      +'<button onclick="openLink(\''+dlinks.naver+'\')" class="link-btn" style="padding:10px 4px;">✈️ '+naverLabel+'</button>'
-      +'<button onclick="openLink(\''+dlinks.agoda+'\')" class="link-btn" style="padding:10px 4px;">🏨 Agoda</button>'
-      +'<button onclick="openLink(\''+dlinks.klook+'\')" class="link-btn" style="padding:10px 4px;">🎫 Klook</button>'
-      +'</div>';
-  })();
+  el.innerHTML='<div style="font-size:14px;color:var(--sb);font-weight:500;margin-bottom:4px;">'+(t.route||'여행')+'</div>'
+    +'<div style="font-size:10px;color:var(--m);margin-bottom:12px;">'+(t.dates||'')+'</div>'
+    +(t.text?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;font-size:11px;color:var(--m);line-height:1.8;max-height:40vh;overflow-y:auto;">'+t.text.replace(/\n/g,'<br>')+'</div>':'')
+    +(ins?'<div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:8px;">'+ins+'</div>':'')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">'
+    +'<button onclick="openLink(\'https://flight.naver.com\')" class="link-btn" style="padding:10px 4px;">✈️ 네이버항공</button>'
+    +'<button onclick="openLink(\'https://www.agoda.com\')" class="link-btn" style="padding:10px 4px;">🏨 아고다</button>'
+    +'<button onclick="openLink(\'https://www.klook.com\')" class="link-btn" style="padding:10px 4px;">🎫 클룩</button>'
+    +'</div>';
 }
 function closeFullDetail(){var tf=document.getElementById('tripsFull'),fd=document.getElementById('fullTripDetail');if(fd)fd.style.display='none';if(tf)tf.style.display='block';}
 function startUpgradeFromTrip(idx){
@@ -3228,341 +2806,6 @@ function startUpgradeFromTrip(idx){
   setTimeout(function(){var d=document.getElementById('fullDestInput');if(d&&t)d.value=(t.route||'')+(t.dates?' · '+t.dates:'')+(t.pax?' · '+t.pax+'인':'');},300);
 }
 function openLink(url){window.open(url,'_blank');}
-
-// ══ 옵션 잠금 해제 ══
-var _pendingUnlockOpt=null;
-var UNLOCK_COIN_COST=5;
-var _unlockedOptions={}; // {tripIdx: {A:true, B:false, C:false}}
-
-function requestUnlockOption(opt){
-  // 비로그인 시 로그인 유도
-  if(!requireLogin(function(){ goPage('trips'); setTimeout(function(){ showHalfDetail(currentHalfTripIdx); setTimeout(function(){ requestUnlockOption(opt); },300); },300); })) return;
-  var tripIdx=currentHalfTripIdx;
-  var t=halfTrips[tripIdx];
-  if(!t){console.error('[Unlock] tripIdx='+tripIdx+' 없음');return;}
-
-  // 이미 해제됐으면 바로 표시
-  if(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt]){
-    doUnlockOption(opt, tripIdx, true);
-    return;
-  }
-  // 코인 부족 확인
-  if(coins<UNLOCK_COIN_COST){
-    alert(lang==='ko'?'코인이 부족합니다. 충전해주세요 🪙':'Insufficient coins. Please charge.');
-    openCoinModal(); return;
-  }
-
-  _pendingUnlockOpt={opt:opt, tripIdx:tripIdx};
-
-  // 팝업 내용 업데이트
-  var title=document.getElementById('unlockConfirmTitle');
-  var desc=document.getElementById('unlockConfirmDesc');
-  var bal=document.getElementById('unlockCoinBalance');
-  var confirmBtn=document.getElementById('t-unlock-confirm');
-  var cancelBtn=document.getElementById('t-unlock-cancel');
-
-  if(title) title.textContent=(lang==='ko'?'🌕 Option '+opt+' 상세 잠금 해제':'🌕 Unlock Option '+opt+' Details');
-  if(desc) desc.innerHTML=(lang==='ko'
-    ?'<strong style="color:var(--gold);">5🪙</strong> 코인을 사용해 Option '+opt+'의 상세 정보를 받겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정 루트'
-    :'Use <strong style="color:var(--gold);">5🪙</strong> coins to unlock Option '+opt+' details?<br><br>· Restaurant names + booking links<br>· Hour-by-hour itinerary<br>· Confirmed card discounts');
-  if(bal) bal.textContent=coins+'🪙';
-  if(confirmBtn) confirmBtn.textContent=lang==='ko'?'5🪙 사용 · 잠금 해제':'Use 5🪙 · Unlock';
-  if(cancelBtn) cancelBtn.textContent=lang==='ko'?'취소':'Cancel';
-
-  var modal=document.getElementById('unlockConfirmModal');
-  if(modal) modal.style.display='flex';
-}
-
-async function confirmUnlockOption(){
-  var modal=document.getElementById('unlockConfirmModal');
-  if(modal) modal.style.display='none';
-  if(!_pendingUnlockOpt) return;
-
-  var opt=_pendingUnlockOpt.opt;
-  var tripIdx=_pendingUnlockOpt.tripIdx;
-  _pendingUnlockOpt=null;
-
-  // 코인 차감 (earnCoin 먼저, 없으면 paidCoin)
-  if(earnCoinAmt>=UNLOCK_COIN_COST){
-    earnCoinAmt-=UNLOCK_COIN_COST;
-  } else {
-    var need=UNLOCK_COIN_COST-earnCoinAmt;
-    earnCoinAmt=0;
-    paidCoinAmt=Math.max(0,paidCoinAmt-need);
-  }
-  updateCoinUI();
-
-  await doUnlockOption(opt, tripIdx, false);
-}
-
-async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
-  var t=halfTrips[tripIdx]; if(!t) return;
-  var btn=document.getElementById('unlockBtn'+opt);
-
-  if(alreadyUnlocked){
-    // 이미 저장된 결과 표시
-    showUnlockedOption(opt, tripIdx);
-    return;
-  }
-
-  // 버튼 로딩 상태
-  if(btn){ btn.disabled=true; btn.innerHTML='⏳ 분석 중...<br><span style="font-size:9px;color:var(--m);">잠시만요</span>'; }
-
-  // Gemini에게 해당 옵션 상세 요청 — 원본 텍스트 컨텍스트 포함
-  var optName=(t[opt]&&t[opt].name)||('Option '+opt);
-  // 원본에서 해당 옵션 부분만 추출 (전체 전달 시 입력 토큰 낭비)
-  var fullText=t.text||'';
-  var optLabel = opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
-  var nights = parseInt(t.nights)||5;
-  var isWeekTrip = nights >= 7;
-  var weeks = Math.round(nights/7);
-
-  // 원본 텍스트에서 해당 옵션 부분 추출
-  var baseText = fullText || '';
-  var optStart = -1;
-  ['Option '+opt+':', 'Option '+opt+' ','OPTION '+opt].forEach(function(k){
-    if(optStart<0){ var i=baseText.indexOf(k); if(i>=0) optStart=i; }
-  });
-  var nextOpts = opt==='A'?['Option B:','Option B ']:opt==='B'?['Option C:','Option C ']:[];
-  var optEnd = baseText.length;
-  nextOpts.forEach(function(k){ var i=baseText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
-  var optionBase = optStart>=0
-    ? baseText.substring(optStart, Math.min(optEnd, optStart+2000))
-    : baseText.substring(0, 1200);
-
-  // 프롬프트: 원본 항목을 유지하면서 각각 구체화 (Week/Day 구조 그대로 유지)
-  var prompt = lang==='ko'
-    ? '아래는 DAL AI 여행 플랜의 [Option '+opt+' - '+optLabel+'] 부분이야:\n---\n'+optionBase+'\n---\n\n'
-      +'위 내용의 구조(항공/숙소/'+( isWeekTrip?'Week별 일정':'Day별 일정')+'/할인)를 그대로 유지하면서, 각 항목을 더 구체적으로 작성해줘.\n'
-      +'반드시 한국어로. 레이블이나 ** 없이 자연스러운 문체로.\n\n'
-      +'[첫 줄] Option '+opt+'('+optLabel+') 총 예상 비용: XXX~XXX만원\n\n'
-      +'확장 방식:\n'
-      +'- 항공: 추천 이유 + 대안 항공사 1개\n'
-      +'- 숙소: 추천 이유 + 비슷한 수준 대안 1곳 + 예상 가격\n'
-      +(isWeekTrip
-        ? '- Week별: 원본의 각 주차 핵심 장소마다 구체적 방문 팁 + 추천 식당 2곳(이름+메뉴+가격) 추가\n'
-        : '- Day별: 원본의 각 날 일정에 추천 식당(이름+메뉴+가격) + 구체적 팁 추가\n')
-      +'- 할인: 카드사명 + 예상 절약금액 + 얼리버드 타이밍\n\n'
-      +'모든 항목 완료 후 마지막 줄에 [완료] 표시'
-    : 'Below is [Option '+opt+' - '+optLabel+'] from DAL AI plan:\n---\n'+optionBase+'\n---\n\n'
-      +'Keep the same structure (flight/hotel/'+(isWeekTrip?'weekly':'daily')+' itinerary/discounts) and expand each item specifically.\n'
-      +'English only. Natural sentences, no ** labels.\n\n'
-      +'[First line] Option '+opt+'('+optLabel+') total: $XXX~$XXX\n\n'
-      +'How to expand:\n'
-      +'- Flight: why recommended + 1 alternative airline\n'
-      +'- Hotel: why recommended + 1 similar alternative + price\n'
-      +(isWeekTrip
-        ? '- Each week: add specific tips for key places + 2 restaurants (name+dish+price)\n'
-        : '- Each day: add restaurant (name+dish+price) + specific tips\n')
-      +'- Discounts: card name + estimated savings + timing\n\n'
-      +'Write [DONE] on last line after completing all items';
-
-  // 재귀 이어받기 — PC/모바일 동일 동작, 연속 fetch 제한 우회
-  var _unlockAccum = '';
-  var _unlockMax = 3;
-  var _unlockCount = 0;
-  var _isWeekTrip = isWeekTrip;
-  var _weeks = weeks;
-  var _nights = nights;
-
-  async function doFetch(text){
-    var res=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:text}]}],
-        generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
-    if(!res.ok){ console.warn('[Unlock] fetch 실패:', res.status); return null; }
-    var d=await res.json();
-    var pts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
-    var t=pts.map(function(p){return p.text||'';}).join('').trim();
-    console.log('[Unlock] fetch 결과 길이:', t.length, '완료마커:', t.includes('[완료]')||t.includes('[DONE]'));
-    return t||null;
-  }
-
-  async function continueUnlock(){
-    var isDone=_unlockAccum.includes('[완료]')||_unlockAccum.includes('[DONE]');
-    if(isDone || _unlockCount>= _unlockMax){
-      // 완료 — 마커 제거 후 저장
-      var final=_unlockAccum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
-      console.log('[Unlock] 최종 완료. 총 길이:', final.length, '이어받기 횟수:', _unlockCount);
-      if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
-      _unlockedOptions[tripIdx][opt]=final;
-      showUnlockedOption(opt, tripIdx);
-      // 서버 저장
-      saveUnlockedToServer(tripIdx, opt, final);
-      return;
-    }
-    _unlockCount++;
-    if(btn) btn.innerHTML='⏳ '+(_unlockCount===1
-      ?(lang==='ko'?'분석 중...':'Analyzing...')
-      :(lang==='ko'?'이어받는 중... ('+_unlockCount+'/'+(_unlockMax+1)+')':'Continuing... ('+_unlockCount+'/'+(_unlockMax+1)+')'))
-      +'<br><span style="font-size:9px;color:var(--m);">잠시만요</span>';
-
-    var fetchText;
-    if(_unlockCount===1){
-      fetchText=prompt;
-    } else {
-      var lastChunk=_unlockAccum.slice(-800);
-      var doneTarget=lang==='ko'
-        ?(_isWeekTrip?'Week '+_weeks+'까지':'Day '+_nights+'까지')+' 모든 항목'
-        :(_isWeekTrip?'all weeks to Week '+_weeks:'all days to Day '+_nights);
-      fetchText=lang==='ko'
-        ?'[이어쓰기] 아래 내용 바로 다음부터 이어서 작성. 중복 없이. '+doneTarget+' 완료 후에만 [완료] 표시:\n---\n'+lastChunk
-        :'[CONTINUE] Continue right after the text below. No overlap. Write [DONE] only after '+doneTarget+':\n---\n'+lastChunk;
-    }
-
-    try{
-      var r=await doFetch(fetchText);
-      if(r){
-        _unlockAccum+=(_unlockCount>1?'\n':'')+r;
-      } else {
-        // fetch 실패 시 재시도 1회
-        console.warn('[Unlock] '+_unlockCount+'차 실패, 재시도');
-        await new Promise(function(res){setTimeout(res,1500);});
-        var r2=await doFetch(fetchText);
-        if(r2) _unlockAccum+=(_unlockCount>1?'\n':'')+r2;
-      }
-      // 0.5초 후 다음 이어받기 (PC 연속 fetch 제한 방지)
-      await new Promise(function(res){setTimeout(res,500);});
-      await continueUnlock();
-    }catch(e){
-      console.error('[Unlock] '+_unlockCount+'차 오류:', e.message);
-      if(_unlockAccum.length>100){
-        // 중간까지 받은 내용이라도 저장
-        var partial=_unlockAccum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
-        if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
-        _unlockedOptions[tripIdx][opt]=partial;
-        showUnlockedOption(opt, tripIdx);
-        saveUnlockedToServer(tripIdx, opt, partial);
-      } else {
-        earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-        if(btn){ btn.disabled=false; btn.onclick=function(){requestUnlockOption(opt);};
-          btn.innerHTML='⚠️ '+e.message.substring(0,30)+'<br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>'; }
-      }
-    }
-  }
-
-  try{
-    await continueUnlock();
-  }catch(e){
-    console.error('[Unlock] 전체 오류:', e.message);
-    earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
-    if(btn){ btn.disabled=false; btn.onclick=function(){requestUnlockOption(opt);};
-      btn.innerHTML='⚠️ 오류<br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>'; }
-  }
-}
-
-function showUnlockedOption(opt, tripIdx){
-  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
-  var btn=document.getElementById('unlockBtn'+opt);
-
-  // 버튼을 "열림" 상태로 변경
-  if(btn){
-    btn.disabled=false;
-    btn.style.background='rgba(196,175,135,.2)';
-    btn.style.borderColor='rgba(196,175,135,.5)';
-    btn.innerHTML='✅ Option '+opt+'<br><span style="font-size:9px;color:var(--ok);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
-    btn.onclick=function(){ showUnlockedDetail(opt, tripIdx); };
-  }
-
-  // 상세 내용 바로 표시
-  showUnlockedDetail(opt, tripIdx);
-}
-
-function showUnlockedDetail(opt, tripIdx){
-  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
-  if(!text) return;
-  var rendered=text
-    .replace(/\r\n/g,'\n')           // 윈도우 줄바꿈 통일
-    .replace(/\n{3,}/g,'\n\n')        // 3줄 이상 빈줄 → 2줄로
-    .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">')
-    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;margin-bottom:2px;">$1</strong>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--w);">$1</strong>')
-    .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--gold)">·</span> $1')
-    .replace(/\n\n/g,'<br>')           // 빈 줄 → 줄바꿈 1개
-    .replace(/\n/g,'<br>');
-
-  var area=document.getElementById('unlockedDetailsArea');
-  if(!area) return;
-
-  // 이미 같은 옵션 블록이 있으면 교체, 없으면 추가
-  var existing=document.getElementById('unlockBlock'+opt);
-  var optColor=opt==='A'?'var(--gold)':opt==='B'?'var(--ac)':'var(--ok)';
-  var block=document.createElement('div');
-  block.id='unlockBlock'+opt;
-  block.style.cssText='margin-bottom:4px;padding:14px 0;width:100%;box-sizing:border-box;border-bottom:1px solid var(--b1);';
-  var dalLabel=lang==='ko'?'DAL':'DAL';
-  block.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
-    +'<div style="font-size:9px;color:'+optColor+';background:rgba(196,175,135,.06);padding:3px 10px;border-radius:10px;border:1px solid '+optColor+'40;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
-    +'<div style="display:flex;gap:5px;">'
-    +'<button onclick="shareOptionPlan(\''+opt+'\')" style="font-size:10px;padding:4px 8px;background:transparent;border:1px solid var(--b2);border-radius:10px;color:var(--m);cursor:pointer;" title="외부 공유">📤</button>'
-    +'<button onclick="shareToDalSocialOpt(\''+opt+'\')" style="font-size:10px;padding:4px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.3);border-radius:10px;color:var(--gold);cursor:pointer;" title="DAL 소셜 공유">🌙</button>'
-    +'</div>'
-    +'</div>'
-    +'<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>';
-
-  if(existing){
-    area.replaceChild(block, existing);
-  } else {
-    area.appendChild(block);
-  }
-
-  // 잠금 버튼 상태 업데이트
-  var btn=document.getElementById('unlockBtn'+opt);
-  if(btn){
-    btn.style.background=opt==='A'?'rgba(196,175,135,.2)':opt==='B'?'rgba(91,143,255,.2)':'rgba(0,200,100,.15)';
-    btn.innerHTML='✅ Option '+opt+'<br><span style="font-size:9px;color:var(--m);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
-  }
-}
-
-function buildDeepLinks(trip){
-  // trip: {route, dates, nights, pax, B:{flight, hotel}}
-  var dest=''; var destCode='';
-  var route=(trip&&trip.route)||'';
-  // ICN→목적지 파싱
-  var routeParts=route.split(/[→\-]/);
-  var destRaw=routeParts.length>1?routeParts[routeParts.length-1].trim():'';
-  // 주요 도시 코드 매핑
-  var cityMap={'도쿄':'TYO','Tokyo':'TYO','오사카':'OSA','Osaka':'OSA','교토':'KIX','Kyoto':'KIX',
-    '방콕':'BKK','Bangkok':'BKK','치앙마이':'CNX','싱가포르':'SIN','Singapore':'SIN',
-    '파리':'CDG','Paris':'CDG','발리':'DPS','Bali':'DPS','뉴욕':'JFK','New York':'JFK',
-    '뉴욕/LA':'LAX','LA':'LAX','바르셀로나':'BCN','Barcelona':'BCN','서울':'ICN','Seoul':'ICN',
-    '제주':'CJU','Jeju':'CJU','부산':'PUS','Busan':'PUS'};
-  var flightDest='';
-  Object.keys(cityMap).forEach(function(k){if(destRaw.indexOf(k)>=0) flightDest=cityMap[k];});
-  
-  // 날짜 파싱 시도 (dates: "2026.04.10~2026.04.15" 또는 "Apr 10~15")
-  var dates=(trip&&trip.dates)||'';
-  var checkIn='',checkOut='';
-  var dm=dates.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/g);
-  if(dm&&dm.length>=2){
-    checkIn=dm[0].replace(/[.\-\/]/g,'-');
-    checkOut=dm[1].replace(/[.\-\/]/g,'-');
-  }
-  var pax=(trip&&trip.pax)||1;
-  var hotelName=(trip&&trip.B&&trip.B.hotel)||destRaw;
-  var hotelSearch=encodeURIComponent(hotelName.split('(')[0].trim());
-  var destSearch=encodeURIComponent(destRaw||'');
-
-  // 딥링크 생성
-  var naverUrl='https://flight.naver.com/flights/international/ICN-'+(flightDest||'TYO')+
-    (checkIn?'-'+checkIn.replace(/-/g,''):'')+(checkOut?'-'+checkOut.replace(/-/g,''):'')+
-    '?adult='+(pax||1);
-  var agodaUrl='https://www.agoda.com/search?city='+destSearch+
-    (checkIn?'&checkIn='+checkIn:'')+(checkOut?'&checkOut='+checkOut:'')+'&rooms=1&adults='+(pax||1);
-  var klookUrl='https://www.klook.com/en-US/search/?query='+destSearch;
-
-  return {naver:naverUrl, agoda:agodaUrl, klook:klookUrl};
-}
-
-function updateTripLinks(trip){
-  var links=buildDeepLinks(trip);
-  // 플래닝 기록 상세화면 링크 업데이트
-  var btns=document.querySelectorAll('#halfTripDetail .link-btn');
-  if(btns.length>=3){
-    btns[0].onclick=function(){openLink(links.naver);};
-    btns[1].onclick=function(){openLink(links.agoda);};
-    btns[2].onclick=function(){openLink(links.klook);};
-  }
-}
 
 // ══ 맞춤 플래닝 ══
 async function startFullAnalysis(){
@@ -3580,37 +2823,27 @@ async function startFullAnalysis(){
   var thinkId='ftk'+Date.now();
   addFullMsg('dal','<span style="color:var(--m)">Gemini 2.5 Flash ✨ 맞춤 분석 중...</span>',thinkId);
   var style=STYLES[travelStyle]&&STYLES[travelStyle][lang];
-  var styleName=style?style.name:'';
-  var subStyle=travelSubStyle||'';
-  var userProfile=styleName?(lang==='ko'?('[여행자 스타일] '+styleName+(subStyle?' > '+subStyle:'')+'\n'):('[Traveler style] '+styleName+(subStyle?' > '+subStyle:'')+'\n')):'';
+  var sc=style?((lang==='ko'?'여행 스타일: ':'Travel style: ')+style.name+'\\n'):'';
   var sp=lang==='ko'
-    ?userProfile+'[맞춤 조건] '+ctx+'\n[요청] '+destText+'\n\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n유료 맞춤 플래닝으로 아래 항목을 구체적으로 제공:\n1. Option A(프리미엄) B(스마트 추천) C(가성비) 상세 비교\n2. 각 옵션별 구체적 식당명 3곳 + 예약 필요여부 + 대표 메뉴\n3. 시간대별 동선 (오전/오후/저녁 이동 수단 + 소요시간 포함)\n4. 이 시즌 놓치면 안 되는 할인 타이밍 (얼리버드/특가 날짜)\n5. 카드사별 혜택 적용 시 최적 결제 방법\n6. 현지인만 아는 팁 + 주의사항\n7. 최저가 예약처 안내 (네이버항공, 아고다, 클룩)'
-    :userProfile+'[Custom conditions] '+ctx+'\n[Request] '+destText+'\n\nYou are DAL AI Travel Planner. Reply ONLY in English.\nPremium custom planning — provide in detail:\n1. Option A(Premium) B(Smart Pick) C(Value) full comparison\n2. Specific restaurant names per option (3 each) + reservation needed + must-try dish\n3. Hour-by-hour route with transport + travel time\n4. Discount timing this season (early bird dates, flash sales)\n5. Best credit card payment strategy\n6. Local insider tips + warnings\n7. Best booking platforms (flights, hotels, tours)';
+    ?sc+'당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\\n조건: '+ctx+'\\n\\n1. 즉시 상세 추천. 추가질문 금지.\\n2. Option A(프리미엄) B(스마트 추천) C(가성비) 비교\\n3. 추천 이유, 주의사항, 숨겨진 팁, 카드 할인 최적화\\n4. 최저가 예약처 안내 (네이버항공, 아고다, 클룩)'
+    :sc+'You are DAL AI Travel Planner.\\nConditions: '+ctx+'\\n\\n1. Immediate detailed recommendations.\\n2. Compare Option A/B/C.\\n3. Include reasons, warnings, hidden tips, card discounts.\\n4. Suggest booking links.';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\n\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:sp+'\\n\\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
     var te=document.getElementById(thinkId);if(te)te.remove();
     if(r.ok){
       var data=await r.json();
       var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
       var reply=parts.map(function(p){return p.text||'';}).join('').trim();
       if(!reply)reply=lang==='ko'?'잠시 후 다시 시도해주세요.':'Please try again.';
-      window._lastFullText=reply;window._lastFullCtx=ctx||destText;
+      window._lastFullText=reply;window._lastFullCtx=ctx;
       addFullMsgResult(reply);earnCoinAmt+=5;updateCoinUI();
       if(saveBtn)saveBtn.style.display='block';
-    } else {
-      var errData=await r.json().catch(function(){return {};});
-      var errMsg=(errData.error&&errData.error.message)||('HTTP '+r.status);
-      addFullMsg('dal',(lang==='ko'?'⚠️ 오류: ':'⚠️ Error: ')+errMsg);
-      // 코인 환불
-      earnCoinAmt+=5; if(paidCoinAmt===0) earnCoinAmt+=10; updateCoinUI();
-      if(inp)inp.style.display='block'; if(res)res.style.display='none';
     }
   }catch(e){
     var te2=document.getElementById(thinkId);if(te2)te2.remove();
-    addFullMsg('dal',(lang==='ko'?'⚠️ 연결 오류: ':'⚠️ Error: ')+e.message);
-    earnCoinAmt+=10; updateCoinUI();
-    if(inp)inp.style.display='block'; if(res)res.style.display='none';
+    addFullMsg('dal',(lang==='ko'?'연결 오류: ':'Error: ')+e.message);
+    if(paidCoinAmt+earnCoinAmt<coins)earnCoinAmt+=10;updateCoinUI();
   }
 }
 function addFullMsg(who,content,id){
@@ -3624,24 +2857,13 @@ function addFullMsgResult(text){
   var area=document.getElementById('fullChatArea');if(!area)return;
   var div=document.createElement('div');div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
-  var rendered=text
-    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:8px;">$1</strong>')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^[\-\*] (.+)/gm,'<span style="color:var(--m);">· </span>$1')
-    .replace(/\n/g,'<br>');
-  div.innerHTML='<div class="msg-bubble" style="line-height:1.9;">'+rendered+'</div><div class="msg-meta">DAL · '+now+'</div>';
+  div.innerHTML='<div class="msg-bubble">'+text.replace(/\n/g,'<br>')+'</div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div);area.scrollTop=area.scrollHeight;
 }
 async function saveFullTrip(){
   var saveBtn=document.getElementById('fullSaveBtnArea');if(saveBtn)saveBtn.style.display='none';
   var dest=(document.getElementById('fullDestInput')||{value:''}).value||window._lastFullCtx||'여행';
-  // 텍스트에서 핵심 인사이트 추출
-  var fullText=window._lastFullText||'';
-  var insightLines=fullText.split('\n').filter(function(l){return l.trim().length>20 && !l.startsWith('#');}).slice(0,3);
-  var insights=insightLines.length>0
-    ? insightLines.map(function(l){return {icon:'💡',text:l.replace(/\*\*/g,'').trim().substring(0,80),type:''};})
-    : [{icon:'🧠',text:lang==='ko'?'맞춤 분석 완료. 아래에서 확인하세요.':'Custom planning complete.',type:''}];
-  fullTrips.unshift({route:dest,dates:new Date().toLocaleDateString('ko-KR'),ctx:window._lastFullCtx||'',text:fullText,insights:insights});
+  fullTrips.unshift({route:dest,dates:new Date().toLocaleDateString('ko-KR'),ctx:window._lastFullCtx||'',text:window._lastFullText||'',insights:[{icon:'🧠',text:'맞춤 분석 완료. 상세 결과 탭에서 확인하세요.',type:''}]});
   earnCoinAmt+=5;updateCoinUI();
   addFullMsg('dal',lang==='ko'?'✅ 맞춤 플래닝 기록에 저장됐습니다! 🪙 5코인 적립!':'✅ Saved! +🪙 5 coins!');
   setTimeout(function(){goPage('trips');setTripsTab('full');},800);
@@ -3662,14 +2884,14 @@ function initDailyReward(){
 }
 function renderDailyUI(d,today){
   var streak=d.streak||0,checked=d.lastDate===today;
-  var st=document.getElementById('dailyStreakText');if(st)st.textContent=lang==='en'?'🔥 Day '+(streak||1)+' streak':'🔥 연속 접속 '+(streak||1)+'일째';
-  var ss=document.getElementById('dailyStreakSub');if(ss)ss.textContent=checked?(lang==='en'?'Checked in today 🎉':'오늘 출석 완료 🎉'):(lang==='en'?'Check in today · Earn 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+' coins':'오늘 출석 시 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+'코인 지급');
-  var btn=document.getElementById('dailyCheckInBtn');if(btn){btn.textContent=checked?(lang==='en'?'✓ Done':'✓ 완료'):(lang==='en'?'🪙 Check In':'🪙 출석 체크');btn.style.opacity=checked?'0.4':'1';btn.style.cursor=checked?'default':'pointer';}
+  var st=document.getElementById('dailyStreakText');if(st)st.textContent='🔥 연속 접속 '+(streak||1)+'일째';
+  var ss=document.getElementById('dailyStreakSub');if(ss)ss.textContent=checked?'오늘 출석 완료 🎉':'오늘 출석 시 🪙 '+STREAK_COINS[Math.min(streak,STREAK_COINS.length-1)]+'코인 지급';
+  var btn=document.getElementById('dailyCheckInBtn');if(btn){btn.textContent=checked?'✓ 완료':'🪙 출석 체크';btn.style.opacity=checked?'0.4':'1';btn.style.cursor=checked?'default':'pointer';}
   renderStreakCalendar(streak,checked);
 }
 function renderStreakCalendar(streak,checked){
   var el=document.getElementById('streakCalendar');if(!el)return;
-  var days=lang==='en'?['M','T','W','T','F','S','S']:['월','화','수','목','금','토','일'];el.innerHTML='';
+  var days=['월','화','수','목','금','토','일'];el.innerHTML='';
   for(var i=0;i<7;i++){
     var done=i<streak||(i===streak&&checked);
     var div=document.createElement('div');
@@ -3713,7 +2935,7 @@ function selectEventDest(dest, eventName){
   var city = (DEST_NAMES[dest]&&DEST_NAMES[dest][lang]) || dest;
   var input = document.getElementById('chatInput');
   if(input){
-    input.value = lang==='ko' ? city + ' — ' + eventName + ' 여행 플랜 만들어줘' : city + ' — ' + eventName + ' travel plan';
+    input.value = city + ' — ' + eventName + ' 여행 플랜 만들어줘';
     collapseHero();
     input.focus();
     // 예산 계산기 목적지도 자동 선택
@@ -3727,110 +2949,32 @@ function selectEventDest(dest, eventName){
 
 // ══ 플래닝 입력 자동 업데이트 ══
 var DEST_LABELS = {
-  ko:{ jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)', sg:'싱가포르', fr:'프랑스(파리)', bali:'발리(인도네시아)', us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도', vn:'베트남(다낭/하노이)', ph:'필리핀(세부/보라카이)', tw:'대만(타이베이)', hk:'홍콩', my:'말레이시아(쿠알라룸푸르)', in:'인도(델리/뭄바이)', it:'이탈리아(로마/피렌체)', uk:'영국(런던)', de:'독일(베를린/뮌헨)', gr:'그리스(산토리니)', pt:'포르투갈(리스본)', ch:'스위스(루체른)', nl:'네덜란드(암스테르담)', tr:'튀르키예(이스탄불)', ca:'캐나다(밴쿠버)', mx:'멕시코(칸쿤)', au:'호주(시드니)', nz:'뉴질랜드(퀸스타운)', ae:'두바이(UAE)', ma:'모로코(마라케시)', za:'남아프리카(케이프타운)', eg:'이집트(카이로)' },
-  en:{ jp:'Japan(Tokyo/Kyoto/Osaka)', th:'Thailand(Bangkok/Chiang Mai)', sg:'Singapore', fr:'France(Paris)', bali:'Bali', us:'USA(New York/LA)', sp:'Spain(Barcelona)', kr:'Korea(Seoul/Busan)', jeju:'Jeju Island', vn:'Vietnam(Da Nang/Hanoi)', ph:'Philippines(Cebu/Boracay)', tw:'Taiwan(Taipei)', hk:'Hong Kong', my:'Malaysia(Kuala Lumpur)', in:'India(Delhi/Mumbai)', it:'Italy(Rome/Florence)', uk:'UK(London)', de:'Germany(Berlin/Munich)', gr:'Greece(Santorini)', pt:'Portugal(Lisbon)', ch:'Switzerland(Lucerne)', nl:'Netherlands(Amsterdam)', tr:'Turkey(Istanbul)', ca:'Canada(Vancouver)', mx:'Mexico(Cancun)', au:'Australia(Sydney)', nz:'New Zealand(Queenstown)', ae:'Dubai(UAE)', ma:'Morocco(Marrakech)', za:'South Africa(Cape Town)', eg:'Egypt(Cairo)' }
+  jp:'일본(도쿄/교토/오사카)', th:'태국(방콕/치앙마이)',
+  sg:'싱가포르', fr:'프랑스(파리)', bali:'발리',
+  us:'미국(뉴욕/LA)', sp:'스페인(바르셀로나)', kr:'한국(서울/부산)', jeju:'제주도'
 };
-
-// 출발지 레이블
-var ORIGIN_LABELS = {
-  ko:{ kr:'인천(ICN)', jp_dep:'도쿄/오사카', cn_dep:'베이징/상하이', sg_dep:'싱가포르', hk_dep:'홍콩', th_dep:'방콕', tw_dep:'타이베이', uk_dep:'런던', fr_dep:'파리', de_dep:'프랑크푸르트', us_dep:'뉴욕/LA', au_dep:'시드니' },
-  en:{ kr:'Incheon(ICN)', jp_dep:'Tokyo/Osaka', cn_dep:'Beijing/Shanghai', sg_dep:'Singapore', hk_dep:'Hong Kong', th_dep:'Bangkok', tw_dep:'Taipei', uk_dep:'London', fr_dep:'Paris', de_dep:'Frankfurt', us_dep:'New York/LA', au_dep:'Sydney' }
-};
-
-// 박/주 모드 토글
-var _nightsMode = 'nights'; // 'nights' or 'weeks'
-function toggleNightsMode(){
-  _nightsMode = _nightsMode==='nights'?'weeks':'nights';
-  var ni=document.getElementById('planNights');
-  var wi=document.getElementById('planWeeks');
-  var tg=document.getElementById('nightsToggle');
-  if(_nightsMode==='weeks'){
-    if(ni) ni.style.display='none';
-    if(wi) wi.style.display='block';
-    if(tg) tg.textContent=lang==='ko'?'← 박 단위로':'← nights mode';
-  } else {
-    if(ni) ni.style.display='block';
-    if(wi) wi.style.display='none';
-    if(tg) tg.textContent=lang==='ko'?'7박+ → 주 단위':'7+ nights → weeks';
-  }
-  updatePlanInput();
-}
-function onNightsChange(){
-  var ni=document.getElementById('planNights');
-  var val=parseInt(ni&&ni.value)||5;
-  // 7박 이상 입력 시 자동으로 주 단위로 전환
-  if(val>6 && _nightsMode==='nights'){
-    ni.value=6;
-    toggleNightsMode();
-    return;
-  }
-  updatePlanInput();
-}
-window.toggleNightsMode=toggleNightsMode; window.onNightsChange=onNightsChange;
 
 function updatePlanInput(){
   var dest = (document.getElementById('planDest')||{value:''}).value;
   var ppl  = (document.getElementById('planPeople')||{value:'2'}).value || '2';
+  var nts  = (document.getElementById('planNights')||{value:'5'}).value || '5';
   var style = STYLES[travelStyle] && STYLES[travelStyle][lang];
   var styleLabel = style ? style.name : '';
-  var subStyleLabel = travelSubStyle || '';
-  var destLabel = (DEST_LABELS[lang]&&DEST_LABELS[lang][dest]) || '';
-
-  // 출발지
-  var originVal = (document.getElementById('planOrigin')||{value:'kr'}).value || 'kr';
-  var originLabel = (ORIGIN_LABELS[lang]&&ORIGIN_LABELS[lang][originVal]) || (lang==='ko'?'인천(ICN)':'Incheon(ICN)');
-
-  // 박수 또는 주수
-  var nts, durationLabel;
-  if(_nightsMode==='weeks'){
-    var wks=(document.getElementById('planWeeks')||{value:'1'}).value||'1';
-    nts=parseInt(wks)*7;
-    durationLabel=wks+(lang==='ko'?'주 여행':' week trip');  // "2주 여행" 명확히
-  } else {
-    nts=(document.getElementById('planNights')||{value:'5'}).value||'5';
-    durationLabel=nts+(lang==='ko'?'박':' nights');
-  }
-
-  // 월 정보
-  var monthEl = document.getElementById('eventMonthFilter');
-  var monthVal = monthEl ? monthEl.value : 'all';
-  var monthNames = lang==='ko'
-    ? {1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월'}
-    : {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'};
-  var monthLabel = (monthVal && monthVal!=='all') ? monthNames[parseInt(monthVal)] : '';
-
-  // 선택된 이벤트명
-  var eventLabel = window._selectedEventName || '';
+  var destLabel = DEST_LABELS[dest] || '';
 
   var inp = document.getElementById('chatInput');
   if(!inp) return;
 
-  // 스타일만 선택되고 목적지 없을 때 → 스타일 기반 placeholder
   if(!destLabel){
-    if(styleLabel){
-      inp.placeholder = lang==='en'
-        ? styleLabel+(subStyleLabel?' · '+subStyleLabel:'')+' — select destination below'
-        : styleLabel+(subStyleLabel?' · '+subStyleLabel:'')+' 여행 — 목적지를 선택해주세요';
-    } else {
-      inp.placeholder = lang==='en'?'Select above or type directly':'위에서 선택하거나 직접 입력하세요';
-    }
+    inp.placeholder = '위에서 선택하거나 직접 입력하세요';
     inp.value = '';
     return;
   }
 
-  // 전체 조합 (출발지 + 박/주 포함)
-  var parts = [];
-  parts.push(originLabel+(lang==='ko'?' 출발 →':' →'));
-  parts.push(destLabel);
-  if(monthLabel) parts.push(monthLabel);
-  if(eventLabel) parts.push(eventLabel);
-  parts.push(durationLabel);
-  parts.push(ppl + (lang==='ko'?'인':' pax'));
-  if(styleLabel) parts.push(styleLabel);
-  if(subStyleLabel) parts.push(subStyleLabel);
-  parts.push(lang==='ko'?'— Option A/B/C 플랜 만들어줘':'— create Option A/B/C plan');
-
-  inp.value = parts.join(' ');
+  var txt = destLabel + ' ' + nts + '박 ' + ppl + '인';
+  if(styleLabel) txt += ' ' + styleLabel;
+  txt += (lang==='ko' ? ' 여행 — Option A/B/C 플랜 만들어줘' : ' trip — create Option A/B/C plan');
+  inp.value = txt;
 
   // 예산 계산기 연동
   var cd = document.getElementById('calcDest');
@@ -3839,56 +2983,53 @@ function updatePlanInput(){
   if(cd) cd.value = dest;
   if(cp) cp.value = ppl;
   if(cn) cn.value = nts;
-  if(typeof calcBudget==='function') calcBudget();
+  calcBudget();
 }
 
-// ══ 이벤트 클릭 → 목적지 자동 선택 + AI 입력창 통합 갱신 ══
+// ══ 이벤트 클릭 → 목적지 자동 선택 (수정) ══
 function selectEventByIdx(idx){
   var evEl = document.getElementById('eventList');
   var events = evEl && evEl._evCache;
   if(!events || !events[idx]) return;
   var e = events[idx];
 
-  // ① 목적지 드롭다운 자동 세팅 + 강조 표시
+  // ① 목적지 드롭다운 강제 세팅
   var pd = document.getElementById('planDest');
   if(pd){
     pd.value = e.dest;
     pd.style.borderColor = 'var(--gold)';
-    pd.style.background = 'rgba(196,175,135,.08)';
-    setTimeout(function(){ pd.style.borderColor = 'var(--b2)'; pd.style.background='var(--s1)'; }, 2000);
+    setTimeout(function(){ pd.style.borderColor = 'var(--b2)'; }, 1500);
   }
 
-  // ② 이벤트명 저장 → updatePlanInput에서 참조
-  window._selectedEventName = e.name;
-
-  // ③ updatePlanInput으로 전체 통합 갱신
-  updatePlanInput();
-
-  // ④ 입력창 하이라이트 + 스크롤
+  // ② 입력창 직접 작성 (updatePlanInput 기반 + 이벤트명 포함)
+  var ppl = (document.getElementById('planPeople')||{value:'2'}).value || '2';
+  var nts = (document.getElementById('planNights')||{value:'5'}).value || '5';
+  var destLabel = DEST_LABELS[e.dest] || e.dest;
+  var style = STYLES[travelStyle] && STYLES[travelStyle][lang];
+  var styleLabel = style ? ' ' + style.name : '';
   var inp = document.getElementById('chatInput');
   if(inp){
+    inp.value = destLabel + ' ' + nts + '박 ' + ppl + '인' + styleLabel + ' — ' + e.name + ' 시즌 여행 플랜 만들어줘';
     inp.style.borderColor = 'var(--ac)';
-    setTimeout(function(){ inp.style.borderColor = 'var(--b2)'; }, 2000);
-    inp.scrollIntoView({behavior:'smooth', block:'center'});
-    inp.focus();
+    setTimeout(function(){ inp.style.borderColor = 'var(--b2)'; }, 1500);
   }
 }
 
-// selectStyleChip은 함수 내부에서 직접 updatePlanInput 호출
+// ══ selectStyleChip 업데이트 시 입력창도 갱신 ══
+var _origSelectStyleChip = selectStyleChip;
+selectStyleChip = function(el, style){
+  _origSelectStyleChip(el, style);
+  updatePlanInput();
+};
 
 
 window.onload=function(){
   renderChips(); renderRanking(); renderEvents(); renderChecklist();
-  // renderDiscountToggles 제거 (적용할인 섹션 제거됨)
-  renderTreeBreakdown(); calcFinalPrice();
+  renderDiscountToggles(); renderTreeBreakdown(); calcFinalPrice();
   renderCardList(); renderAirlineCards(); updateChatPlaceholder();
   setMode('half'); updateLimitBar(); initDailyReward();
   var mf=document.getElementById('eventMonthFilter');if(mf){mf.value=new Date().getMonth()+1;renderEvents();}
   updatePlanInput(); initSupabase();
-  // 비로그인 시 로그인 페이지로 자동 이동
-  setTimeout(function(){
-    if(!isLoggedIn) goPage('my');
-  },500);
 };
 
 // 전역 함수 직접 등록
@@ -3904,7 +3045,138 @@ window.openEmail=openEmail; window.submitCS=submitCS;
 window.doLogin=doLogin; window.doLogout=doLogout;
 window.confirmWithdraw=confirmWithdraw; window.selectStyle=selectStyle;
 window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
-window.saveToTrip=saveToTrip; window.toggleFollow=toggleFollow;
+
+
+// ══ 옵션 잠금해제 ══
+var _pendingUnlockOpt=null;
+var UNLOCK_COIN_COST=5;
+var _unlockedOptions={};
+
+function requestUnlockOption(opt){
+  if(!requireLogin(function(){ goPage('trips'); setTimeout(function(){ showHalfDetail(currentHalfTripIdx); setTimeout(function(){ requestUnlockOption(opt); },300); },300); })) return;
+  var tripIdx=currentHalfTripIdx;
+  var t=halfTrips[tripIdx]; if(!t) return;
+  if(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt]){ showUnlockedDetail(opt,tripIdx); return; }
+  if(coins<UNLOCK_COIN_COST){ alert(lang==='ko'?'코인이 부족합니다. 충전해주세요 🪙':'Insufficient coins.'); openCoinModal(); return; }
+  _pendingUnlockOpt={opt:opt,tripIdx:tripIdx};
+  var title=document.getElementById('unlockConfirmTitle');
+  var desc=document.getElementById('unlockConfirmDesc');
+  var bal=document.getElementById('unlockCoinBalance');
+  var confirmBtn=document.getElementById('t-unlock-confirm');
+  var cancelBtn=document.getElementById('t-unlock-cancel');
+  if(title) title.textContent=lang==='ko'?'🌕 Option '+opt+' 상세 잠금 해제':'🌕 Unlock Option '+opt+' Details';
+  if(desc) desc.innerHTML=lang==='ko'
+    ?'<strong style="color:var(--gold);">5🪙</strong> 코인을 사용해 Option '+opt+'의 상세 정보를 받겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정 루트'
+    :'Use <strong style="color:var(--gold);">5🪙</strong> coins to unlock Option '+opt+' details?<br><br>· Restaurant names + links<br>· Hour-by-hour itinerary<br>· Confirmed card discounts';
+  if(bal) bal.textContent=coins+'🪙';
+  if(confirmBtn) confirmBtn.textContent=lang==='ko'?'5🪙 사용 · 잠금 해제':'Use 5🪙 · Unlock';
+  if(cancelBtn) cancelBtn.textContent=lang==='ko'?'취소':'Cancel';
+  var modal=document.getElementById('unlockConfirmModal');
+  if(modal) modal.style.display='flex';
+}
+
+async function confirmUnlockOption(){
+  var modal=document.getElementById('unlockConfirmModal');
+  if(modal) modal.style.display='none';
+  if(!_pendingUnlockOpt) return;
+  var opt=_pendingUnlockOpt.opt, tripIdx=_pendingUnlockOpt.tripIdx;
+  _pendingUnlockOpt=null;
+  if(earnCoinAmt>=UNLOCK_COIN_COST){ earnCoinAmt-=UNLOCK_COIN_COST; }
+  else{ var need=UNLOCK_COIN_COST-earnCoinAmt; earnCoinAmt=0; paidCoinAmt=Math.max(0,paidCoinAmt-need); }
+  updateCoinUI();
+  await doUnlockOption(opt,tripIdx,false);
+}
+
+async function doUnlockOption(opt,tripIdx,alreadyUnlocked){
+  var t=halfTrips[tripIdx]; if(!t) return;
+  if(alreadyUnlocked){ showUnlockedDetail(opt,tripIdx); return; }
+  var nights=parseInt(t.nights)||5;
+  var isWeekTrip=nights>=7;
+  var fullText=t.text||'';
+  var optBase=fullText.substring(0,1500);
+  var _accum='', _max=3, _count=0;
+
+  async function doFetch(fetchText){
+    var res=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:fetchText}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
+    if(!res.ok) return null;
+    var d=await res.json();
+    var pts=(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[];
+    return pts.map(function(p){return p.text||'';}).join('').trim()||null;
+  }
+
+  async function continueUnlock(){
+    var isDone=_accum.indexOf('[완료]')>=0||_accum.indexOf('[DONE]')>=0;
+    if(isDone||_count>=_max){
+      var final=_accum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
+      if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
+      _unlockedOptions[tripIdx][opt]=final;
+      showUnlockedDetail(opt,tripIdx);
+      if(typeof saveUnlockedToServer==='function') saveUnlockedToServer(tripIdx,opt,final);
+      return;
+    }
+    _count++;
+    var promptKo, promptEn, fetchText;
+    if(_count===1){
+      promptKo='아래는 여행 AI 플랜 내용이야.\n---\n'+optBase+'\n---\n\n[첫 줄] Option '+opt+' 총 예상 비용: XXX~XXX만원\n\n'+
+        (isWeekTrip?'- Week별 핵심 장소마다 추천 식당 2곳(이름+메뉴+가격대) + 구체적 팁\n':'- Day별 추천 식당(이름+메뉴+가격대) + 구체적 팁\n')+
+        '- 항공: 추천 이유 + 대안 1개\n- 숙소: 추천 이유 + 대안 1곳 + 가격\n- 카드사명 + 예상 절약금액 + 얼리버드 타이밍\n\n모든 항목 완료 후 마지막 줄에 [완료]';
+      promptEn='Expand Option '+opt+' from this travel plan:\n---\n'+optBase+'\n---\n\n[First line] Option '+opt+' total: $XXX~$XXX\n\n'+
+        (isWeekTrip?'- Each week: 2 restaurants (name+dish+price) + tips\n':'- Each day: restaurant (name+dish+price) + tips\n')+
+        '- Flight: why + 1 alternative\n- Hotel: why + 1 alternative + price\n- Card discount timing\n\nWrite [DONE] on last line when complete';
+      fetchText=lang==='ko'?promptKo:promptEn;
+    } else {
+      var last=_accum.slice(-600);
+      fetchText=lang==='ko'
+        ?'[이어쓰기] 아래 내용 바로 다음부터 이어서. 중복없이. 완료시 마지막에 [완료]:\n---\n'+last
+        :'[CONTINUE] Continue right after. No overlap. Write [DONE] when done:\n---\n'+last;
+    }
+    try{
+      var r=await doFetch(fetchText);
+      if(r) _accum+=(_count>1?'\n':'')+r;
+      await new Promise(function(resolve){setTimeout(resolve,500);});
+      await continueUnlock();
+    }catch(e){
+      if(_accum.length>100){
+        var partial=_accum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
+        if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
+        _unlockedOptions[tripIdx][opt]=partial;
+        showUnlockedDetail(opt,tripIdx);
+        if(typeof saveUnlockedToServer==='function') saveUnlockedToServer(tripIdx,opt,partial);
+      } else {
+        earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
+        alert(lang==='ko'?'오류가 발생했습니다. 다시 시도해주세요.':'Error. Please try again.');
+      }
+    }
+  }
+
+  try{ await continueUnlock(); }
+  catch(e){ earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI(); alert(lang==='ko'?'오류: '+e.message:'Error: '+e.message); }
+}
+
+function showUnlockedDetail(opt,tripIdx){
+  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
+  if(!text) return;
+  var rendered=text
+    .replace(/\r\n/g,'\n').replace(/\n{3,}/g,'\n\n')
+    .replace(/---+/g,'<hr style="border:none;border-top:1px solid var(--b1);margin:8px 0;">')
+    .replace(/#{1,4} (.+)/g,'<strong style="color:var(--sb);font-size:12px;display:block;margin-top:10px;">$1</strong>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--w);">$1</strong>')
+    .replace(/\n\n/g,'<br>').replace(/\n/g,'<br>');
+  var area=document.getElementById('unlockedDetailsArea');
+  if(!area) return;
+  var existing=document.getElementById('unlockBlock'+opt);
+  var optColor=opt==='A'?'var(--gold)':opt==='B'?'var(--ac)':'var(--ok)';
+  var block=document.createElement('div');
+  block.id='unlockBlock'+opt;
+  block.style.cssText='margin-bottom:4px;padding:14px 0;border-bottom:1px solid var(--b1);';
+  block.innerHTML='<div style="font-size:9px;color:'+optColor+';margin-bottom:12px;padding:3px 10px;border-radius:10px;border:1px solid '+optColor+'40;display:inline-block;">✅ Option '+opt+' '+(lang==='ko'?'상세 정보 (5🪙 사용)':'Details Unlocked (5🪙)')+'</div>'
+    +'<div style="font-size:11px;color:var(--m);line-height:1.9;">'+rendered+'</div>';
+  if(existing){ area.replaceChild(block,existing); } else { area.appendChild(block); }
+}
+
+
+window.saveToTrip=saveToTrip; window.deleteTripConfirm=deleteTripConfirm; window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
 window.searchUsers=searchUsers; window.openNewPost=openNewPost;
@@ -3923,59 +3195,6 @@ window.doEmailLogin=doEmailLogin; window.doEmailSignup=doEmailSignup;
 window.setHomeTab=setHomeTab; window.selectStyleChip=selectStyleChip;
 window.toggleFullChip=toggleFullChip; window.toggleFullBudget=toggleFullBudget;
 window.startFullAnalysis=startFullAnalysis; window.saveFullTrip=saveFullTrip; window.backToFullInput=backToFullInput;
-window.shareOptionPlan=async function(opt){
-  var t=halfTrips[currentHalfTripIdx];
-  if(!t) return;
-  var optLabel=opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
-  var detail=(_unlockedOptions[currentHalfTripIdx]&&_unlockedOptions[currentHalfTripIdx][opt])||'';
-  var preview=detail.substring(0,100).replace(/<[^>]+>/g,'');
-  var shareText='[DAL🌙] '+(t.route||'')+(t.nights?' '+t.nights+(lang==='ko'?'박':' nights'):'')+' Option '+opt+' ('+optLabel+')\n'+preview+'...\nhttps://dal-moon.com';
-  if(navigator.share){
-    try{ await navigator.share({title:'DAL 여행 플랜 Option '+opt, text:shareText}); }catch(e){}
-  } else {
-    navigator.clipboard&&navigator.clipboard.writeText(shareText)
-      .then(function(){ alert(lang==='ko'?'Option '+opt+' 플랜이 복사되었습니다!':'Option '+opt+' plan copied!'); });
-  }
-};
-window.shareExternal=async function(){
-  var t=halfTrips[currentHalfTripIdx];
-  if(!t) return;
-  var shareText=(lang==='ko'?'DAL🌙로 찾은 여행 플랜: ':'My travel plan via DAL🌙: ')+(t.route||'')+(t.nights?' · '+(t.nights)+(lang==='ko'?'박':'n'):'');
-  if(navigator.share){
-    try{ await navigator.share({title:'DAL 여행 플랜', text:shareText, url:'https://dal-moon.com'}); }
-    catch(e){}
-  } else {
-    navigator.clipboard&&navigator.clipboard.writeText(shareText+' https://dal-moon.com')
-      .then(function(){ alert(lang==='ko'?'링크가 복사되었습니다!':'Link copied!'); });
-  }
-};
-window.shareToDalSocialOpt=function(opt){
-  var t=halfTrips[currentHalfTripIdx];
-  if(!t) return;
-  var optLabel=opt==='A'?(lang==='ko'?'프리미엄':'Premium'):opt==='B'?(lang==='ko'?'스마트 추천':'Smart Pick'):(lang==='ko'?'가성비':'Value');
-  var detail=(_unlockedOptions[currentHalfTripIdx]&&_unlockedOptions[currentHalfTripIdx][opt])||'';
-  var preview=detail.replace(/<[^>]+>/g,'').substring(0,80);
-  var msg=(lang==='ko'
-    ?'📍 '+( t.route||'여행')+' Option '+opt+' ('+optLabel+') 공유!\n'+preview+'...\nDAL AI로 만든 플랜 🌙'
-    :'📍 '+( t.route||'trip')+' Option '+opt+' ('+optLabel+') shared!\n'+preview+'...\nMade with DAL AI 🌙');
-  goPage('social');
-  setTimeout(function(){
-    var inp=document.getElementById('newPostInput');
-    if(inp){ inp.value=msg; inp.focus(); }
-  },300);
-};
-window.shareToDalSocial=function(){
-  var t=halfTrips[currentHalfTripIdx];
-  if(!t) return;
-  var msg=(lang==='ko'?'📍 '+(t.route||'여행')+' '+(t.nights||'')+'박 여행 플랜 공유! DAL AI로 만들었어요 🌙':'📍 Sharing my '+(t.nights||'')+'-night trip to '+(t.route||'')+' via DAL AI 🌙');
-  // 소셜 탭으로 이동하면서 게시글 미리 채우기
-  goPage('social');
-  setTimeout(function(){
-    var inp=document.getElementById('newPostInput');
-    if(inp){ inp.value=msg; inp.focus(); }
-  },300);
-};
-window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail;
 window.setTripsTab=setTripsTab; window.showHalfDetail=showHalfDetail; window.closeHalfDetail=closeHalfDetail;
 window.showFullDetail=showFullDetail; window.closeFullDetail=closeFullDetail;
 window.startUpgradeFromTrip=startUpgradeFromTrip; window.openLink=openLink;
@@ -3997,6 +3216,19 @@ window.initSupabase=initSupabase; window.handleOAuthCallback=handleOAuthCallback
     <div style="display:flex;gap:8px;">
       <button onclick="closeWithdrawModal()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);color:var(--m);border-radius:2px;font-size:12px;cursor:pointer;">취소</button>
       <button onclick="doWithdraw()" style="flex:1;padding:10px;background:rgba(240,96,96,.15);border:1px solid var(--red);color:var(--red);border-radius:2px;font-size:12px;cursor:pointer;">탈퇴 확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 옵션 잠금해제 확인 팝업 -->
+<div id="unlockConfirmModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:24px;max-width:320px;width:90%;margin:auto;">
+    <div style="font-size:16px;color:var(--sb);font-weight:500;margin-bottom:8px;text-align:center;" id="unlockConfirmTitle">🌕 Option A 상세 잠금 해제</div>
+    <div style="font-size:12px;color:var(--m);line-height:1.7;margin-bottom:16px;text-align:center;" id="unlockConfirmDesc">5🪙 코인을 사용해 Option A의 상세 정보를 열겠습니까?<br><br>· 식당명 + 예약 링크<br>· 시간대별 동선<br>· 카드 할인 확정</div>
+    <div style="font-size:11px;color:var(--m);text-align:center;margin-bottom:16px;">현재 보유: <span id="unlockCoinBalance" style="color:var(--gold);font-weight:500;">50🪙</span></div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="document.getElementById('unlockConfirmModal').style.display='none';" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);border-radius:4px;font-size:12px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-unlock-cancel">취소</button>
+      <button onclick="confirmUnlockOption()" style="flex:1;padding:10px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.4);border-radius:4px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-unlock-confirm">5🪙 사용 · 잠금 해제</button>
     </div>
   </div>
 </div>
