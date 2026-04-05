@@ -1,5 +1,4 @@
 const https = require('https');
-
 exports.handler = async function(event) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -7,31 +6,25 @@ exports.handler = async function(event) {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
-
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
-
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
-
   try {
     const body = JSON.parse(event.body);
     const model = body.model || 'gemini-2.5-flash';
     const apiKey = process.env.GEMINI_API_KEY;
-
     if (!apiKey) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'GEMINI_API_KEY not set' }) };
     }
-
     const payload = JSON.stringify({
       contents: body.contents,
       generationConfig: body.generationConfig || { maxOutputTokens: 2000, temperature: 0.7 }
     });
-
     const result = await new Promise((resolve, reject) => {
-      const urlPath = `/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const urlPath = `/v1/models/${model}:generateContent?key=${apiKey}`;
       const options = {
         hostname: 'generativelanguage.googleapis.com',
         path: urlPath,
@@ -50,9 +43,7 @@ exports.handler = async function(event) {
       req.write(payload);
       req.end();
     });
-
     return { statusCode: result.status, headers, body: result.body };
-
   } catch (error) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
