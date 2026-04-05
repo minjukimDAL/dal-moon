@@ -1501,9 +1501,13 @@ function applyLang(){
   var enAbout=document.getElementById('about-en');
   if(koAbout) koAbout.style.display=lang==='ko'?'block':'none';
   if(enAbout) enAbout.style.display=lang==='en'?'block':'none';
-  // AI 채팅 초기 메시지 재설정
+  // 채팅이 비어있을 때만 초기 메시지 표시 (기존 대화 유지)
   var area=document.getElementById('chatArea');
-  if(area && area.children.length>0){ area.innerHTML=''; if(typeof initChat==='function') initChat(); }
+  if(area && area.children.length===0){ if(typeof initChat==='function') initChat(); }
+  // updateChatPlaceholder는 별도 호출
+  if(typeof updateChatPlaceholder==='function') updateChatPlaceholder();
+  // updatePlanInput으로 입력창 언어 반영
+  if(typeof updatePlanInput==='function') updatePlanInput();
 }
 function toggleLang(){
   lang = lang==='ko'?'en':'ko';
@@ -1979,7 +1983,7 @@ async function saveToTrip(){
       '"C":{"name":"옵션명","price":총가격숫자,"flight":"항공사+좌석등급","hotel":"호텔명+등급","days":["Day1","Day2","Day3"]}}\n\n추천글:\n'+tripText.substring(0,3000);
     try{
       var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{role:'user',parts:[{text:extractPrompt}]}],generationConfig:{maxOutputTokens:3500,temperature:0.1}})});
+        body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:extractPrompt}]}],generationConfig:{maxOutputTokens:3500,temperature:0.1}})});
       if(res.ok){
         var data=await res.json();
         var raw=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts&&data.candidates[0].content.parts[0]&&data.candidates[0].content.parts[0].text)||'';
@@ -2924,7 +2928,7 @@ async function startFullAnalysis(){
     :sc+'You are DAL AI Travel Planner.\\nConditions: '+ctx+'\\n\\n1. Immediate detailed recommendations.\\n2. Compare Option A/B/C.\\n3. Include reasons, warnings, hidden tips, card discounts.\\n4. Suggest booking links.';
   try{
     var r=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:sp+'\\n\\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sp+'\\n\\nRequest: '+(destText||ctx)}]}],generationConfig:{maxOutputTokens:2000,temperature:0.7}})});
     var te=document.getElementById(thinkId);if(te)te.remove();
     if(r.ok){
       var data=await r.json();
