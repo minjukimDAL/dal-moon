@@ -789,6 +789,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="font-size:9px;color:var(--m);">새 글은 새로고침 후 표시됩니다</div>
+      <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;color:var(--m);cursor:pointer;">🔄 새로고침</button>
+    </div>
     <div id="socialFeed" style="margin-bottom:10px;">
       <div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
         아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙
@@ -2155,21 +2159,17 @@ async function saveToTripSnap(snapText, snapJson, snapQuery){
   if(!requireLogin(function(){ saveToTripSnap(snapText, snapJson, snapQuery); })) return;
   addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
   var j=snapJson;
-  var newRoute=(j&&j.route)||snapQuery||'여행';
   var newText=snapText||'';
-  var isDup=halfTrips.some(function(t){
-    return t.route===newRoute && (t.text||'').substring(0,50)===(newText).substring(0,50);
-  });
-  if(isDup){
-    addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
-    setTimeout(function(){goPage('trips');},800);
-    return;
-  }
+  // route: 입력쿼리에서 추출 (snapQuery = 유저가 입력한 텍스트)
+  var newRoute=(j&&j.route)||snapQuery||'여행';
+  // 날짜/박수/인원 재추출 (snapQuery 기반)
+  var qNight=snapQuery&&snapQuery.match(/(\d+)박/);
+  var qPax=snapQuery&&snapQuery.match(/(\d+)인/);
   var newTrip={
     route:newRoute,
     dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-    nights:(j&&j.nights)||null,
-    pax:(j&&j.pax)||null,
+    nights:(j&&j.nights)||(qNight?parseInt(qNight[1]):null),
+    pax:(j&&j.pax)||(qPax?parseInt(qPax[1]):null),
     A:(j&&j.A)||null, B:(j&&j.B)||null, C:(j&&j.C)||null,
     text:newText,
     id:'local_'+Date.now()
@@ -2182,7 +2182,7 @@ async function saveToTripSnap(snapText, snapJson, snapQuery){
     });
   }
   addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
-  setTimeout(function(){goPage('trips');},800);
+  setTimeout(function(){goPage('trips');},1000);
 }
 async function saveToTrip(){
   if(!requireLogin(function(){ saveToTrip(); })) return;
@@ -2598,6 +2598,62 @@ function searchUsers(q){
     }).catch(function(){ el.innerHTML=''; });
   }
 }
+// ══ 팔로우 유저 ══
+var _followingUsers={};
+function toggleFollowUser(btn, userId, nickname){
+  var isFollowing=btn.classList.contains('following');
+  btn.className='follow-btn'+(isFollowing?'':' following');
+  btn.style.cssText='font-size:9px;padding:4px 10px;';
+  btn.textContent=isFollowing?(lang==='ko'?'팔로우':'Follow'):(lang==='ko'?'팔로잉 ✓':'Following ✓');
+  var fl=document.getElementById('followList');
+  if(!isFollowing){
+    _followingUsers[userId]=nickname;
+    if(fl){
+      var existing=document.getElementById('follow_'+userId);
+      if(!existing){
+        var card=document.createElement('div');
+        card.className='follow-card'; card.id='follow_'+userId;
+        var unfollowLabel=lang==='ko'?'팔로잉 ✓':'Following ✓';
+        card.innerHTML='<div class="room-avatar">👤</div>'
+          +'<div style="flex:1;"><div style="font-size:12px;color:var(--sb);">'+nickname+'</div><div style="font-size:9px;color:var(--m);">DAL 여행자</div></div>';
+        var ufBtn=document.createElement('button');
+        ufBtn.className='follow-btn following';
+        ufBtn.style.cssText='font-size:9px;padding:4px 10px;';
+        ufBtn.textContent=unfollowLabel;
+        ufBtn.onclick=function(){ toggleFollowUser(ufBtn, userId, nickname); };
+        card.appendChild(ufBtn);
+        var empty=fl.querySelector('[style*="text-align:center"]');
+        if(empty) fl.innerHTML='';
+        fl.appendChild(card);
+      }
+    }
+  } else {
+    delete _followingUsers[userId];
+    var card=document.getElementById('follow_'+userId);
+    if(card) card.remove();
+    if(fl&&fl.children.length===0){
+      fl.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 팔로우한 여행자가 없어요.<br>피드에서 팔로우 버튼을 눌러보세요 🌙':'No followed travelers yet.<br>Follow someone from Feed 🌙')+'</div>';
+    }
+  }
+}
+// ══ 피드 좋아요 ══
+async function likeFeedPost(btn, postId){
+  var cur=parseInt((btn.textContent||'').replace('❤️ ',''))||0;
+  btn.textContent='❤️ '+(cur+1);
+  btn.style.color='var(--red)';
+  if(_currentToken&&postId){
+    try{
+      await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({likes:cur+1})
+      });
+    }catch(e){ console.warn('[Feed] 좋아요 실패:',e.message); }
+  }
+}
+// ══ 피드 새로고침 ══
+function refreshFeed(){ if(typeof loadPostsFromServer==='function') loadPostsFromServer(); }
+
 function openNewPost(){
   if(!requireLogin(function(){ openNewPost(); })) return;
   var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip');
@@ -2776,13 +2832,42 @@ async function loadPostsFromServer(){
     if(r&&Array.isArray(r)&&r.length>0){
       var feedEl=document.getElementById('socialFeed');
       if(!feedEl) return;
-      feedEl.innerHTML=r.map(function(p){
-        return '<div class="feed-card">'
-          +'<div class="feed-user"><div class="feed-avatar">👤</div><div><div style="font-size:11px;color:var(--sb);">'+p.nickname+'</div><div style="font-size:9px;color:var(--m);">'+new Date(p.created_at).toLocaleDateString(lang==='ko'?'ko-KR':'en-US')+'</div></div></div>'
+      feedEl.innerHTML=''; r.map(function(p){
+        var isMe=(_currentUserId&&p.user_id===_currentUserId);
+        var cardDiv=document.createElement('div');
+        cardDiv.className='feed-card';
+        var followHtml=isMe
+          ?'<span style="font-size:9px;color:var(--m);padding:3px 8px;border:1px solid var(--b2);border-radius:10px;">'+(lang==='ko'?'나':'Me')+'</span>'
+          :'<span class="feed-follow-placeholder" data-uid="'+p.user_id+'" data-nick="'+p.nickname+'"></span>';
+        cardDiv.innerHTML='<div class="feed-user">'
+          +'<div class="feed-avatar">👤</div>'
+          +'<div style="flex:1;"><div style="font-size:11px;color:var(--sb);">'+p.nickname+'</div><div style="font-size:9px;color:var(--m);">'+new Date(p.created_at).toLocaleDateString(lang==='ko'?'ko-KR':'en-US')+'</div></div>'
+          +followHtml
+          +'</div>'
           +'<div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">'+p.content+'</div>'
-          +'<div class="feed-actions"><button class="feed-btn">❤️ '+( p.likes||0)+'</button></div>'
-          +'</div>';
-      }).join('');
+          +'<div class="feed-actions"></div>';
+        // 팔로우 버튼 동적 생성
+        if(!isMe){
+          var ph=cardDiv.querySelector('.feed-follow-placeholder');
+          var uid=p.user_id, nick=p.nickname;
+          var fb=document.createElement('button');
+          fb.className='follow-btn'; fb.style.cssText='font-size:9px;padding:4px 10px;';
+          fb.textContent=lang==='ko'?'팔로우':'Follow';
+          fb.onclick=function(){ toggleFollowUser(fb,uid,nick); };
+          if(ph) ph.parentNode.replaceChild(fb,ph);
+        }
+        // 좋아요 버튼 동적 생성
+        var likeBtn=document.createElement('button');
+        likeBtn.className='feed-btn';
+        likeBtn.textContent='❤️ '+(p.likes||0);
+        var pid=p.id;
+        likeBtn.onclick=function(){ likeFeedPost(likeBtn,pid); };
+        cardDiv.querySelector('.feed-actions').appendChild(likeBtn);
+        feedEl.appendChild(cardDiv);
+        return null;
+      });
+      var dummy=null;
+      if(false) [].join('');
       console.log('[Posts] 서버에서 로드:', r.length+'개');
     }
   }catch(e){ console.warn('[Posts] 로드 실패:', e.message); }
@@ -3962,7 +4047,7 @@ window.openEmail=openEmail; window.submitCS=submitCS;
 window.doLogin=doLogin; window.doLogout=doLogout;
 window.confirmWithdraw=confirmWithdraw; window.selectStyle=selectStyle;
 window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
-window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollow=toggleFollow;
+window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollowUser=toggleFollowUser; window.likeFeedPost=likeFeedPost; window.refreshFeed=refreshFeed; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
 window.searchUsers=searchUsers; window.openNewPost=openNewPost;
