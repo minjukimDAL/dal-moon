@@ -789,27 +789,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
-    <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="2시간 전 · 싱가포르" data-en="2h ago · Singapore">2시간 전 · 싱가포르</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇸🇬 싱가포르 10월 꿀팁! F1 그랑프리(10/17-19) 피해서 10/20 이후 예약하면 호텔 40% 저렴. 마리나베이샌즈 뷰룸 1박 35만원에 잡았어요 🎉 DAL Full 모드로 비교하고 바로 예약!</div>
-      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)"><span data-ko="🔗 공유" data-en="🔗 Share">🔗 공유</span></button></div>
+    <div id="socialFeed" style="margin-bottom:10px;">
+      <div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
+        아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙
+      </div>
     </div>
-    <div class="feed-card">
-      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="어제 · 도쿄" data-en="Yesterday · Tokyo">어제 · 도쿄</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
-      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br>DAL Full 모드 검색 → 🪙 5코인 적립!</div>
-      <div class="feed-actions"><button class="feed-btn">❤️ 41</button><button class="feed-btn">💬 12</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
-    </div>
-    <div id="socialFeed" style="margin-bottom:10px;"></div>
-    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기</button>
+        <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기</button>
   </div>
   <!-- 팔로잉 -->
   <div id="social-follow" style="padding:14px 18px;display:none;">
     <div style="font-size:10px;color:var(--m);margin-bottom:12px;line-height:1.8;" id="t-follow-sub">팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.</div>
-    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:8px;" id="t-suggested">추천 여행자</div>
-    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="싱가포르·발리 전문 · 팔로워 234" data-en="Singapore·Bali expert · 234 followers">싱가포르·발리 전문 · 팔로워 234</span></div></div><button class="follow-btn following"><span data-ko="팔로잉 ✓" data-en="Following ✓">팔로잉 ✓</span></button></div>
-    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="도쿄·오사카 전문 · 팔로워 189" data-en="Tokyo·Osaka expert · 189 followers">도쿄·오사카 전문 · 팔로워 189</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);"><span data-ko="파리·바르셀로나 전문 · 팔로워 312" data-en="Paris·Barcelona expert · 312 followers">파리·바르셀로나 전문 · 팔로워 312</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
-    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);"><span data-ko="동남아 가성비 · 팔로워 521" data-en="SE Asia value expert · 521 followers">동남아 가성비 · 팔로워 521</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div id="followList" style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
+      아직 팔로우한 여행자가 없어요.<br>다른 여행자를 팔로우하면 피드에서 정보를 받아볼 수 있어요 🌙
+    </div>
 
   </div>
   <div id="social-info" style="display:none;padding:14px 18px;">
@@ -2144,12 +2136,53 @@ function addMsgFull(text){
   var div=document.createElement('div'); div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
   var rendered=text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  // 클로저로 현재 시점 데이터 캡처
+  var _snapText=text;
+  var _snapJson=window._lastTripJson;
+  var _snapQuery=window._lastTripQuery;
   div.innerHTML='<div class="msg-bubble">'+rendered
     +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
-    +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
+    +'<button id="saveTripBtn_'+Date.now()+'" style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;">'
     +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
     +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div); area.scrollTop=area.scrollHeight;
+  // 버튼에 클로저 이벤트 직접 바인딩
+  var saveBtn=div.querySelector('button[id^="saveTripBtn_"]');
+  if(saveBtn) saveBtn.addEventListener('click', function(){ saveToTripSnap(_snapText, _snapJson, _snapQuery); });
+}
+
+async function saveToTripSnap(snapText, snapJson, snapQuery){
+  if(!requireLogin(function(){ saveToTripSnap(snapText, snapJson, snapQuery); })) return;
+  addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
+  var j=snapJson;
+  var newRoute=(j&&j.route)||snapQuery||'여행';
+  var newText=snapText||'';
+  var isDup=halfTrips.some(function(t){
+    return t.route===newRoute && (t.text||'').substring(0,50)===(newText).substring(0,50);
+  });
+  if(isDup){
+    addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
+    setTimeout(function(){goPage('trips');},800);
+    return;
+  }
+  var newTrip={
+    route:newRoute,
+    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
+    nights:(j&&j.nights)||null,
+    pax:(j&&j.pax)||null,
+    A:(j&&j.A)||null, B:(j&&j.B)||null, C:(j&&j.C)||null,
+    text:newText,
+    id:'local_'+Date.now()
+  };
+  halfTrips.unshift(newTrip);
+  renderHalfTripsList();
+  if(_currentToken&&typeof saveTripToServer==='function'){
+    saveTripToServer(newTrip).then(function(serverId){
+      if(serverId) halfTrips[0].id=serverId;
+    });
+  }
+  addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
+  setTimeout(function(){goPage('trips');},800);
 }
 async function saveToTrip(){
   if(!requireLogin(function(){ saveToTrip(); })) return;
@@ -2538,15 +2571,32 @@ function sendChatMsg(){
     area.appendChild(r); area.scrollTop=area.scrollHeight;
   },800);
 }
-function openNewChat(){document.getElementById('newChatModal').classList.add('open');}
+function openNewChat(){
+  if(!requireLogin(function(){ openNewChat(); })) return;
+  document.getElementById('newChatModal').classList.add('open');
+}
 function searchUsers(q){
   var el=document.getElementById('userSearchResults'); if(!el) return;
   if(q.length<2){el.innerHTML='';return;}
-  var mock=['김민지','이여행러','박준혁','최가성비','정배낭'];
-  var results=mock.filter(function(n){return n.toLowerCase().includes(q.toLowerCase());});
-  el.innerHTML=results.map(function(n){
-    return '<div class="msg-room" style="cursor:pointer;" onclick="document.getElementById(\'newChatModal\').classList.remove(\'open\');openChat(\''+n+'\',\'👤\')"><div class="room-avatar">👤</div><div><div style="font-size:12px;color:var(--sb);">'+n+'</div><div style="font-size:10px;color:var(--m);">DAL 유저</div></div></div>';
-  }).join('');
+  // Beta: 실제 유저 검색은 Supabase profiles 테이블 연동 예정
+  el.innerHTML='<div style="text-align:center;font-size:10px;color:var(--m);padding:16px;line-height:1.8;">'
+    +'🔍 "'+q+'" 검색 중...<br><span style="font-size:9px;">Beta: 유저 검색은 서버 연동 후 활성화됩니다</span>'
+    +'</div>';
+  // Supabase profiles 검색 (로그인 시)
+  if(_currentToken){
+    _sfGet('/rest/v1/profiles?nickname=ilike.*'+encodeURIComponent(q)+'*&select=id,nickname&limit=10').then(function(r){
+      if(r&&Array.isArray(r)&&r.length>0){
+        el.innerHTML=r.map(function(u){
+          return '<div class="msg-room" style="cursor:pointer;" onclick="document.getElementById(\'newChatModal\').classList.remove(\'open\');openChat(\''+u.nickname+'\',\'👤\')">'
+            +'<div class="room-avatar">👤</div>'
+            +'<div><div style="font-size:12px;color:var(--sb);">'+u.nickname+'</div><div style="font-size:10px;color:var(--m);">DAL 여행자</div></div>'
+            +'</div>';
+        }).join('');
+      } else {
+        el.innerHTML='<div style="text-align:center;font-size:10px;color:var(--m);padding:16px;">'+(lang==='ko'?'검색 결과가 없습니다.':'No users found.')+'</div>';
+      }
+    }).catch(function(){ el.innerHTML=''; });
+  }
 }
 function openNewPost(){
   if(!requireLogin(function(){ openNewPost(); })) return;
@@ -3912,7 +3962,7 @@ window.openEmail=openEmail; window.submitCS=submitCS;
 window.doLogin=doLogin; window.doLogout=doLogout;
 window.confirmWithdraw=confirmWithdraw; window.selectStyle=selectStyle;
 window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
-window.saveToTrip=saveToTrip; window.toggleFollow=toggleFollow;
+window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
 window.searchUsers=searchUsers; window.openNewPost=openNewPost;
