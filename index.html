@@ -2076,8 +2076,16 @@ async function sendMsg(){
   // text 변수 직접 사용 (input.value는 이미 초기화됨)
   userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+text+'\n';
   var sysPrompt=lang==='ko'
-    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우:\n'+'  - 절대 daily 일정을 주지 말 것. 반드시 주차별(Week 1, Week 2...) 요약만 제공.\n'+'  - 각 주차: 핵심 테마 + 추천 장소 3~4개 + 숙소 타입 + 이동 팁 (3~5줄)\n'+'  - 토큰 절약을 위해 간결하게. 전체 주차를 빠짐없이 완성할 것.\n'+'[일반] "X박 여행"인 경우: Day별 오전/오후/저녁 키워드로 간결하게.\n'+'1. 즉시 상세 추천. 추가질문 금지.\n'+'2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n'+'   - 항공: 항공사명 + 직항여부 + 좌석등급\n'+'   - 숙소: 호텔명 + 등급 + 위치\n'+'   - 박여행: Day별 키워드 / 주여행: Week별 핵심 테마+장소\n'+'3. 금액 대신 할인 인사이트:\n'+'   - 출발 요일별 가격 차이 / 얼리버드 시점 / 카드 혜택 (카드사명 명시)\n'+'4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
-    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip":\n'+'  - NEVER give daily schedules. Provide ONLY weekly summaries (Week 1, Week 2...).\n'+'  - Each week: core theme + 3-4 key places + accommodation type + transport tip (3-5 lines).\n'+'  - Be concise to fit all weeks. Complete ALL weeks without stopping.\n'+'[NORMAL] If "X nights": Day-by-day morning/afternoon/evening keywords, concise.\n'+'1. Immediate recommendations, no follow-up questions.\n'+'2. Compare Option A(Premium) B(Smart Pick) C(Value):\n'+'   - Flight: airline + direct/stop + class\n'+'   - Hotel: name + stars + location\n'+'   - Nights trip: daily keywords / Week trip: weekly theme+places\n'+'3. Discount insights (no fixed prices):\n'+'   - Best departure days / Early bird timing / Card benefits (card name)\n'+'4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
+    ?'DAL AI 여행 플래너. 한국어로. 즉시 추천, 추가질문 금지.\n'
+      +userCtx
+      +'X주 여행→주차별 요약만. X박→Day별 키워드(오전/오후/저녁).\n'
+      +'Option A(프리미엄) B(스마트) C(가성비) 비교: 항공사+좌석/호텔명+등급/일정키워드.\n'
+      +'금액 대신 할인인사이트(출발요일차이/얼리버드/카드사명). 마지막줄: 🌕맞춤플래닝업그레이드시상세제공'
+    :'DAL AI Planner. English only. Immediate answer, no questions.\n'
+      +userCtx
+      +'Week trip→weekly summary only. Night trip→daily AM/PM/Eve keywords.\n'
+      +'Compare A(Premium) B(Smart) C(Value): airline+class/hotel+stars/itinerary.\n'
+      +'Discount insights only(no fixed price): departure days/early bird/card name. Last line: 🌕Upgrade for details';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
@@ -2088,7 +2096,20 @@ async function sendMsg(){
       addDalMsg('⏳ '+(lang==='ko'?'Gemini 일일 한도. '+getResetCountdown():'Gemini daily limit. '+getResetCountdown()));
       return;
     }
-    if(!res.ok){var err=await res.json().catch(function(){return{};});if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}addDalMsg('API error: '+((err.error&&err.error.message)||res.status));return;}
+    if(!res.ok){
+      var err=await res.json().catch(function(){return{};});
+      var errMsg=(err.error&&err.error.message)||String(res.status);
+      var thinkEl2=document.getElementById(thinkId); if(thinkEl2)thinkEl2.remove();
+      if(res.status===504){
+        addDalMsg(lang==='ko'
+          ?'⏱️ 응답 시간이 초과됐어요. 잠시 후 다시 검색해주세요.<br><span style="font-size:10px;color:var(--m);">tip: 요청을 조금 더 간단하게 줄여보세요</span>'
+          :'⏱️ Request timed out. Please try again shortly.<br><span style="font-size:10px;color:var(--m);">tip: Try a simpler request</span>');
+        usage.count=Math.max(0,usage.count-1); updateLimitBar(); // 504는 횟수 차감 안 함
+      } else {
+        addDalMsg('API error: '+errMsg);
+      }
+      return;
+    }
     var data=await res.json();
     // Gemini 2.5 Flash: thinking은 parts[0], 실제답변은 parts[1]이상
     var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
@@ -2137,22 +2158,30 @@ function addMsg(who,html,id){
 function addDalMsg(html,id){addMsg('dal',html,id);}
 function addMsgFull(text){
   var area=document.getElementById('chatArea'); if(!area) return;
-  var div=document.createElement('div'); div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
   var rendered=text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  // 클로저로 현재 시점 데이터 캡처
+  // 클로저: AI 응답 완료 시점의 데이터 캡처
   var _snapText=text;
   var _snapJson=window._lastTripJson;
   var _snapQuery=window._lastTripQuery;
-  div.innerHTML='<div class="msg-bubble">'+rendered
-    +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
-    +'<button id="saveTripBtn_'+Date.now()+'" style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;">'
-    +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
-    +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
+  // DOM 직접 생성 (innerHTML 타이밍 문제 방지)
+  var div=document.createElement('div'); div.className='msg msg-dal';
+  var bubble=document.createElement('div'); bubble.className='msg-bubble';
+  bubble.innerHTML=rendered;
+  // 저장 버튼 영역
+  var btnWrap=document.createElement('div');
+  btnWrap.style.cssText='margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;';
+  var saveBtn=document.createElement('button');
+  saveBtn.style.cssText='width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;';
+  saveBtn.textContent=lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip';
+  saveBtn.onclick=function(){ saveToTripSnap(_snapText, _snapJson, _snapQuery); };
+  btnWrap.appendChild(saveBtn);
+  bubble.appendChild(btnWrap);
+  div.appendChild(bubble);
+  var meta=document.createElement('div'); meta.className='msg-meta';
+  meta.textContent='DAL · '+now;
+  div.appendChild(meta);
   area.appendChild(div); area.scrollTop=area.scrollHeight;
-  // 버튼에 클로저 이벤트 직접 바인딩
-  var saveBtn=div.querySelector('button[id^="saveTripBtn_"]');
-  if(saveBtn) saveBtn.addEventListener('click', function(){ saveToTripSnap(_snapText, _snapJson, _snapQuery); });
 }
 
 async function saveToTripSnap(snapText, snapJson, snapQuery){
