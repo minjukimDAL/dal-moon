@@ -2205,13 +2205,18 @@ async function saveToTripSnap(snapText, snapJson, snapQuery){
   };
   halfTrips.unshift(newTrip);
   renderHalfTripsList();
+  addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
+  // 서버 저장 완료 후 이동 (loadTripsFromServer가 덮어쓰기 전에 id 확정)
   if(_currentToken&&typeof saveTripToServer==='function'){
     saveTripToServer(newTrip).then(function(serverId){
       if(serverId) halfTrips[0].id=serverId;
+      setTimeout(function(){goPage('trips');},300);
+    }).catch(function(){
+      setTimeout(function(){goPage('trips');},300);
     });
+  } else {
+    setTimeout(function(){goPage('trips');},300);
   }
-  addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
-  setTimeout(function(){goPage('trips');},1000);
 }
 async function saveToTrip(){
   if(!requireLogin(function(){ saveToTrip(); })) return;
@@ -2314,7 +2319,10 @@ function goPage(id){
   if(id==='my') hideMyPage();
   if(id==='trips'){
     setTripsTab(currentTripsTab||'half');
-    if(_currentToken&&typeof loadTripsFromServer==='function') loadTripsFromServer();
+    // 방금 저장한 데이터 보호: 0.5초 딜레이 후 서버 동기화
+    if(_currentToken&&typeof loadTripsFromServer==='function'){
+      setTimeout(function(){ loadTripsFromServer(); }, 500);
+    }
   }
   if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
 }
