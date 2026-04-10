@@ -2106,7 +2106,13 @@ async function sendMsg(){
           :'⏱️ Request timed out. Please try again shortly.<br><span style="font-size:10px;color:var(--m);">tip: Try a simpler request</span>');
         usage.count=Math.max(0,usage.count-1); updateLimitBar(); // 504는 횟수 차감 안 함
       } else {
-        addDalMsg('API error: '+errMsg);
+        var isOverloaded=errMsg&&(errMsg.indexOf('high demand')>=0||errMsg.indexOf('overloaded')>=0||errMsg.indexOf('UNAVAILABLE')>=0);
+        if(isOverloaded||res.status===503){
+          addDalMsg(lang==='ko'?'🔄 Gemini가 일시적으로 혼잡해요. 3초 후 자동 재시도...':'🔄 Gemini busy. Retrying in 3 seconds...');
+          setTimeout(function(){ var inp=document.getElementById('chatInput'); if(inp){ inp.value=text; sendMsg(); } },3000);
+        } else {
+          addDalMsg(lang==='ko'?'⚠️ 일시적 오류. 잠시 후 다시 시도해주세요.':'⚠️ Temporary error. Please try again.');
+        }
       }
       return;
     }
