@@ -2326,9 +2326,11 @@ function goPage(id){
   if(id==='my') hideMyPage();
   if(id==='trips'){
     setTripsTab(currentTripsTab||'half');
-    // 방금 저장한 데이터 보호: 0.5초 딜레이 후 서버 동기화
-    if(_currentToken&&typeof loadTripsFromServer==='function'){
-      setTimeout(function(){ loadTripsFromServer(); }, 1500);
+    // halfTrips가 이미 있으면 서버 재로드 안 함 (탭 이동시 데이터 보호)
+    if(_currentToken&&typeof loadTripsFromServer==='function'&&halfTrips.length===0){
+      setTimeout(function(){ loadTripsFromServer(); }, 500);
+    } else {
+      renderHalfTripsList();
     }
   }
   if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
@@ -2785,24 +2787,30 @@ async function loadCoinsFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
     var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins_bonus,coins_earned,coins_paid');
-    if(r&&r[0]){
-      bonusCoinAmt=r[0].coins_bonus||0;
-      earnCoinAmt=r[0].coins_earned||0;
-      paidCoinAmt=r[0].coins_paid||0;
+    if(r&&r[0]&&(r[0].coins_bonus!==null||r[0].coins_earned!==null)){
+      // 서버에 코인 데이터 있음 → 로드
+      bonusCoinAmt=typeof r[0].coins_bonus==='number'?r[0].coins_bonus:50;
+      earnCoinAmt=typeof r[0].coins_earned==='number'?r[0].coins_earned:0;
+      paidCoinAmt=typeof r[0].coins_paid==='number'?r[0].coins_paid:0;
       updateCoinUI();
-      console.log('[Coin] 서버에서 로드:', coins);
+      console.log('[Coin] 서버에서 로드 완료:', bonusCoinAmt+earnCoinAmt+paidCoinAmt, '코인');
+    } else {
+      // 서버에 없음 → 현재 로컬값 그대로 유지, 서버에 저장
+      console.log('[Coin] 서버 데이터 없음 → 로컬값 유지 후 저장');
+      await saveCoinsToServer();
     }
   }catch(e){ console.warn('[Coin] 로드 실패:', e.message); }
 }
 async function saveCoinsToServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
-    await fetch(SUPA_URL+'/rest/v1/profiles?id=eq.'+_currentUserId,{
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({coins_bonus:bonusCoinAmt,coins_earned:earnCoinAmt,coins_paid:paidCoinAmt,updated_at:new Date().toISOString()})
+    // upsert: row 없어도 생성됨
+    await fetch(SUPA_URL+'/rest/v1/profiles',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({id:_currentUserId,coins_bonus:bonusCoinAmt,coins_earned:earnCoinAmt,coins_paid:paidCoinAmt,updated_at:new Date().toISOString()})
     });
-    console.log('[Coin] 서버 저장 완료:', coins);
+    console.log('[Coin] 서버 저장 완료 — 잔액:', bonusCoinAmt+earnCoinAmt+paidCoinAmt, '코인');
   }catch(e){ console.warn('[Coin] 저장 실패:', e.message); }
 }
 
@@ -4152,8 +4160,22 @@ window.shareToDalSocialOpt=function(opt){
     :'📍 '+( t.route||'trip')+' Option '+opt+' ('+optLabel+') shared!\n'+preview+'...\nMade with DAL AI 🌙');
   goPage('social');
   setTimeout(function(){
-    var inp=document.getElementById('newPostInput');
-    if(inp){ inp.value=msg; inp.focus(); }
+    // 피드 탭 활성화
+    var feedTab=document.querySelector('.tab-btn[onclick*="feed"]');
+    if(feedTab) feedTab.click();
+    else showSocialTab('feed', null);
+    // 글쓰기 프롬프트 실행
+    setTimeout(function(){
+      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':' Share your travel tip', msg);
+      if(text&&text.trim()){
+        var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+        if(_currentToken&&typeof savePostToServer==='function'){
+          savePostToServer(text.trim(), myNick).then(function(ok){
+            if(ok){ loadPostsFromServer(); }
+          });
+        }
+      }
+    },400);
   },300);
 };
 window.shareToDalSocial=function(){
@@ -4163,8 +4185,22 @@ window.shareToDalSocial=function(){
   // 소셜 탭으로 이동하면서 게시글 미리 채우기
   goPage('social');
   setTimeout(function(){
-    var inp=document.getElementById('newPostInput');
-    if(inp){ inp.value=msg; inp.focus(); }
+    // 피드 탭 활성화
+    var feedTab=document.querySelector('.tab-btn[onclick*="feed"]');
+    if(feedTab) feedTab.click();
+    else showSocialTab('feed', null);
+    // 글쓰기 프롬프트 실행
+    setTimeout(function(){
+      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':' Share your travel tip', msg);
+      if(text&&text.trim()){
+        var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+        if(_currentToken&&typeof savePostToServer==='function'){
+          savePostToServer(text.trim(), myNick).then(function(ok){
+            if(ok){ loadPostsFromServer(); }
+          });
+        }
+      }
+    },400);
   },300);
 };
 window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail;
