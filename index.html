@@ -778,35 +778,47 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 메신저 -->
   <div id="social-msg" style="padding:14px 18px;">
-    <div style="padding:10px;margin-bottom:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">
-      <div style="font-size:10px;color:var(--gold);margin-bottom:3px;">🌙 DAL 메신저 안내</div>
-      <div style="font-size:9px;color:var(--m);line-height:1.7;">대화는 <strong style="color:var(--sb);">48시간 후 자동 삭제</strong>됩니다.<br>개인정보 보호를 위해 민감한 정보는 공유하지 마세요.</div>
+    <div class="msg-room" onclick="openChat('김민지','👩')">
+      <div class="room-avatar">👩</div>
+      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">김민지</div><div style="font-size:10px;color:var(--m);">싱가포르 F1 피하는 팁 알려줄게요!</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);margin-bottom:4px;"><span data-ko="방금" data-en="now">방금</span></div><div class="room-badge">2</div></div>
     </div>
-    <div id="msgRoomList" style="font-size:11px;color:var(--m);text-align:center;padding:20px 0;line-height:2;">
-      아직 대화가 없어요.<br>팔로우 중인 여행자와 메시지를 시작해보세요 🌙
+    <div class="msg-room" onclick="openChat('DAL 여행그룹','🌍')">
+      <div class="room-avatar">🌍</div>
+      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">DAL 여행그룹</div><div style="font-size:10px;color:var(--m);">10월 싱가포르 동행 구합니다</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="1시간" data-en="1h ago">1시간</span></div></div>
+    </div>
+    <div class="msg-room" onclick="openChat('박준혁','🧑')">
+      <div class="room-avatar">🧑</div>
+      <div style="flex:1;"><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">박준혁</div><div style="font-size:10px;color:var(--m);">도쿄 맛집 리스트 공유!</div></div>
+      <div style="text-align:right;"><div style="font-size:9px;color:var(--m);"><span data-ko="어제" data-en="Yesterday">어제</span></div></div>
     </div>
     <button class="action-btn btn-gold" style="margin-top:14px;" onclick="openNewChat()" id="t-new-msg">+ 새 메시지</button>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:8px;padding:6px;background:rgba(91,143,255,.05);border-radius:2px;border:1px solid rgba(91,143,255,.1);"><span id='t-beta-msg'>Beta · 실제 메시지 전송 기능 테스트 중</span></div>
   </div>
   <!-- 피드 -->
   <div id="social-feed" style="padding:14px 18px;display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--m);">새 글은 새로고침 후 표시됩니다</div>
-      <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;color:var(--m);cursor:pointer;">🔄 새로고침</button>
+    <div class="feed-card">
+      <div class="feed-user"><div class="feed-avatar">👩</div><div><div style="font-size:11px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="2시간 전 · 싱가포르" data-en="2h ago · Singapore">2시간 전 · 싱가포르</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇸🇬 싱가포르 10월 꿀팁! F1 그랑프리(10/17-19) 피해서 10/20 이후 예약하면 호텔 40% 저렴. 마리나베이샌즈 뷰룸 1박 35만원에 잡았어요 🎉 DAL Full 모드로 비교하고 바로 예약!</div>
+      <div class="feed-actions"><button class="feed-btn" onclick="this.textContent='❤️ 24'">❤️ 23</button><button class="feed-btn">💬 8</button><button class="feed-btn" onclick="openShareFeed(this)"><span data-ko="🔗 공유" data-en="🔗 Share">🔗 공유</span></button></div>
     </div>
-    <div id="socialFeed" style="margin-bottom:10px;">
-      <div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
-        아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙
-      </div>
+    <div class="feed-card">
+      <div class="feed-user"><div class="feed-avatar">🧑</div><div><div style="font-size:11px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="어제 · 도쿄" data-en="Yesterday · Tokyo">어제 · 도쿄</span></div></div><button style="margin-left:auto;padding:4px 10px;border:1px solid rgba(196,175,135,.3);border-radius:2px;background:transparent;font-size:9px;color:var(--gold);cursor:pointer;" onclick="toggleFollow(this)">팔로우</button></div>
+      <div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">🇯🇵 도쿄 12월 추천 동선<br>Day1: 아사쿠사→스카이트리<br>Day2: 하라주쿠→시부야<br>Day3: 팀랩 플래닛→오다이바<br>DAL Full 모드 검색 → 🪙 5코인 적립!</div>
+      <div class="feed-actions"><button class="feed-btn">❤️ 41</button><button class="feed-btn">💬 12</button><button class="feed-btn" onclick="openShareFeed(this)">🔗 공유</button></div>
     </div>
-        <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기</button>
+    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기 · 🪙 5코인 적립</button>
   </div>
   <!-- 팔로잉 -->
   <div id="social-follow" style="padding:14px 18px;display:none;">
     <div style="font-size:10px;color:var(--m);margin-bottom:12px;line-height:1.8;" id="t-follow-sub">팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.</div>
-    <div id="followList" style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
-      아직 팔로우한 여행자가 없어요.<br>다른 여행자를 팔로우하면 피드에서 정보를 받아볼 수 있어요 🌙
-    </div>
-
+    <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-bottom:8px;" id="t-suggested">추천 여행자</div>
+    <div class="follow-card"><div class="room-avatar">👩</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">김민지</div><div style="font-size:9px;color:var(--m);"><span data-ko="싱가포르·발리 전문 · 팔로워 234" data-en="Singapore·Bali expert · 234 followers">싱가포르·발리 전문 · 팔로워 234</span></div></div><button class="follow-btn following"><span data-ko="팔로잉 ✓" data-en="Following ✓">팔로잉 ✓</span></button></div>
+    <div class="follow-card"><div class="room-avatar">🧑</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">이여행러</div><div style="font-size:9px;color:var(--m);"><span data-ko="도쿄·오사카 전문 · 팔로워 189" data-en="Tokyo·Osaka expert · 189 followers">도쿄·오사카 전문 · 팔로워 189</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div class="follow-card"><div class="room-avatar">👨</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">박유럽</div><div style="font-size:9px;color:var(--m);"><span data-ko="파리·바르셀로나 전문 · 팔로워 312" data-en="Paris·Barcelona expert · 312 followers">파리·바르셀로나 전문 · 팔로워 312</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div class="follow-card"><div class="room-avatar">👩‍🦱</div><div style="flex:1;"><div style="font-size:12px;color:var(--sb);">최가성비</div><div style="font-size:9px;color:var(--m);"><span data-ko="동남아 가성비 · 팔로워 521" data-en="SE Asia value expert · 521 followers">동남아 가성비 · 팔로워 521</span></div></div><button class="follow-btn" onclick="toggleFollow(this)"><span data-ko="팔로우" data-en="Follow">팔로우</span></button></div>
+    <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;padding:8px;background:rgba(91,143,255,.04);border-radius:2px;"><span data-ko="팔로워 100명 달성 시 🪙 50코인 지급" data-en="Reach 100 followers · Earn 🪙 50 coins">팔로워 100명 달성 시 🪙 50코인 지급</span></div>
   </div>
   <div id="social-info" style="display:none;padding:14px 18px;">
     <div style="margin-bottom:14px;">
@@ -2076,16 +2088,8 @@ async function sendMsg(){
   // text 변수 직접 사용 (input.value는 이미 초기화됨)
   userCtx+=(lang==='ko'?'[요청] ':'[Request] ')+text+'\n';
   var sysPrompt=lang==='ko'
-    ?'DAL AI 여행 플래너. 한국어로. 즉시 추천, 추가질문 금지.\n'
-      +userCtx
-      +'X주 여행→주차별 요약만. X박→Day별 키워드(오전/오후/저녁).\n'
-      +'Option A(프리미엄) B(스마트) C(가성비) 비교: 항공사+좌석/호텔명+등급/일정키워드.\n'
-      +'금액 대신 할인인사이트(출발요일차이/얼리버드/카드사명). 마지막줄: 🌕맞춤플래닝업그레이드시상세제공'
-    :'DAL AI Planner. English only. Immediate answer, no questions.\n'
-      +userCtx
-      +'Week trip→weekly summary only. Night trip→daily AM/PM/Eve keywords.\n'
-      +'Compare A(Premium) B(Smart) C(Value): airline+class/hotel+stars/itinerary.\n'
-      +'Discount insights only(no fixed price): departure days/early bird/card name. Last line: 🌕Upgrade for details';
+    ?userCtx+'\n당신은 DAL AI 여행 플래너입니다. 반드시 한국어로 답변.\n'+'[중요] 요청에 "X주 여행"이 포함된 경우:\n'+'  - 절대 daily 일정을 주지 말 것. 반드시 주차별(Week 1, Week 2...) 요약만 제공.\n'+'  - 각 주차: 핵심 테마 + 추천 장소 3~4개 + 숙소 타입 + 이동 팁 (3~5줄)\n'+'  - 토큰 절약을 위해 간결하게. 전체 주차를 빠짐없이 완성할 것.\n'+'[일반] "X박 여행"인 경우: Day별 오전/오후/저녁 키워드로 간결하게.\n'+'1. 즉시 상세 추천. 추가질문 금지.\n'+'2. Option A(프리미엄) B(스마트 추천) C(가성비) 3가지 비교:\n'+'   - 항공: 항공사명 + 직항여부 + 좌석등급\n'+'   - 숙소: 호텔명 + 등급 + 위치\n'+'   - 박여행: Day별 키워드 / 주여행: Week별 핵심 테마+장소\n'+'3. 금액 대신 할인 인사이트:\n'+'   - 출발 요일별 가격 차이 / 얼리버드 시점 / 카드 혜택 (카드사명 명시)\n'+'4. 마지막 줄: "🌕 맞춤 플래닝 업그레이드 시: 식당명+예약링크 / 시간대별 동선 / 카드할인 확정"'
+    :userCtx+'\nYou are DAL AI Travel Planner. Reply ONLY in English.\n'+'[IMPORTANT] If request contains "X week trip":\n'+'  - NEVER give daily schedules. Provide ONLY weekly summaries (Week 1, Week 2...).\n'+'  - Each week: core theme + 3-4 key places + accommodation type + transport tip (3-5 lines).\n'+'  - Be concise to fit all weeks. Complete ALL weeks without stopping.\n'+'[NORMAL] If "X nights": Day-by-day morning/afternoon/evening keywords, concise.\n'+'1. Immediate recommendations, no follow-up questions.\n'+'2. Compare Option A(Premium) B(Smart Pick) C(Value):\n'+'   - Flight: airline + direct/stop + class\n'+'   - Hotel: name + stars + location\n'+'   - Nights trip: daily keywords / Week trip: weekly theme+places\n'+'3. Discount insights (no fixed prices):\n'+'   - Best departure days / Early bird timing / Card benefits (card name)\n'+'4. Last line: "🌕 Upgrade for: restaurant names+links / hourly route / confirmed discounts"';
     try{
     var res=await fetch(GEMINI_URL,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:sysPrompt+'\n\nRequest: '+text}]}],generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
@@ -2096,26 +2100,7 @@ async function sendMsg(){
       addDalMsg('⏳ '+(lang==='ko'?'Gemini 일일 한도. '+getResetCountdown():'Gemini daily limit. '+getResetCountdown()));
       return;
     }
-    if(!res.ok){
-      var err=await res.json().catch(function(){return{};});
-      var errMsg=(err.error&&err.error.message)||String(res.status);
-      var thinkEl2=document.getElementById(thinkId); if(thinkEl2)thinkEl2.remove();
-      if(res.status===504){
-        addDalMsg(lang==='ko'
-          ?'⏱️ 응답 시간이 초과됐어요. 잠시 후 다시 검색해주세요.<br><span style="font-size:10px;color:var(--m);">tip: 요청을 조금 더 간단하게 줄여보세요</span>'
-          :'⏱️ Request timed out. Please try again shortly.<br><span style="font-size:10px;color:var(--m);">tip: Try a simpler request</span>');
-        usage.count=Math.max(0,usage.count-1); updateLimitBar(); // 504는 횟수 차감 안 함
-      } else {
-        var isOverloaded=errMsg&&(errMsg.indexOf('high demand')>=0||errMsg.indexOf('overloaded')>=0||errMsg.indexOf('UNAVAILABLE')>=0);
-        if(isOverloaded||res.status===503){
-          addDalMsg(lang==='ko'?'🔄 Gemini가 일시적으로 혼잡해요. 3초 후 자동 재시도...':'🔄 Gemini busy. Retrying in 3 seconds...');
-          setTimeout(function(){ var inp=document.getElementById('chatInput'); if(inp){ inp.value=text; sendMsg(); } },3000);
-        } else {
-          addDalMsg(lang==='ko'?'⚠️ 일시적 오류. 잠시 후 다시 시도해주세요.':'⚠️ Temporary error. Please try again.');
-        }
-      }
-      return;
-    }
+    if(!res.ok){var err=await res.json().catch(function(){return{};});if(currentMode==='full'){coins+=FULL_COIN_COST;updateCoinUI();}addDalMsg('API error: '+((err.error&&err.error.message)||res.status));return;}
     var data=await res.json();
     // Gemini 2.5 Flash: thinking은 parts[0], 실제답변은 parts[1]이상
     var parts=(data.candidates&&data.candidates[0]&&data.candidates[0].content&&data.candidates[0].content.parts)||[];
@@ -2164,65 +2149,15 @@ function addMsg(who,html,id){
 function addDalMsg(html,id){addMsg('dal',html,id);}
 function addMsgFull(text){
   var area=document.getElementById('chatArea'); if(!area) return;
+  var div=document.createElement('div'); div.className='msg msg-dal';
   var now=new Date().toLocaleTimeString(lang==='ko'?'ko-KR':'en-US',{hour:'2-digit',minute:'2-digit'});
   var rendered=text.replace(/#{1,4} (.+?)(<br>|\n|$)/g,'<strong style="color:var(--sb);">$1</strong><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  // 클로저: AI 응답 완료 시점의 데이터 캡처
-  var _snapText=text;
-  var _snapJson=window._lastTripJson;
-  var _snapQuery=window._lastTripQuery;
-  // DOM 직접 생성 (innerHTML 타이밍 문제 방지)
-  var div=document.createElement('div'); div.className='msg msg-dal';
-  var bubble=document.createElement('div'); bubble.className='msg-bubble';
-  bubble.innerHTML=rendered;
-  // 저장 버튼 영역
-  var btnWrap=document.createElement('div');
-  btnWrap.style.cssText='margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;';
-  var saveBtn=document.createElement('button');
-  saveBtn.style.cssText='width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;';
-  saveBtn.textContent=lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip';
-  saveBtn.onclick=function(){ saveToTripSnap(_snapText, _snapJson, _snapQuery); };
-  btnWrap.appendChild(saveBtn);
-  bubble.appendChild(btnWrap);
-  div.appendChild(bubble);
-  var meta=document.createElement('div'); meta.className='msg-meta';
-  meta.textContent='DAL · '+now;
-  div.appendChild(meta);
+  div.innerHTML='<div class="msg-bubble">'+rendered
+    +'<div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">'
+    +'<button style="width:100%;padding:11px;background:var(--gold);color:#060710;border:none;border-radius:2px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:\'DM Sans\',sans-serif;" onclick="saveToTrip()">'
+    +(lang==='ko'?'✓ 내 여행에 저장':'✓ Save to My Trip')+'</button>'
+    +'</div></div><div class="msg-meta">DAL · '+now+'</div>';
   area.appendChild(div); area.scrollTop=area.scrollHeight;
-}
-
-async function saveToTripSnap(snapText, snapJson, snapQuery){
-  if(!requireLogin(function(){ saveToTripSnap(snapText, snapJson, snapQuery); })) return;
-  addDalMsg(lang==='ko'?'✨ 저장 중...':'✨ Saving...');
-  var j=snapJson;
-  var newText=snapText||'';
-  // route: 입력쿼리에서 추출 (snapQuery = 유저가 입력한 텍스트)
-  var newRoute=(j&&j.route)||snapQuery||'여행';
-  // 날짜/박수/인원 재추출 (snapQuery 기반)
-  var qNight=snapQuery&&snapQuery.match(/(\d+)박/);
-  var qPax=snapQuery&&snapQuery.match(/(\d+)인/);
-  var newTrip={
-    route:newRoute,
-    dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
-    nights:(j&&j.nights)||(qNight?parseInt(qNight[1]):null),
-    pax:(j&&j.pax)||(qPax?parseInt(qPax[1]):null),
-    A:(j&&j.A)||null, B:(j&&j.B)||null, C:(j&&j.C)||null,
-    text:newText,
-    id:'local_'+Date.now()
-  };
-  halfTrips.unshift(newTrip);
-  renderHalfTripsList();
-  addDalMsg(lang==='ko'?'✅ 내 여행에 저장됐습니다! 내 여행 탭에서 확인하세요.':'✅ Saved to My Trips!');
-  // 서버 저장 완료 후 이동 (loadTripsFromServer가 덮어쓰기 전에 id 확정)
-  if(_currentToken&&typeof saveTripToServer==='function'){
-    saveTripToServer(newTrip).then(function(serverId){
-      if(serverId) halfTrips[0].id=serverId;
-      setTimeout(function(){goPage('trips');},300);
-    }).catch(function(){
-      setTimeout(function(){goPage('trips');},300);
-    });
-  } else {
-    setTimeout(function(){goPage('trips');},300);
-  }
 }
 async function saveToTrip(){
   if(!requireLogin(function(){ saveToTrip(); })) return;
@@ -2269,7 +2204,7 @@ async function saveToTrip(){
     addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
     setTimeout(function(){goPage('trips');},800);
   } else {
-    var newTrip={
+    halfTrips.unshift({
       route:newRoute,
       dates:(j&&j.dates)||new Date().toLocaleDateString('ko-KR'),
       nights:(j&&j.nights)||null,
@@ -2278,15 +2213,9 @@ async function saveToTrip(){
       B:(j&&j.B)||null,
       C:(j&&j.C)||null,
       text:newText,
-      id:'local_'+Date.now()
-    };
-    halfTrips.unshift(newTrip);
+      id:Date.now()
+    });
     renderHalfTripsList();
-    if(_currentToken&&typeof saveTripToServer==='function'){
-      saveTripToServer(newTrip).then(function(serverId){
-        if(serverId) halfTrips[0].id=serverId;
-      });
-    }
   }
   window._lastTripJson=null; window._lastTripText=null;
   setTimeout(function(){goPage('trips');},800);
@@ -2323,14 +2252,7 @@ function goPage(id){
     if(bn) bn.classList.toggle('active',p===id);
   });
   if(id==='my') hideMyPage();
-  if(id==='trips'){
-    setTripsTab(currentTripsTab||'half');
-    // 방금 저장한 데이터 보호: 0.5초 딜레이 후 서버 동기화
-    if(_currentToken&&typeof loadTripsFromServer==='function'){
-      setTimeout(function(){ loadTripsFromServer(); }, 500);
-    }
-  }
-  if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
+  if(id==='trips') setTripsTab(currentTripsTab||'half');
 }
 
 // ══════════════════════════════════════════════
@@ -2357,14 +2279,8 @@ function hideMyPage(){
 // 코인 UI
 // ══════════════════════════════════════════════
 var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
-var _coinSaveTimer=null;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
-  console.log('[Coin] 현재 코인:', coins, '(보너스:'+bonusCoinAmt+' 적립:'+earnCoinAmt+' 유료:'+paidCoinAmt+')');
-  if(_currentToken&&typeof saveCoinsToServer==='function'){
-    if(_coinSaveTimer) clearTimeout(_coinSaveTimer);
-    _coinSaveTimer=setTimeout(saveCoinsToServer, 1000);
-  }
   var coinEl=document.getElementById('coinCount');
   if(coinEl) coinEl.textContent=isLoggedIn?coins:'—';
   var pc=document.getElementById('profileCoins'); if(pc)pc.textContent=coins+' 🪙';
@@ -2614,103 +2530,19 @@ function sendChatMsg(){
     area.appendChild(r); area.scrollTop=area.scrollHeight;
   },800);
 }
-function openNewChat(){
-  if(!requireLogin(function(){ openNewChat(); })) return;
-  document.getElementById('newChatModal').classList.add('open');
-}
+function openNewChat(){document.getElementById('newChatModal').classList.add('open');}
 function searchUsers(q){
   var el=document.getElementById('userSearchResults'); if(!el) return;
   if(q.length<2){el.innerHTML='';return;}
-  // Beta: 실제 유저 검색은 Supabase profiles 테이블 연동 예정
-  el.innerHTML='<div style="text-align:center;font-size:10px;color:var(--m);padding:16px;line-height:1.8;">'
-    +'🔍 "'+q+'" 검색 중...<br><span style="font-size:9px;">Beta: 유저 검색은 서버 연동 후 활성화됩니다</span>'
-    +'</div>';
-  // Supabase profiles 검색 (로그인 시)
-  if(_currentToken){
-    _sfGet('/rest/v1/profiles?nickname=ilike.*'+encodeURIComponent(q)+'*&select=id,nickname&limit=10').then(function(r){
-      if(r&&Array.isArray(r)&&r.length>0){
-        el.innerHTML=r.map(function(u){
-          return '<div class="msg-room" style="cursor:pointer;" onclick="document.getElementById(\'newChatModal\').classList.remove(\'open\');openChat(\''+u.nickname+'\',\'👤\')">'
-            +'<div class="room-avatar">👤</div>'
-            +'<div><div style="font-size:12px;color:var(--sb);">'+u.nickname+'</div><div style="font-size:10px;color:var(--m);">DAL 여행자</div></div>'
-            +'</div>';
-        }).join('');
-      } else {
-        el.innerHTML='<div style="text-align:center;font-size:10px;color:var(--m);padding:16px;">'+(lang==='ko'?'검색 결과가 없습니다.':'No users found.')+'</div>';
-      }
-    }).catch(function(){ el.innerHTML=''; });
-  }
+  var mock=['김민지','이여행러','박준혁','최가성비','정배낭'];
+  var results=mock.filter(function(n){return n.toLowerCase().includes(q.toLowerCase());});
+  el.innerHTML=results.map(function(n){
+    return '<div class="msg-room" style="cursor:pointer;" onclick="document.getElementById(\'newChatModal\').classList.remove(\'open\');openChat(\''+n+'\',\'👤\')"><div class="room-avatar">👤</div><div><div style="font-size:12px;color:var(--sb);">'+n+'</div><div style="font-size:10px;color:var(--m);">DAL 유저</div></div></div>';
+  }).join('');
 }
-// ══ 팔로우 유저 ══
-var _followingUsers={};
-function toggleFollowUser(btn, userId, nickname){
-  var isFollowing=btn.classList.contains('following');
-  btn.className='follow-btn'+(isFollowing?'':' following');
-  btn.style.cssText='font-size:9px;padding:4px 10px;';
-  btn.textContent=isFollowing?(lang==='ko'?'팔로우':'Follow'):(lang==='ko'?'팔로잉 ✓':'Following ✓');
-  var fl=document.getElementById('followList');
-  if(!isFollowing){
-    _followingUsers[userId]=nickname;
-    if(fl){
-      var existing=document.getElementById('follow_'+userId);
-      if(!existing){
-        var card=document.createElement('div');
-        card.className='follow-card'; card.id='follow_'+userId;
-        var unfollowLabel=lang==='ko'?'팔로잉 ✓':'Following ✓';
-        card.innerHTML='<div class="room-avatar">👤</div>'
-          +'<div style="flex:1;"><div style="font-size:12px;color:var(--sb);">'+nickname+'</div><div style="font-size:9px;color:var(--m);">DAL 여행자</div></div>';
-        var ufBtn=document.createElement('button');
-        ufBtn.className='follow-btn following';
-        ufBtn.style.cssText='font-size:9px;padding:4px 10px;';
-        ufBtn.textContent=unfollowLabel;
-        ufBtn.onclick=function(){ toggleFollowUser(ufBtn, userId, nickname); };
-        card.appendChild(ufBtn);
-        var empty=fl.querySelector('[style*="text-align:center"]');
-        if(empty) fl.innerHTML='';
-        fl.appendChild(card);
-      }
-    }
-  } else {
-    delete _followingUsers[userId];
-    var card=document.getElementById('follow_'+userId);
-    if(card) card.remove();
-    if(fl&&fl.children.length===0){
-      fl.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='ko'?'아직 팔로우한 여행자가 없어요.<br>피드에서 팔로우 버튼을 눌러보세요 🌙':'No followed travelers yet.<br>Follow someone from Feed 🌙')+'</div>';
-    }
-  }
-}
-// ══ 피드 좋아요 ══
-async function likeFeedPost(btn, postId){
-  var cur=parseInt((btn.textContent||'').replace('❤️ ',''))||0;
-  btn.textContent='❤️ '+(cur+1);
-  btn.style.color='var(--red)';
-  if(_currentToken&&postId){
-    try{
-      await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
-        method:'PATCH',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({likes:cur+1})
-      });
-    }catch(e){ console.warn('[Feed] 좋아요 실패:',e.message); }
-  }
-}
-// ══ 피드 새로고침 ══
-function refreshFeed(){ if(typeof loadPostsFromServer==='function') loadPostsFromServer(); }
-
 function openNewPost(){
-  if(!requireLogin(function(){ openNewPost(); })) return;
-  var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip');
-  if(text&&text.trim()){
-    var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
-    if(_currentToken&&typeof savePostToServer==='function'){
-      savePostToServer(text, myNick).then(function(ok){
-        if(ok){ loadPostsFromServer(); alert(lang==='ko'?'✅ 피드에 게시되었습니다!':'✅ Posted!'); }
-        else { alert(lang==='ko'?'게시 중 오류가 발생했습니다.':'Failed to post.'); }
-      });
-    } else {
-      alert(lang==='ko'?'✅ 게시되었습니다! (로그인 후 서버 저장)':'✅ Posted! (Login to save to server)');
-    }
-  }
+  var text=prompt(lang==='ko'?'여행 정보를 공유해주세요 (🪙 5코인 적립)':'Share your travel tip (Earn 🪙 5 coins)');
+  if(text&&text.trim()){earnCoinAmt+=5;updateCoinUI();alert(lang==='ko'?'🪙 5코인 적립! 피드에 게시되었습니다.':'🪙 5 coins earned! Posted to feed.');}
 }
 function openShareFeed(btn){
   var card=btn.closest('.feed-card');
@@ -2762,172 +2594,6 @@ async function _sf(path, body, token){
   return r.json();
 }
 
-// ══ 서버 연동 전역 변수 ══
-var _currentToken=null, _currentUserId=null;
-
-// ══ Supabase DB 헬퍼 ══
-async function _sfGet(path, token){
-  var r=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+(token||_currentToken||SUPA_KEY)}});
-  return r.json();
-}
-async function _sfPatch(path, body, token){
-  var r=await fetch(SUPA_URL+path,{method:'PATCH',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+(token||_currentToken||SUPA_KEY),'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});
-  return r.json();
-}
-async function _sfDel(path, token){
-  var r=await fetch(SUPA_URL+path,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+(token||_currentToken||SUPA_KEY)}});
-  return r.ok;
-}
-
-// ══ 코인 서버 연동 ══
-async function loadCoinsFromServer(){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins_bonus,coins_earned,coins_paid');
-    if(r&&r[0]){
-      bonusCoinAmt=r[0].coins_bonus||0;
-      earnCoinAmt=r[0].coins_earned||0;
-      paidCoinAmt=r[0].coins_paid||0;
-      updateCoinUI();
-      console.log('[Coin] 서버에서 로드:', coins);
-    }
-  }catch(e){ console.warn('[Coin] 로드 실패:', e.message); }
-}
-async function saveCoinsToServer(){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    await fetch(SUPA_URL+'/rest/v1/profiles?id=eq.'+_currentUserId,{
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({coins_bonus:bonusCoinAmt,coins_earned:earnCoinAmt,coins_paid:paidCoinAmt,updated_at:new Date().toISOString()})
-    });
-    console.log('[Coin] 서버 저장 완료:', coins);
-  }catch(e){ console.warn('[Coin] 저장 실패:', e.message); }
-}
-
-// ══ 여행 서버 연동 ══
-async function loadTripsFromServer(){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    var r=await _sfGet('/rest/v1/trips?user_id=eq.'+_currentUserId+'&order=created_at.desc&select=*');
-    if(r&&Array.isArray(r)){
-      halfTrips=r.map(function(t){
-        var data=typeof t.data==='string'?JSON.parse(t.data||'{}'):t.data||{};
-        return {id:t.id,route:t.route||'여행',dates:t.dates||'',nights:t.nights,pax:t.pax,text:t.text||'',A:data.A||null,B:data.B||null,C:data.C||null};
-      });
-      renderHalfTripsList();
-      console.log('[Trips] 서버에서 로드:', halfTrips.length+'개');
-    }
-  }catch(e){ console.warn('[Trips] 로드 실패:', e.message); }
-}
-async function saveTripToServer(trip){
-  if(!_currentToken||!_currentUserId) return null;
-  try{
-    var r=await fetch(SUPA_URL+'/rest/v1/trips',{
-      method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify({user_id:_currentUserId,route:trip.route,dates:trip.dates,nights:trip.nights,pax:trip.pax,text:trip.text,data:JSON.stringify({A:trip.A,B:trip.B,C:trip.C})})
-    });
-    var d=await r.json();
-    console.log('[Trips] 서버 저장 완료');
-    return d&&d[0]&&d[0].id?d[0].id:null;
-  }catch(e){ console.warn('[Trips] 저장 실패:', e.message); return null; }
-}
-async function deleteTripFromServer(tripId){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    await _sfDel('/rest/v1/trips?id=eq.'+tripId+'&user_id=eq.'+_currentUserId);
-    console.log('[Trips] 서버 삭제 완료:', tripId);
-  }catch(e){ console.warn('[Trips] 삭제 실패:', e.message); }
-}
-
-// ══ 잠금해제 서버 연동 ══
-async function loadUnlockedFromServer(){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    var r=await _sfGet('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&select=*');
-    if(r&&Array.isArray(r)){
-      r.forEach(function(u){
-        if(!_unlockedOptions[u.trip_id]) _unlockedOptions[u.trip_id]={};
-        _unlockedOptions[u.trip_id][u.option_key]=u.content||'';
-      });
-      console.log('[Unlocked] 서버에서 로드:', r.length+'개');
-    }
-  }catch(e){ console.warn('[Unlocked] 로드 실패:', e.message); }
-}
-async function saveUnlockedToServer(tripId, optKey, content){
-  if(!_currentToken||!_currentUserId) return;
-  try{
-    await fetch(SUPA_URL+'/rest/v1/unlocked',{
-      method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({user_id:_currentUserId,trip_id:String(tripId),option_key:optKey,content:content})
-    });
-    console.log('[Unlocked] 서버 저장 완료: Option', optKey);
-  }catch(e){ console.warn('[Unlocked] 저장 실패:', e.message); }
-}
-
-// ══ 소셜 피드 서버 연동 ══
-async function loadPostsFromServer(){
-  if(!_currentToken) return;
-  try{
-    var r=await _sfGet('/rest/v1/posts?order=created_at.desc&limit=20&select=*');
-    if(r&&Array.isArray(r)&&r.length>0){
-      var feedEl=document.getElementById('socialFeed');
-      if(!feedEl) return;
-      feedEl.innerHTML=''; r.map(function(p){
-        var isMe=(_currentUserId&&p.user_id===_currentUserId);
-        var cardDiv=document.createElement('div');
-        cardDiv.className='feed-card';
-        var followHtml=isMe
-          ?'<span style="font-size:9px;color:var(--m);padding:3px 8px;border:1px solid var(--b2);border-radius:10px;">'+(lang==='ko'?'나':'Me')+'</span>'
-          :'<span class="feed-follow-placeholder" data-uid="'+p.user_id+'" data-nick="'+p.nickname+'"></span>';
-        cardDiv.innerHTML='<div class="feed-user">'
-          +'<div class="feed-avatar">👤</div>'
-          +'<div style="flex:1;"><div style="font-size:11px;color:var(--sb);">'+p.nickname+'</div><div style="font-size:9px;color:var(--m);">'+new Date(p.created_at).toLocaleDateString(lang==='ko'?'ko-KR':'en-US')+'</div></div>'
-          +followHtml
-          +'</div>'
-          +'<div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">'+p.content+'</div>'
-          +'<div class="feed-actions"></div>';
-        // 팔로우 버튼 동적 생성
-        if(!isMe){
-          var ph=cardDiv.querySelector('.feed-follow-placeholder');
-          var uid=p.user_id, nick=p.nickname;
-          var fb=document.createElement('button');
-          fb.className='follow-btn'; fb.style.cssText='font-size:9px;padding:4px 10px;';
-          fb.textContent=lang==='ko'?'팔로우':'Follow';
-          fb.onclick=function(){ toggleFollowUser(fb,uid,nick); };
-          if(ph) ph.parentNode.replaceChild(fb,ph);
-        }
-        // 좋아요 버튼 동적 생성
-        var likeBtn=document.createElement('button');
-        likeBtn.className='feed-btn';
-        likeBtn.textContent='❤️ '+(p.likes||0);
-        var pid=p.id;
-        likeBtn.onclick=function(){ likeFeedPost(likeBtn,pid); };
-        cardDiv.querySelector('.feed-actions').appendChild(likeBtn);
-        feedEl.appendChild(cardDiv);
-        return null;
-      });
-      var dummy=null;
-      if(false) [].join('');
-      console.log('[Posts] 서버에서 로드:', r.length+'개');
-    }
-  }catch(e){ console.warn('[Posts] 로드 실패:', e.message); }
-}
-async function savePostToServer(text, nickname){
-  if(!_currentToken||!_currentUserId) return false;
-  try{
-    var r=await fetch(SUPA_URL+'/rest/v1/posts',{
-      method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify({user_id:_currentUserId,nickname:nickname||'DAL User',content:text})
-    });
-    console.log('[Posts] 서버 저장 완료');
-    return r.ok;
-  }catch(e){ console.warn('[Posts] 저장 실패:', e.message); return false; }
-}
-
 // 세션 저장/복구
 function _saveSession(data){
   try{localStorage.setItem('dal_s',JSON.stringify({u:data.user,t:data.access_token,e:data.expires_at}));}catch(e){}
@@ -2945,12 +2611,6 @@ function initSupabase(){
 function onLoginSuccess(user, token){
   if(!user) return;
   isLoggedIn=true;
-  _currentToken=token;
-  _currentUserId=user.id;
-  // 서버 데이터 로드
-  loadCoinsFromServer();
-  loadTripsFromServer();
-  loadUnlockedFromServer();
   // 로그인 전 시도한 액션 자동 실행
   setTimeout(function(){
     if(_pendingAction){
@@ -2958,7 +2618,7 @@ function onLoginSuccess(user, token){
       _pendingAction=null;
       try{ action(); }catch(e){ console.warn('pendingAction 실행 오류:',e); }
     }
-  },800);
+  },500);
   // D옵션: 코인 배지 활성화 + 유저 아이콘 골드 테두리
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='1';coinBadge.style.borderColor='rgba(196,175,135,.5)';}
@@ -2977,10 +2637,6 @@ function onLoginSuccess(user, token){
 
 function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
-  _currentToken=null; _currentUserId=null;
-  halfTrips=[]; _unlockedOptions={};
-  bonusCoinAmt=50; earnCoinAmt=0; paidCoinAmt=0;
-  if(typeof renderHalfTripsList==='function') renderHalfTripsList();
   // D옵션: 코인 배지 비활성화 + 유저 아이콘 원복
   var coinBadge=document.getElementById('headerCoinBadge');
   if(coinBadge){coinBadge.style.opacity='0.4';coinBadge.style.borderColor='rgba(196,175,135,.15)';}
@@ -3251,11 +2907,7 @@ function deleteTripConfirm(idx){
   var t=halfTrips[idx]; if(!t) return;
   var msg=lang==='ko'?'"'+(t.route||'여행')+'" 여행을 삭제하겠습니까?':'Delete "' +(t.route||'trip')+'"?';
   if(confirm(msg)){
-    var deletedId=halfTrips[idx]&&halfTrips[idx].id;
     halfTrips.splice(idx,1);
-    if(_currentToken&&deletedId&&typeof deleteTripFromServer==='function'&&!String(deletedId).startsWith('local_')){
-      deleteTripFromServer(deletedId);
-    }
     // 해당 idx의 unlocked 데이터도 삭제
     delete _unlockedOptions[idx];
     // idx 재정렬
@@ -3574,7 +3226,6 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
       _unlockedOptions[tripIdx][opt]=final;
       showUnlockedOption(opt, tripIdx);
-      if(typeof saveUnlockedToServer==='function') saveUnlockedToServer(tripIdx, opt, final);
       return;
     }
     _unlockCount++;
@@ -4090,7 +3741,7 @@ window.openEmail=openEmail; window.submitCS=submitCS;
 window.doLogin=doLogin; window.doLogout=doLogout;
 window.confirmWithdraw=confirmWithdraw; window.selectStyle=selectStyle;
 window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
-window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollowUser=toggleFollowUser; window.likeFeedPost=likeFeedPost; window.refreshFeed=refreshFeed; window.toggleFollow=toggleFollow;
+window.saveToTrip=saveToTrip; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
 window.searchUsers=searchUsers; window.openNewPost=openNewPost;
