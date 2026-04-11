@@ -2148,7 +2148,11 @@ async function sendMsg(){
     window._lastTripQuery=text;
     window._lastTripJson=parsedJson;
     window._selectedEventName=null; // 전송 후 이벤트 초기화
-    addMsgFull(displayText); earnCoinAmt+=5; updateCoinUI();
+    addMsgFull(displayText);
+    earnCoinAmt+=5; updateCoinUI();
+    // 검색 완료 후 즉시 코인 서버 저장
+    if(_coinSaveTimer){ clearTimeout(_coinSaveTimer); _coinSaveTimer=null; }
+    saveCoinsToServer();
   }catch(e){
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     var errMsg=e.message||String(e);
@@ -2961,6 +2965,8 @@ function onLoginSuccess(user, token){
   isLoggedIn=true;
   _currentToken=token;
   _currentUserId=user.id;
+  // 로그인 즉시 현재 코인 UI 표시 (서버 로드 전)
+  updateCoinUI();
   // 서버 데이터 로드
   loadCoinsFromServer();
   loadTripsFromServer();
@@ -3484,15 +3490,22 @@ async function confirmUnlockOption(){
   var tripIdx=_pendingUnlockOpt.tripIdx;
   _pendingUnlockOpt=null;
 
-  // 코인 차감 (earnCoin 먼저, 없으면 paidCoin)
+  // 코인 차감 (earnCoin 먼저, 없으면 bonusCoin, 없으면 paidCoin)
   if(earnCoinAmt>=UNLOCK_COIN_COST){
     earnCoinAmt-=UNLOCK_COIN_COST;
-  } else {
+  } else if(bonusCoinAmt>=(UNLOCK_COIN_COST-earnCoinAmt)){
     var need=UNLOCK_COIN_COST-earnCoinAmt;
     earnCoinAmt=0;
-    paidCoinAmt=Math.max(0,paidCoinAmt-need);
+    bonusCoinAmt=Math.max(0,bonusCoinAmt-need);
+  } else {
+    var need2=UNLOCK_COIN_COST-earnCoinAmt-bonusCoinAmt;
+    earnCoinAmt=0; bonusCoinAmt=0;
+    paidCoinAmt=Math.max(0,paidCoinAmt-need2);
   }
   updateCoinUI();
+  // 즉시 서버 저장 (타이머 취소 후 바로 저장 — 연속 차감 시 정확성 보장)
+  if(_coinSaveTimer){ clearTimeout(_coinSaveTimer); _coinSaveTimer=null; }
+  await saveCoinsToServer();
 
   await doUnlockOption(opt, tripIdx, false);
 }
@@ -3561,7 +3574,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 
   // 재귀 이어받기 — PC/모바일 동일 동작, 연속 fetch 제한 우회
   var _unlockAccum = '';
-  var _unlockMax = 3;
+  var _unlockMax = 4;
   var _unlockCount = 0;
   var _isWeekTrip = isWeekTrip;
   var _weeks = weeks;
@@ -3569,7 +3582,7 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 
   async function doFetch(text){
     var res=await fetch('/.netlify/functions/gemini',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gemini-2.5-flash',contents:[{role:'user',parts:[{text:text}]}],
+      body:JSON.stringify({model:GEMINI_MODEL,contents:[{role:'user',parts:[{text:text}]}],
         generationConfig:{maxOutputTokens:8000,temperature:0.7}})});
     if(!res.ok){ console.warn('[Unlock] fetch 실패:', res.status); return null; }
     var d=await res.json();
@@ -4158,15 +4171,16 @@ window.shareToDalSocialOpt=function(opt){
   var msg=(lang==='ko'
     ?'📍 '+( t.route||'여행')+' Option '+opt+' ('+optLabel+') 공유!\n'+preview+'...\nDAL AI로 만든 플랜 🌙'
     :'📍 '+( t.route||'trip')+' Option '+opt+' ('+optLabel+') shared!\n'+preview+'...\nMade with DAL AI 🌙');
+  // 내여행 상세화면 닫기 (복귀 시 목록 정상 표시)
+  var hd=document.getElementById('halfTripDetail');
+  var lw=document.getElementById('tripsListWrap');
+  if(hd) hd.style.display='none';
+  if(lw) lw.style.display='block';
   goPage('social');
   setTimeout(function(){
-    // 피드 탭 활성화
-    var feedTab=document.querySelector('.tab-btn[onclick*="feed"]');
-    if(feedTab) feedTab.click();
-    else showSocialTab('feed', null);
-    // 글쓰기 프롬프트 실행
+    showSocialTab('feed', document.querySelector('.tab-btn[onclick*="feed"]'));
     setTimeout(function(){
-      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':' Share your travel tip', msg);
+      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip', msg);
       if(text&&text.trim()){
         var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
         if(_currentToken&&typeof savePostToServer==='function'){
@@ -4175,7 +4189,7 @@ window.shareToDalSocialOpt=function(opt){
           });
         }
       }
-    },400);
+    },300);
   },300);
 };
 window.shareToDalSocial=function(){
@@ -4183,15 +4197,16 @@ window.shareToDalSocial=function(){
   if(!t) return;
   var msg=(lang==='ko'?'📍 '+(t.route||'여행')+' '+(t.nights||'')+'박 여행 플랜 공유! DAL AI로 만들었어요 🌙':'📍 Sharing my '+(t.nights||'')+'-night trip to '+(t.route||'')+' via DAL AI 🌙');
   // 소셜 탭으로 이동하면서 게시글 미리 채우기
+  // 내여행 상세화면 닫기 (복귀 시 목록 정상 표시)
+  var hd=document.getElementById('halfTripDetail');
+  var lw=document.getElementById('tripsListWrap');
+  if(hd) hd.style.display='none';
+  if(lw) lw.style.display='block';
   goPage('social');
   setTimeout(function(){
-    // 피드 탭 활성화
-    var feedTab=document.querySelector('.tab-btn[onclick*="feed"]');
-    if(feedTab) feedTab.click();
-    else showSocialTab('feed', null);
-    // 글쓰기 프롬프트 실행
+    showSocialTab('feed', document.querySelector('.tab-btn[onclick*="feed"]'));
     setTimeout(function(){
-      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':' Share your travel tip', msg);
+      var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip', msg);
       if(text&&text.trim()){
         var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
         if(_currentToken&&typeof savePostToServer==='function'){
@@ -4200,7 +4215,7 @@ window.shareToDalSocial=function(){
           });
         }
       }
-    },400);
+    },300);
   },300);
 };
 window.requestUnlockOption=requestUnlockOption; window.confirmUnlockOption=confirmUnlockOption; window.showUnlockedDetail=showUnlockedDetail;
