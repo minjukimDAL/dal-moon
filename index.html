@@ -2326,9 +2326,8 @@ function goPage(id){
   if(id==='my') hideMyPage();
   if(id==='trips'){
     setTripsTab(currentTripsTab||'half');
-    // halfTrips가 이미 있으면 서버 재로드 안 함 (탭 이동시 데이터 보호)
     if(_currentToken&&typeof loadTripsFromServer==='function'&&halfTrips.length===0){
-      setTimeout(function(){ loadTripsFromServer(); }, 500);
+      setTimeout(function(){ loadTripsFromServer(); }, 300);
     } else {
       renderHalfTripsList();
     }
@@ -3443,7 +3442,8 @@ function requestUnlockOption(opt){
   if(!t){console.error('[Unlock] tripIdx='+tripIdx+' 없음');return;}
 
   // 이미 해제됐으면 바로 표시
-  if(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt]){
+  var tripId=(t&&t.id)||String(tripIdx);
+  if(_unlockedOptions[tripId]&&_unlockedOptions[tripId][opt]){
     doUnlockOption(opt, tripIdx, true);
     return;
   }
@@ -3591,10 +3591,11 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       // 완료 — 마커 제거 후 저장
       var final=_unlockAccum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
       console.log('[Unlock] 최종 완료. 총 길이:', final.length, '이어받기 횟수:', _unlockCount);
-      if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
-      _unlockedOptions[tripIdx][opt]=final;
+      var tripId=(halfTrips[tripIdx]&&halfTrips[tripIdx].id)||String(tripIdx);
+      if(!_unlockedOptions[tripId]) _unlockedOptions[tripId]={};
+      _unlockedOptions[tripId][opt]=final;
       showUnlockedOption(opt, tripIdx);
-      if(typeof saveUnlockedToServer==='function') saveUnlockedToServer(tripIdx, opt, final);
+      if(typeof saveUnlockedToServer==='function') saveUnlockedToServer(tripId, opt, final);
       return;
     }
     _unlockCount++;
@@ -3657,7 +3658,8 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 }
 
 function showUnlockedOption(opt, tripIdx){
-  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
+  var tripId=(halfTrips[tripIdx]&&halfTrips[tripIdx].id)||String(tripIdx);
+  var text=(_unlockedOptions[tripId]&&_unlockedOptions[tripId][opt])||'';
   var btn=document.getElementById('unlockBtn'+opt);
 
   // 버튼을 "열림" 상태로 변경
@@ -3674,7 +3676,8 @@ function showUnlockedOption(opt, tripIdx){
 }
 
 function showUnlockedDetail(opt, tripIdx){
-  var text=(_unlockedOptions[tripIdx]&&_unlockedOptions[tripIdx][opt])||'';
+  var tripId=(halfTrips[tripIdx]&&halfTrips[tripIdx].id)||String(tripIdx);
+  var text=(_unlockedOptions[tripId]&&_unlockedOptions[tripId][opt])||'';
   if(!text) return;
   var rendered=text
     .replace(/\r\n/g,'\n')           // 윈도우 줄바꿈 통일
