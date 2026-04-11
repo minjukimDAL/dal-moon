@@ -2327,9 +2327,7 @@ function goPage(id){
   if(id==='trips'){
     setTripsTab(currentTripsTab||'half');
     if(_currentToken&&typeof loadTripsFromServer==='function'&&halfTrips.length===0){
-      setTimeout(function(){ loadTripsFromServer(); }, 300);
-    } else {
-      renderHalfTripsList();
+      loadTripsFromServer();
     }
   }
   if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
@@ -2806,11 +2804,12 @@ async function loadCoinsFromServer(){
 async function saveCoinsToServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
-    await fetch(SUPA_URL+'/rest/v1/profiles',{
+    var cr=await fetch(SUPA_URL+'/rest/v1/profiles',{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify({id:_currentUserId,coins:earnCoinAmt+paidCoinAmt,bonus_coins:bonusCoinAmt,updated_at:new Date().toISOString()})
+      body:JSON.stringify({id:_currentUserId,coins:earnCoinAmt+paidCoinAmt,bonus_coins:bonusCoinAmt})
     });
+    if(!cr.ok){ var ce=await cr.text(); console.warn('[Coin] 저장 HTTP 오류:', cr.status, ce); return; }
     console.log('[Coin] 서버 저장 완료 — 잔액:', earnCoinAmt+bonusCoinAmt, '코인');
   }catch(e){ console.warn('[Coin] 저장 실패:', e.message); }
 }
@@ -2859,7 +2858,7 @@ async function loadUnlockedFromServer(){
     if(r&&Array.isArray(r)){
       r.forEach(function(u){
         if(!_unlockedOptions[u.trip_id]) _unlockedOptions[u.trip_id]={};
-        _unlockedOptions[u.trip_id][u.option_key]=u.content||'';
+        _unlockedOptions[u.trip_id][u.opt]=u.content||'';
       });
       console.log('[Unlocked] 서버에서 로드:', r.length+'개');
     }
@@ -2868,11 +2867,12 @@ async function loadUnlockedFromServer(){
 async function saveUnlockedToServer(tripId, optKey, content){
   if(!_currentToken||!_currentUserId) return;
   try{
-    await fetch(SUPA_URL+'/rest/v1/unlocked',{
+    var r2=await fetch(SUPA_URL+'/rest/v1/unlocked',{
       method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({user_id:_currentUserId,trip_id:String(tripId),option_key:optKey,content:content})
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({user_id:_currentUserId,trip_id:tripId,opt:optKey,content:content})
     });
+    if(!r2.ok){ var errText=await r2.text(); console.warn('[Unlocked] 저장 HTTP 오류:', r2.status, errText); return; }
     console.log('[Unlocked] 서버 저장 완료: Option', optKey);
   }catch(e){ console.warn('[Unlocked] 저장 실패:', e.message); }
 }
@@ -3636,8 +3636,9 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       if(_unlockAccum.length>100){
         // 중간까지 받은 내용이라도 저장
         var partial=_unlockAccum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
-        if(!_unlockedOptions[tripIdx]) _unlockedOptions[tripIdx]={};
-        _unlockedOptions[tripIdx][opt]=partial;
+        var tripId2=(halfTrips[tripIdx]&&halfTrips[tripIdx].id)||String(tripIdx);
+        if(!_unlockedOptions[tripId2]) _unlockedOptions[tripId2]={};
+        _unlockedOptions[tripId2][opt]=partial;
         showUnlockedOption(opt, tripIdx);
       } else {
         earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI();
