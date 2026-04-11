@@ -2149,10 +2149,6 @@ async function sendMsg(){
     window._lastTripJson=parsedJson;
     window._selectedEventName=null; // 전송 후 이벤트 초기화
     addMsgFull(displayText);
-    earnCoinAmt+=5; updateCoinUI();
-    // 검색 완료 후 즉시 코인 서버 저장
-    if(_coinSaveTimer){ clearTimeout(_coinSaveTimer); _coinSaveTimer=null; }
-    saveCoinsToServer();
   }catch(e){
     var thinkEl=document.getElementById(thinkId); if(thinkEl)thinkEl.remove();
     var errMsg=e.message||String(e);
@@ -2363,7 +2359,7 @@ function hideMyPage(){
 // ══════════════════════════════════════════════
 // 코인 UI
 // ══════════════════════════════════════════════
-var coins=50, bonusCoinAmt=50, earnCoinAmt=0, paidCoinAmt=0;
+var coins=0, bonusCoinAmt=0, earnCoinAmt=0, paidCoinAmt=0;
 var _coinSaveTimer=null;
 function updateCoinUI(){
   coins=bonusCoinAmt+earnCoinAmt+paidCoinAmt;
@@ -2799,8 +2795,10 @@ async function loadCoinsFromServer(){
       updateCoinUI();
       console.log('[Coin] 서버에서 로드 완료:', bonusCoinAmt+earnCoinAmt+paidCoinAmt, '코인');
     } else {
-      // 서버에 없음 → 현재 로컬값 그대로 유지, 서버에 저장
-      console.log('[Coin] 서버 데이터 없음 → 로컬값 유지 후 저장');
+      // 서버에 없음 → 신규 유저: 50코인 지급 후 서버 저장
+      console.log('[Coin] 신규 유저 — 50코인 지급');
+      bonusCoinAmt=50; earnCoinAmt=0; paidCoinAmt=0;
+      updateCoinUI();
       await saveCoinsToServer();
     }
   }catch(e){ console.warn('[Coin] 로드 실패:', e.message); }
@@ -2824,8 +2822,9 @@ async function loadTripsFromServer(){
   try{
     var r=await _sfGet('/rest/v1/trips?user_id=eq.'+_currentUserId+'&order=created_at.desc&select=*');
     if(r&&Array.isArray(r)){
-      // 서버 결과가 로컬보다 적으면 덮어쓰지 않음 (방금 저장한 데이터 보호)
-      if(r.length < halfTrips.length){
+      // 로컬에 데이터 있고 서버가 더 적으면 스킵 (방금 저장한 데이터 보호)
+      // 단, 로컬이 비어있으면 항상 서버에서 로드 (로그인 직후 복구)
+      if(halfTrips.length > 0 && r.length < halfTrips.length){
         console.log('[Trips] 서버 결과('+r.length+')가 로컬('+halfTrips.length+')보다 적음 — 덮어쓰기 스킵');
         return;
       }
@@ -2999,7 +2998,7 @@ function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
   _currentToken=null; _currentUserId=null;
   halfTrips=[]; _unlockedOptions={};
-  bonusCoinAmt=50; earnCoinAmt=0; paidCoinAmt=0;
+  bonusCoinAmt=0; earnCoinAmt=0; paidCoinAmt=0;
   if(typeof renderHalfTripsList==='function') renderHalfTripsList();
   // D옵션: 코인 배지 비활성화 + 유저 아이콘 원복
   var coinBadge=document.getElementById('headerCoinBadge');
