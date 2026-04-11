@@ -2786,18 +2786,19 @@ async function _sfDel(path, token){
 async function loadCoinsFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
-    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins_bonus,coins_earned,coins_paid');
-    if(r&&r[0]&&(r[0].coins_bonus!==null||r[0].coins_earned!==null)){
+    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins,bonus_coins');
+    if(r&&r[0]&&r[0].coins!==null&&r[0].coins!==undefined){
       // 서버에 코인 데이터 있음 → 로드
-      bonusCoinAmt=typeof r[0].coins_bonus==='number'?r[0].coins_bonus:50;
-      earnCoinAmt=typeof r[0].coins_earned==='number'?r[0].coins_earned:0;
-      paidCoinAmt=typeof r[0].coins_paid==='number'?r[0].coins_paid:0;
+      // coins = 총 적립/유료 코인, bonus_coins = 보너스 코인
+      earnCoinAmt=typeof r[0].coins==='number'?r[0].coins:0;
+      bonusCoinAmt=typeof r[0].bonus_coins==='number'?r[0].bonus_coins:0;
+      paidCoinAmt=0;
       updateCoinUI();
-      console.log('[Coin] 서버에서 로드 완료:', bonusCoinAmt+earnCoinAmt+paidCoinAmt, '코인');
+      console.log('[Coin] 서버에서 로드 완료:', earnCoinAmt+bonusCoinAmt, '코인');
     } else {
-      // 서버에 없음 → 신규 유저: 50코인 지급 후 서버 저장
-      console.log('[Coin] 신규 유저 — 50코인 지급');
-      bonusCoinAmt=50; earnCoinAmt=0; paidCoinAmt=0;
+      // 서버에 프로필 row 없음 → 신규 유저: 30코인 지급 후 저장
+      console.log('[Coin] 신규 유저 — 30코인 지급');
+      earnCoinAmt=30; bonusCoinAmt=0; paidCoinAmt=0;
       updateCoinUI();
       await saveCoinsToServer();
     }
@@ -2806,13 +2807,12 @@ async function loadCoinsFromServer(){
 async function saveCoinsToServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
-    // upsert: row 없어도 생성됨
     await fetch(SUPA_URL+'/rest/v1/profiles',{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-      body:JSON.stringify({id:_currentUserId,coins_bonus:bonusCoinAmt,coins_earned:earnCoinAmt,coins_paid:paidCoinAmt,updated_at:new Date().toISOString()})
+      body:JSON.stringify({id:_currentUserId,coins:earnCoinAmt+paidCoinAmt,bonus_coins:bonusCoinAmt,updated_at:new Date().toISOString()})
     });
-    console.log('[Coin] 서버 저장 완료 — 잔액:', bonusCoinAmt+earnCoinAmt+paidCoinAmt, '코인');
+    console.log('[Coin] 서버 저장 완료 — 잔액:', earnCoinAmt+bonusCoinAmt, '코인');
   }catch(e){ console.warn('[Coin] 저장 실패:', e.message); }
 }
 
@@ -2822,12 +2822,6 @@ async function loadTripsFromServer(){
   try{
     var r=await _sfGet('/rest/v1/trips?user_id=eq.'+_currentUserId+'&order=created_at.desc&select=*');
     if(r&&Array.isArray(r)){
-      // 로컬에 데이터 있고 서버가 더 적으면 스킵 (방금 저장한 데이터 보호)
-      // 단, 로컬이 비어있으면 항상 서버에서 로드 (로그인 직후 복구)
-      if(halfTrips.length > 0 && r.length < halfTrips.length){
-        console.log('[Trips] 서버 결과('+r.length+')가 로컬('+halfTrips.length+')보다 적음 — 덮어쓰기 스킵');
-        return;
-      }
       halfTrips=r.map(function(t){
         var data=typeof t.data==='string'?JSON.parse(t.data||'{}'):t.data||{};
         return {id:t.id,route:t.route||'여행',dates:t.dates||'',nights:t.nights,pax:t.pax,text:t.text||'',A:data.A||null,B:data.B||null,C:data.C||null};
