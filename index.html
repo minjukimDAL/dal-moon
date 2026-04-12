@@ -499,19 +499,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             </optgroup>
           </select>
           <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
-          <!-- 박수(1-6) / 주(1-6주) 전환 -->
-          <div style="flex:1;display:flex;flex-direction:column;gap:3px;">
-            <input id="planNights" type="number" min="1" max="6" value="5" onchange="onNightsChange()" style="padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;width:100%;" placeholder="박">
-            <select id="planWeeks" onchange="updatePlanInput()" style="display:none;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;width:100%;">
-              <option value="1">1주</option>
-              <option value="2">2주</option>
-              <option value="3">3주</option>
-              <option value="4">4주</option>
-              <option value="5">5주</option>
-              <option value="6">6주</option>
-            </select>
-            <div id="nightsToggle" style="font-size:8px;color:var(--ac);text-align:center;cursor:pointer;" onclick="toggleNightsMode()">7박+ → 주 단위</div>
-          </div>
+          <!-- 기간 선택 (1박~6박, 1주~4주 통합) -->
+          <select id="planDuration" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;">
+            <option value="n1">1박</option>
+            <option value="n2">2박</option>
+            <option value="n3">3박</option>
+            <option value="n4">4박</option>
+            <option value="n5" selected>5박</option>
+            <option value="n6">6박</option>
+            <option value="w1">1주</option>
+            <option value="w2">2주</option>
+            <option value="w3">3주</option>
+            <option value="w4">4주</option>
+          </select>
         </div>
       </div>
 
@@ -2130,7 +2130,9 @@ async function sendMsg(){
     if(!parsedJson){
       var routeMatch=displayText.match(/ICN[→\-][^\s,，。]+/);
       var nightMatch=displayText.match(/(\d+)박/);
+      var weekMatch=displayText.match(/(\d+)주/);
       var paxMatch=displayText.match(/(\d+)인/);
+      var parsedNights=nightMatch?parseInt(nightMatch[1]):(weekMatch?parseInt(weekMatch[1])*7:null);
       // 목적지 추출 개선 — 입력 text에서 직접 추출
       var destFromText=text.replace(/[\d]박.*$/,'').replace(/Option.*$/,'').replace(/플랜.*$/,'').trim();
       destFromText=destFromText.substring(0,30);
@@ -2138,7 +2140,7 @@ async function sendMsg(){
         parsedJson={
           route:routeMatch?routeMatch[0]:(destFromText||text.split(' ')[0]||'여행'),
           dates:new Date().toLocaleDateString('ko-KR'),
-          nights:nightMatch?parseInt(nightMatch[1]):null,
+          nights:parsedNights,
           pax:paxMatch?parseInt(paxMatch[1]):null,
           A:null, B:null, C:null
         };
@@ -3234,6 +3236,8 @@ function setTripsTab(tab){
   currentTripsTab='half';
   var th=document.getElementById('tripsHalf'),tf=document.getElementById('tripsFull');
   var hd=document.getElementById('halfTripDetail'),fd=document.getElementById('fullTripDetail');
+  var lw=document.getElementById('tripsListWrap');
+  if(lw)lw.style.display='block';  // 목록 항상 보이게
   if(th)th.style.display='block';
   if(tf)tf.style.display='none';
   if(hd)hd.style.display='none';
@@ -3954,34 +3958,7 @@ var ORIGIN_LABELS = {
 
 // 박/주 모드 토글
 var _nightsMode = 'nights'; // 'nights' or 'weeks'
-function toggleNightsMode(){
-  _nightsMode = _nightsMode==='nights'?'weeks':'nights';
-  var ni=document.getElementById('planNights');
-  var wi=document.getElementById('planWeeks');
-  var tg=document.getElementById('nightsToggle');
-  if(_nightsMode==='weeks'){
-    if(ni) ni.style.display='none';
-    if(wi) wi.style.display='block';
-    if(tg) tg.textContent=lang==='ko'?'← 박 단위로':'← nights mode';
-  } else {
-    if(ni) ni.style.display='block';
-    if(wi) wi.style.display='none';
-    if(tg) tg.textContent=lang==='ko'?'7박+ → 주 단위':'7+ nights → weeks';
-  }
-  updatePlanInput();
-}
-function onNightsChange(){
-  var ni=document.getElementById('planNights');
-  var val=parseInt(ni&&ni.value)||5;
-  // 7박 이상 입력 시 자동으로 주 단위로 전환
-  if(val>6 && _nightsMode==='nights'){
-    ni.value=6;
-    toggleNightsMode();
-    return;
-  }
-  updatePlanInput();
-}
-window.toggleNightsMode=toggleNightsMode; window.onNightsChange=onNightsChange;
+window.toggleNightsMode=function(){}; window.onNightsChange=function(){};
 
 function updatePlanInput(){
   var dest = (document.getElementById('planDest')||{value:''}).value;
@@ -3995,14 +3972,15 @@ function updatePlanInput(){
   var originVal = (document.getElementById('planOrigin')||{value:'kr'}).value || 'kr';
   var originLabel = (ORIGIN_LABELS[lang]&&ORIGIN_LABELS[lang][originVal]) || (lang==='ko'?'인천(ICN)':'Incheon(ICN)');
 
-  // 박수 또는 주수
+  // 기간 (통합 select: n1~n6=박, w1~w4=주)
   var nts, durationLabel;
-  if(_nightsMode==='weeks'){
-    var wks=(document.getElementById('planWeeks')||{value:'1'}).value||'1';
-    nts=parseInt(wks)*7;
-    durationLabel=wks+(lang==='ko'?'주 여행':' week trip');  // "2주 여행" 명확히
+  var durVal=(document.getElementById('planDuration')||{value:'n5'}).value||'n5';
+  if(durVal.startsWith('w')){
+    var wks=parseInt(durVal.substring(1))||1;
+    nts=wks*7;
+    durationLabel=wks+(lang==='ko'?'주 여행':' week trip');
   } else {
-    nts=(document.getElementById('planNights')||{value:'5'}).value||'5';
+    nts=parseInt(durVal.substring(1))||5;
     durationLabel=nts+(lang==='ko'?'박':' nights');
   }
 
