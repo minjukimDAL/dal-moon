@@ -2216,7 +2216,7 @@ async function saveToTripSnap(snapText, snapJson, snapQuery){
   // 서버 저장 완료 후 이동 (loadTripsFromServer가 덮어쓰기 전에 id 확정)
   if(_currentToken&&typeof saveTripToServer==='function'){
     saveTripToServer(newTrip).then(function(serverId){
-      if(serverId) halfTrips[0].id=serverId;
+      if(serverId && halfTrips[0] && halfTrips[0].id.toString().startsWith('local_')) halfTrips[0].id=serverId;
       setTimeout(function(){goPage('trips');},300);
     }).catch(function(){
       setTimeout(function(){goPage('trips');},300);
@@ -2815,8 +2815,11 @@ async function saveCoinsToServer(){
 }
 
 // ══ 여행 서버 연동 ══
+var _isLoadingTrips=false;
 async function loadTripsFromServer(){
   if(!_currentToken||!_currentUserId) return;
+  if(_isLoadingTrips) return;
+  _isLoadingTrips=true;
   try{
     var r=await _sfGet('/rest/v1/trips?user_id=eq.'+_currentUserId+'&order=created_at.desc&select=*');
     if(r&&Array.isArray(r)){
@@ -2828,6 +2831,7 @@ async function loadTripsFromServer(){
       console.log('[Trips] 서버에서 로드:', halfTrips.length+'개');
     }
   }catch(e){ console.warn('[Trips] 로드 실패:', e.message); }
+  finally{ _isLoadingTrips=false; }
 }
 async function saveTripToServer(trip){
   if(!_currentToken||!_currentUserId) return null;
@@ -3361,7 +3365,8 @@ function showHalfDetail(idx){
   // → 아래 forEach에서 처리
 
   // 원본 AI 텍스트 미리보기 (잠금해제 내역 없을 때만)
-  if(t.text && !(_unlockedOptions[idx] && Object.keys(_unlockedOptions[idx]).length>0)){
+  var tripId=(t&&t.id)||String(idx);
+  if(t.text && !(_unlockedOptions[tripId] && Object.keys(_unlockedOptions[tripId]).length>0)){
     var uda2=document.getElementById('unlockedDetailsArea');
     if(uda2){
       var preR=t.text
@@ -3381,7 +3386,7 @@ function showHalfDetail(idx){
   ['A','B','C'].forEach(function(o){
     var btn=document.getElementById('unlockBtn'+o);
     if(!btn) return;
-    if(_unlockedOptions[idx]&&_unlockedOptions[idx][o]){
+    if(_unlockedOptions[tripId]&&_unlockedOptions[tripId][o]){
       btn.disabled=false;
       btn.style.background=o==='A'?'rgba(196,175,135,.2)':o==='B'?'rgba(91,143,255,.2)':'rgba(0,200,100,.15)';
       btn.innerHTML='✅ Option '+o+'<br><span style="font-size:9px;color:var(--m);">'+(lang==='ko'?'열림':'Unlocked')+'</span>';
