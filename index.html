@@ -676,6 +676,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   <div id="tripsListWrap" class="page-wrap">
     <div style="margin-bottom:14px;">
       <div style="font-size:11px;font-weight:500;color:var(--ac);padding:4px 0;">🌙 <span id='t-tripsTabHalf'>플래닝 기록</span></div>
+      <div style="font-size:9px;color:var(--m);margin-top:4px;">검색 기록 <strong style="color:var(--sb);">48시간</strong> · 상세 플랜 <strong style="color:var(--sb);">7일</strong> 보관 · 텍스트 복사로 영구 저장 가능</div>
     </div>
     <div id="tripsHalf" style="display:block;">
       <div id="halfTripsList"></div>
@@ -1306,10 +1307,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div class="modal-body">
       <div style="background:var(--s2);border:1px solid var(--b1);border-radius:2px;padding:12px;font-size:11px;color:var(--m);margin-bottom:14px;line-height:1.8;" id="sharePlanPreview"></div>
       <div class="sec-label" id="t-share-via">공유 방법</div>
-      <div class="share-method" onclick="doSharePlan('msg')"><span style="font-size:20px;margin-right:8px;">💬</span><div><div style="font-size:12px;color:var(--sb);" id="t-share-msg">DAL 메신저로 보내기</div><div style="font-size:10px;color:var(--m);">팔로우 중인 친구에게 전송</div></div></div>
-      <div class="share-method" onclick="doSharePlan('email')"><span style="font-size:20px;margin-right:8px;">✉️</span><div><div style="font-size:12px;color:var(--sb);" id="t-share-email">이메일로 보내기</div><div style="font-size:10px;color:var(--m);">상세 플랜 PDF로 전송</div></div></div>
-      <div class="share-method" onclick="doSharePlan('kakao')"><span style="font-size:20px;margin-right:8px;">🟡</span><div><div style="font-size:12px;color:var(--sb);">카카오톡으로 보내기</div><div style="font-size:10px;color:var(--m);">카카오 공유하기</div></div></div>
-      <div class="share-method" onclick="doSharePlan('copy')"><span style="font-size:20px;margin-right:8px;">🔗</span><div><div style="font-size:12px;color:var(--sb);" id="t-share-copy">링크 복사</div><div style="font-size:10px;color:var(--m);">클립보드에 복사</div></div></div>
+      <div class="share-method" onclick="doSharePlan('copy')"><span style="font-size:20px;margin-right:8px;">📋</span><div><div style="font-size:12px;color:var(--sb);" id="t-share-copy">전체 텍스트 복사</div><div style="font-size:10px;color:var(--m);" id="t-share-copy-sub">카카오톡·메모장 등에 바로 붙여넣기</div></div></div>
+      <div class="share-method" onclick="doSharePlan('kakao')"><span style="font-size:20px;margin-right:8px;">🟡</span><div><div style="font-size:12px;color:var(--sb);">카카오톡으로 보내기</div><div style="font-size:10px;color:var(--m);">텍스트 복사 후 카카오톡 열기</div></div></div>
     </div>
   </div>
 </div>
@@ -1923,24 +1922,56 @@ function doBookTrip(){
 }
 
 // R2-9 공유
+function buildShareText(){
+  var t=halfTrips[currentHalfTripIdx];
+  var opt=OPTIONS[selectedOpt]&&OPTIONS[selectedOpt][lang];
+  var tripId=(t&&t.id)||String(currentHalfTripIdx);
+  var unlockedText=(_unlockedOptions[tripId]&&_unlockedOptions[tripId][selectedOpt])||'';
+  var header='🌙 DAL AI 여행 플랜\n'
+    +(t?'📍 '+(t.route||'여행')+(t.nights?' · '+t.nights+(lang==='ko'?'박':' nights'):'')+(t.pax?' · '+t.pax+(lang==='ko'?'인':' pax'):'')+'\n':'')
+    +'📅 '+(t&&t.dates||new Date().toLocaleDateString('ko-KR'))+'\n'
+    +'━━━━━━━━━━━━━━━━━\n\n';
+  var body='';
+  if(unlockedText){
+    body='[Option '+selectedOpt+(opt?' · '+opt.name:'')+' 상세 플랜]\n\n'+unlockedText;
+  } else if(t&&t.text){
+    body=t.text;
+  } else if(opt){
+    body='Option '+selectedOpt+(opt?' '+opt.name:'')+'\n'
+      +(lang==='ko'?'총액: ':'Total: ')+formatWon(opt.price)+'\n'
+      +(opt.flight?'✈️ '+opt.flight.label+'\n':'')
+      +(opt.hotel?'🏨 '+opt.hotel.label+'\n':'');
+  }
+  var footer='\n\n━━━━━━━━━━━━━━━━━\n🌙 dal-moon.com 에서 AI 여행 플래닝';
+  return header+body+footer;
+}
 function openShareModal(){
   var opt=OPTIONS[selectedOpt]&&OPTIONS[selectedOpt][lang];
   var preview=document.getElementById('sharePlanPreview');
-  if(opt&&preview){
-    preview.innerHTML='📋 Option '+selectedOpt+': '+opt.name+'<br>'
-      +(lang==='ko'?'총액 ':'Total ')+formatWon(opt.price)+'<br>'
-      +opt.flight.label+' · '+opt.hotel.label;
+  if(preview){
+    var t=halfTrips[currentHalfTripIdx];
+    var tripId=(t&&t.id)||String(currentHalfTripIdx);
+    var hasUnlocked=(_unlockedOptions[tripId]&&_unlockedOptions[tripId][selectedOpt]);
+    preview.innerHTML='📋 Option '+selectedOpt+(opt?' · '+opt.name:'')+(opt?'<br>'+(lang==='ko'?'총액 ':'Total ')+formatWon(opt.price):'')
+      +(hasUnlocked?'<br><span style="color:var(--ok);font-size:10px;">✅ 상세 플랜 포함</span>':'<br><span style="font-size:10px;color:var(--m);">기본 요약 포함</span>');
   }
   document.getElementById('shareModal').classList.add('open');
 }
 function doSharePlan(method){
   document.getElementById('shareModal').classList.remove('open');
-  var opt=OPTIONS[selectedOpt]&&OPTIONS[selectedOpt][lang];
-  var msg='[DAL 여행 플랜] Option '+selectedOpt+(opt?' '+opt.name:'')+(opt?' '+formatWon(opt.price):'');
-  if(method==='copy'){
-    navigator.clipboard.writeText(msg).then(function(){alert(lang==='ko'?'링크 복사 완료!':'Copied!');}).catch(function(){alert(msg);});
+  var fullText=buildShareText();
+  if(method==='copy'||method==='kakao'){
+    navigator.clipboard.writeText(fullText)
+      .then(function(){
+        alert(method==='kakao'
+          ?(lang==='ko'?'복사 완료! 카카오톡을 열어서 붙여넣기 해주세요 🌙':'Copied! Open KakaoTalk and paste 🌙')
+          :(lang==='ko'?'전체 플랜이 복사됐어요! 원하는 곳에 붙여넣기 해주세요 🌙':'Full plan copied! Paste anywhere 🌙'));
+      })
+      .catch(function(){ alert(fullText); });
   } else {
-    alert((lang==='ko'?'공유 완료: ':'Shared via ')+method+'\n'+msg);
+    navigator.clipboard.writeText(fullText).then(function(){
+      alert(lang==='ko'?'복사 완료!':'Copied!');
+    }).catch(function(){ alert(fullText); });
   }
 }
 
@@ -2863,8 +2894,9 @@ async function loadUnlockedFromServer(){
     var r=await _sfGet('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&select=*');
     if(r&&Array.isArray(r)){
       r.forEach(function(u){
+        if(!u.content||u.content==='EMPTY'||u.content.length<50) return; // 빈/EMPTY 무시
         if(!_unlockedOptions[u.trip_id]) _unlockedOptions[u.trip_id]={};
-        _unlockedOptions[u.trip_id][u.opt]=u.content||'';
+        _unlockedOptions[u.trip_id][u.opt]=u.content;
       });
       console.log('[Unlocked] 서버에서 로드:', r.length+'개');
     }
@@ -2944,6 +2976,21 @@ async function savePostToServer(text, nickname){
   }catch(e){ console.warn('[Posts] 저장 실패:', e.message); return false; }
 }
 
+// ══ 데이터 만료 정리 (trips: 2일, unlocked: 7일) ══
+async function cleanupExpiredData(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    var now=new Date();
+    // trips: 2일(48시간) 이전 삭제
+    var trips2d=new Date(now.getTime()-2*24*60*60*1000).toISOString();
+    await _sfDel('/rest/v1/trips?user_id=eq.'+_currentUserId+'&created_at=lt.'+trips2d);
+    // unlocked: 7일 이전 삭제
+    var unlock7d=new Date(now.getTime()-7*24*60*60*1000).toISOString();
+    await _sfDel('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&created_at=lt.'+unlock7d);
+    console.log('[Cleanup] 만료 데이터 정리 완료');
+  }catch(e){ console.warn('[Cleanup] 정리 실패:', e.message); }
+}
+
 // 세션 저장/복구
 function _saveSession(data){
   try{localStorage.setItem('dal_s',JSON.stringify({u:data.user,t:data.access_token,e:data.expires_at}));}catch(e){}
@@ -2965,10 +3012,12 @@ function onLoginSuccess(user, token){
   _currentUserId=user.id;
   // 로그인 즉시 현재 코인 UI 표시 (서버 로드 전)
   updateCoinUI();
-  // 서버 데이터 로드
-  loadCoinsFromServer();
-  loadTripsFromServer();
-  loadUnlockedFromServer();
+  // 만료 데이터 정리 후 로드 (순서 중요: 정리 먼저)
+  cleanupExpiredData().then(function(){
+    loadCoinsFromServer();
+    loadTripsFromServer();
+    loadUnlockedFromServer();
+  });
   // 로그인 전 시도한 액션 자동 실행
   setTimeout(function(){
     if(_pendingAction){
@@ -3536,16 +3585,28 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
 
   // 원본 텍스트에서 해당 옵션 부분 추출
   var baseText = fullText || '';
-  var optStart = -1;
-  ['Option '+opt+':', 'Option '+opt+' ','OPTION '+opt].forEach(function(k){
-    if(optStart<0){ var i=baseText.indexOf(k); if(i>=0) optStart=i; }
-  });
-  var nextOpts = opt==='A'?['Option B:','Option B ']:opt==='B'?['Option C:','Option C ']:[];
-  var optEnd = baseText.length;
-  nextOpts.forEach(function(k){ var i=baseText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
-  var optionBase = optStart>=0
-    ? baseText.substring(optStart, Math.min(optEnd, optStart+2000))
-    : baseText.substring(0, 1200);
+  var optionBase = '';
+
+  if(!baseText){
+    // text 없는 여행 — route/nights/pax로 Gemini가 새로 생성
+    var fallbackRoute = t.route || '여행';
+    var fallbackNights = parseInt(t.nights)||5;
+    var fallbackPax = parseInt(t.pax)||2;
+    optionBase = lang==='ko'
+      ? '여행: '+fallbackRoute+'\n기간: '+fallbackNights+'박\n인원: '+fallbackPax+'인\n\n위 여행의 Option '+opt+'('+optLabel+') 상세 플랜을 처음부터 작성해줘.'
+      : 'Trip: '+fallbackRoute+'\nDuration: '+fallbackNights+' nights\nPax: '+fallbackPax+'\n\nCreate Option '+opt+'('+optLabel+') plan from scratch for this trip.';
+  } else {
+    var optStart = -1;
+    ['Option '+opt+':', 'Option '+opt+' ','OPTION '+opt].forEach(function(k){
+      if(optStart<0){ var i=baseText.indexOf(k); if(i>=0) optStart=i; }
+    });
+    var nextOpts = opt==='A'?['Option B:','Option B ']:opt==='B'?['Option C:','Option C ']:[];
+    var optEnd = baseText.length;
+    nextOpts.forEach(function(k){ var i=baseText.indexOf(k,optStart+10); if(i>0&&i<optEnd) optEnd=i; });
+    optionBase = optStart>=0
+      ? baseText.substring(optStart, Math.min(optEnd, optStart+2000))
+      : baseText.substring(0, 1200);
+  }
 
   // 프롬프트: 원본 항목을 유지하면서 각각 구체화 (Week/Day 구조 그대로 유지)
   var prompt = lang==='ko'
@@ -3600,6 +3661,14 @@ async function doUnlockOption(opt, tripIdx, alreadyUnlocked){
       // 완료 — 마커 제거 후 저장
       var final=_unlockAccum.replace(/\[완료\]/g,'').replace(/\[DONE\]/g,'').trim();
       console.log('[Unlock] 최종 완료. 총 길이:', final.length, '이어받기 횟수:', _unlockCount);
+      // 내용이 너무 짧거나 EMPTY면 코인 환불하고 중단
+      if(final.length < 50 || final==='EMPTY'){
+        console.warn('[Unlock] 내용 없음 — 코인 환불');
+        earnCoinAmt+=UNLOCK_COIN_COST; updateCoinUI(); await saveCoinsToServer();
+        if(btn){ btn.disabled=false; btn.onclick=function(){requestUnlockOption(opt);};
+          btn.innerHTML='⚠️ '+(lang==='ko'?'내용 없음, 코인 환불됨':'No content, coins refunded')+'<br><span style="font-size:8px;color:var(--m);">'+(lang==='ko'?'탭하여 재시도':'Tap to retry')+'</span>'; }
+        return;
+      }
       var tripId=(halfTrips[tripIdx]&&halfTrips[tripIdx].id)||String(tripIdx);
       if(!_unlockedOptions[tripId]) _unlockedOptions[tripId]={};
       _unlockedOptions[tripId][opt]=final;
