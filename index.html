@@ -883,20 +883,14 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <!-- 코인 -->
       <div class="coin-display">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:4px;" id="t-mycoins">내 코인</div><div style="font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);" id="profileCoins">50 🪙</div></div>
+          <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:4px;" id="t-mycoins">내 코인</div><div style="font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);" id="profileCoins">0 🪙</div></div>
           <button style="padding:8px 14px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openCoinModal()" id="t-charge">충전하기</button>
         </div>
         <div class="coin-types">
-          <div class="coin-type"><div class="ct-amount" id="bonusCoin">50</div><div class="ct-label"><span id='t-coin-type1'>가입<br>보너스</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund1'>환불불가</span></div></div>
           <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label"><span id='t-coin-type2'>앱사용<br>적립</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund2'>환불불가</span></div></div>
+          <div class="coin-type"><div class="ct-amount" id="bonusCoin">0</div><div class="ct-label"><span id='t-coin-type1'>가입<br>보너스</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund1'>환불불가</span></div></div>
           <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label"><span id='t-coin-type3'>개인<br>충전</span></div><div style="font-size:7px;color:var(--ok);margin-top:3px;"><span id='t-coin-refund'>환불가능</span></div></div>
         </div>
-      </div>
-      <!-- 카드 & 혜택 — R2-2 활성화 -->
-      <div class="card" style="margin-bottom:10px;">
-        <div class="sec-label" id="t-cards">💳 내 카드 & 할인혜택</div>
-        <div id="cardList"></div>
-        <button style="width:100%;padding:9px;border:1px dashed var(--b2);border-radius:2px;background:transparent;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;" onclick="openAddCardModal()" id="t-add-card">+ 카드 / 혜택 추가</button>
       </div>
       <div class="menu-list">
         <div class="menu-item" onclick="showMyPage('miles')" id="t-mileage-menu"><span>✈️ <span id="t-mileage">항공 마일리지</span></span><span style="color:var(--m)">›</span></div>
