@@ -893,8 +893,6 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
       </div>
       <div class="menu-list">
-        <div class="menu-item" onclick="showMyPage('miles')" id="t-mileage-menu"><span>✈️ <span id="t-mileage">항공 마일리지</span></span><span style="color:var(--m)">›</span></div>
-        <div class="menu-item" onclick="showMyPage('passport')" id="t-passport-menu"><span>🛂 <span id="t-passport">여권 정보</span></span><span style="color:var(--m)">›</span></div>
         <div class="menu-item" onclick="showMyPage('notify')"><span>🔔 <span id="t-notify">알림 설정</span></span><span style="color:var(--m)">›</span></div>
         <div class="menu-item" onclick="showMyPage('privacy')"><span>🔒 <span id="t-privacy">개인정보 설정</span></span><span style="color:var(--m)">›</span></div>
         <div class="menu-item" onclick="showMyPage('more-menu')"><span>⚙️ <span id="t-more-menu">더보기</span></span><span style="color:var(--m)">›</span></div>
@@ -993,10 +991,6 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div class="sub-header"><button class="back-btn" onclick="hideMyPage()">←</button><div class="sub-title" id="t-more-sub">더보기</div></div>
       <div class="page-wrap" style="padding-top:12px;">
         <div class="menu-list">
-          <div class="menu-item" onclick="openCoinModal()"><span>🪙 <span id="t-m-charge">코인 충전</span></span><span style="color:var(--m)">›</span></div>
-          <div class="menu-item" onclick="showMyPage('tracking')"><span>📦 <span id="t-m-track">수화물 추적</span></span><span style="color:var(--m)">›</span></div>
-          <div class="menu-item" onclick="showMyPage('partner')"><span>🤝 <span id="t-m-partner">파트너 할인 혜택</span></span><span style="color:var(--m)">›</span></div>
-          <div class="menu-item" onclick="showMyPage('invite')"><span>📣 <span id="t-m-invite">친구 초대 (+30🪙)</span></span><span style="color:var(--m)">›</span></div>
           <div class="menu-item" onclick="showMyPage('cs')"><span>💬 <span id="t-m-cs">고객센터</span></span><span style="color:var(--m)">›</span></div>
           <div class="menu-item" onclick="showMyPage('about')"><span>ℹ️ <span id="t-m-about">DAL 소개</span></span><span style="color:var(--m)">›</span></div>
           <div class="menu-item" onclick="showMyPage('terms')"><span>📋 <span id="t-m-terms">이용약관</span></span><span style="color:var(--m)">›</span></div>
@@ -1056,9 +1050,9 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div id="mypage-cs" style="display:none;">
       <div class="sub-header"><button class="back-btn" onclick="hideMyPage()">←</button><div class="sub-title" id="t-cs-title">고객센터</div></div>
       <div class="page-wrap" style="padding-top:10px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-          <button class="share-btn" style="padding:14px;" onclick="openKakao()">💬 카카오톡</button>
-          <button class="share-btn" style="padding:14px;" onclick="openEmail()">✉️ 이메일</button>
+        <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;margin-bottom:16px;font-size:10px;color:var(--m);line-height:1.9;">
+          ✉️ <strong style="color:var(--sb);">support.dal@gmail.com</strong><br>
+          평일 10:00 - 18:00 · 24시간 내 답변
         </div>
         <div class="sec-label" id="t-faq">자주 묻는 질문</div>
         <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><span id="t-faq1">코인 환불 방법은?</span><span>+</span></div><div class="faq-a">개인 충전 코인만 환불 가능합니다. 마이 → 회원탈퇴 시 잔여 충전 코인이 자동 환불됩니다.</div></div>
@@ -2363,7 +2357,7 @@ function goPage(id){
 // ══════════════════════════════════════════════
 // My Page 서브
 // ══════════════════════════════════════════════
-var mySubPages=['miles','passport','notify','privacy','more-menu','tracking','partner','invite','cs','about','terms'];
+var mySubPages=['notify','privacy','more-menu','cs','about','terms'];
 function showMyPage(name){
   document.getElementById('profileView').querySelector('.page-wrap').style.display='none';
   mySubPages.forEach(function(p){
@@ -2462,7 +2456,7 @@ async function doWithdraw(){
   err.textContent='';
   closeWithdrawModal();
   if(paidCoinAmt>0){
-    alert('환불 처리 안내\n\n충전 코인 '+paidCoinAmt+'코인(₩'+paidCoinAmt*100+')은 영업일 3~5일 내\ndal.support@gmail.com으로 환불 안내 메일을 보내드립니다.');
+    alert('환불 처리 안내\n\n충전 코인 '+paidCoinAmt+'코인(₩'+paidCoinAmt*100+')은 영업일 3~5일 내\nsupport.dal@gmail.com으로 환불 안내 메일을 보내드립니다.');
   }
   // 3단계: Supabase 유저 삭제 (Service Role 없이는 직접 삭제 불가 → 로그아웃 처리)
   // TODO: Edge Function 연동 후 실제 삭제 처리 예정
@@ -2758,15 +2752,37 @@ function toggleFaq(el){
   var a=el.nextElementSibling; a.classList.toggle('open');
   el.querySelector('span:last-child').textContent=a.classList.contains('open')?'−':'+';
 }
-function openKakao(){alert(lang==='ko'?'카카오톡 채널: @DAL_AI\n운영시간: 평일 10:00-18:00':'Kakao: @DAL_AI · Weekdays 10:00-18:00');}
+function openKakao(){} // deprecated
 function openEmail(){var el=document.getElementById('csName');if(el)el.scrollIntoView({behavior:'smooth'});}
-function submitCS(){
-  var name=document.getElementById('csName').value;
-  var body=document.getElementById('csBody').value;
+async function submitCS(){
+  var name=document.getElementById('csName').value.trim();
+  var email=document.getElementById('csEmail').value.trim();
+  var subject=document.getElementById('csSubject').value.trim();
+  var body=document.getElementById('csBody').value.trim();
   if(!name||!body){alert(lang==='ko'?'이름과 문의 내용을 입력해주세요.':'Please fill in name and message.');return;}
-  var ticket='CS-'+Math.floor(10000+Math.random()*90000);
-  alert(lang==='ko'?'문의 접수 완료! 접수번호: '+ticket+'\n24시간 내 dal.support@gmail.com으로 답변':'Submitted! Ref: '+ticket+'\nReply within 24h to dal.support@gmail.com');
-  ['csName','csEmail','csSubject','csBody'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var btn=document.getElementById('t-cs-submit');
+  if(btn){btn.disabled=true;btn.textContent=lang==='ko'?'전송 중...':'Sending...';}
+  try{
+    // Formspree 연동 — Form ID를 받으면 YOUR_FORM_ID 교체
+    var FORMSPREE_ID='YOUR_FORM_ID';
+    var r=await fetch('https://formspree.io/f/'+FORMSPREE_ID,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({name:name,email:email||'(미입력)',subject:subject||'문의',message:body})
+    });
+    if(r.ok){
+      alert(lang==='ko'?'문의가 접수됐어요! 24시간 내 support.dal@gmail.com으로 답변드립니다 🌙':'Submitted! We\'ll reply within 24h to support.dal@gmail.com 🌙');
+      ['csName','csEmail','csSubject','csBody'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    } else {
+      // Formspree ID 미설정 시 mailto 폴백
+      var mailBody=encodeURIComponent('['+subject+']\n\n'+body+'\n\n보낸이: '+name+' ('+email+')');
+      window.open('mailto:support.dal@gmail.com?subject='+encodeURIComponent('[DAL문의] '+(subject||name))+'&body='+mailBody);
+    }
+  }catch(e){
+    var mailBody2=encodeURIComponent(body+'\n\n보낸이: '+name);
+    window.open('mailto:support.dal@gmail.com?subject='+encodeURIComponent('[DAL문의] '+(subject||name))+'&body='+mailBody2);
+  }
+  if(btn){btn.disabled=false;btn.textContent=lang==='ko'?'문의 접수':'Submit';}
 }
 function shareInvite(method){
   var code=document.getElementById('myInviteCode').textContent;
@@ -3145,7 +3161,7 @@ async function doWithdraw(){
   err.textContent='';
   closeWithdrawModal();
   if(paidCoinAmt>0){
-    alert('충전 코인 '+paidCoinAmt+'코인(₩'+paidCoinAmt*100+')은\n영업일 3~5일 내 dal.support@gmail.com으로\n환불 안내 메일을 보내드립니다.');
+    alert('충전 코인 '+paidCoinAmt+'코인(₩'+paidCoinAmt*100+')은\n영업일 3~5일 내 support.dal@gmail.com으로\n환불 안내 메일을 보내드립니다.');
   }
   await doLogout();
   alert(lang==='ko'?'탈퇴가 완료되었습니다. 감사합니다.':'Withdrawal complete. Thank you.');
@@ -3300,9 +3316,14 @@ function renderHalfTripsList(){
     var t=halfTrips[i];
     var btnLabel=lang==='ko'?'← 홈으로':'← Home';
     html+='<div class="trip-record-card" onclick="showHalfDetail('+i+')" style="position:relative;">'
-      +'<button onclick="event.stopPropagation();deleteTripConfirm('+i+')" style="position:absolute;top:8px;right:8px;background:transparent;border:none;font-size:13px;color:var(--m);cursor:pointer;padding:2px 4px;" title="삭제">🗑</button>'
-      +'<div class="trc-head"><div class="trc-dest" style="max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(t.route||'여행')+'</div><span class="trc-badge half">AI 플래닝</span></div>'
-      +'<div class="trc-sub">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'
+      +'<div class="trc-dest" style="max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:500;color:var(--w);">'+(t.route||'여행')+'</div>'
+      +'<button onclick="event.stopPropagation();deleteTripConfirm('+i+')" style="background:transparent;border:none;font-size:13px;color:var(--m);cursor:pointer;padding:2px 6px;flex-shrink:0;" title="삭제">🗑</button>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
+      +'<span class="trc-badge half">AI 플래닝</span>'
+      +'<span class="trc-sub" style="margin:0;">'+(t.dates||'')+' · '+(t.nights||'?')+'박 · '+(t.pax||'?')+'인</span>'
+      +'</div>'
       +(t.B?'<div class="trc-row"><span>\u2708\ufe0f '+(t.B.flight||'-')+'</span></div><div class="trc-row"><span>\ud83c\udfe8 '+(t.B.hotel||'-')+'</span></div>':'')
       +(t.B&&t.B.price?'<div class="trc-total"><span>'+(lang==='ko'?'예상 총액':'Est. Total')+'</span><span>'+formatWon(t.B.price)+'</span></div>':'')
       +'<button onclick="event.stopPropagation();goPage(\'home\')" class="upg-btn-small" style="border-color:rgba(91,143,255,.3);color:var(--ac);">'+btnLabel+'</button>'
@@ -3498,6 +3519,13 @@ function requestUnlockOption(opt){
   if(_unlockedOptions[tripId]&&_unlockedOptions[tripId][opt]){
     doUnlockOption(opt, tripIdx, true);
     return;
+  }
+  // 원본 텍스트 없는 경우 — 폴백으로 진행할지 확인
+  if(!t.text){
+    var proceed=confirm(lang==='ko'
+      ?'이 여행은 저장된 AI 플랜 원문이 없어요.\n\n여행 정보(목적지·기간·인원)만으로 Option '+opt+' 상세를 새로 생성합니다.\n5🪙가 차감됩니다. 계속할까요?'
+      :'This trip has no saved AI plan text.\n\nOption '+opt+' details will be generated fresh from trip info.\n5🪙 will be deducted. Continue?');
+    if(!proceed) return;
   }
   // 코인 부족 확인
   if(coins<UNLOCK_COIN_COST){
