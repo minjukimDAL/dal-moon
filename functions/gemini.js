@@ -1,6 +1,6 @@
 const https = require('https');
 
-// Gemini 호출
+// Gemini 호출 (타임아웃 7초)
 function callGemini(body, apiKey) {
   const model = body.model || 'gemini-2.5-flash';
   const payload = JSON.stringify({
@@ -23,15 +23,21 @@ function callGemini(body, apiKey) {
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve({ status: res.statusCode, body: data }));
     });
-    req.on('error', reject);
+    // 7초 타임아웃 — 초과 시 GPT 폴백으로
+    req.setTimeout(7000, () => {
+      req.destroy();
+      resolve({ status: 503, body: JSON.stringify({ error: { message: 'Gemini timeout' } }) });
+    });
+    req.on('error', (e) => {
+      resolve({ status: 503, body: JSON.stringify({ error: { message: e.message } }) });
+    });
     req.write(payload);
     req.end();
   });
 }
 
-// GPT 폴백 호출 (Gemini contents → OpenAI messages 변환)
+// GPT 폴백 호출
 function callGPT(body, apiKey) {
-  // Gemini contents 형식 → OpenAI messages 형식으로 변환
   const messages = (body.contents || []).map(c => ({
     role: c.role === 'user' ? 'user' : 'assistant',
     content: (c.parts || []).map(p => p.text || '').join('')
@@ -66,7 +72,7 @@ function callGPT(body, apiKey) {
   });
 }
 
-// GPT 응답 → Gemini 응답 형식으로 변환 (index.html이 그대로 파싱 가능)
+// GPT 응답 → Gemini 형식 변환
 function convertGPTToGeminiFormat(gptBody) {
   try {
     const gpt = JSON.parse(gptBody);
@@ -107,20 +113,25 @@ exports.handler = async function(event) {
 
     // 1차: Gemini 시도
     const geminiResult = await callGemini(body, geminiKey);
+    console.log('[Gemini] status:', geminiResult.status);
 
-    // Gemini 성공 시 바로 반환
+    // Gemini 성공
     if (geminiResult.status === 200) {
       return { statusCode: 200, headers, body: geminiResult.body };
     }
 
-    // Gemini 503(혼잡) 또는 429(한도초과) → GPT 폴백 시도
-    if ((geminiResult.status === 503 || geminiResult.status === 429) && openaiKey) {
-      console.log(`[Fallback] Gemini ${geminiResult.status} → GPT 폴백 시도`);
-      const gptResult = await callGPT(body, openaiKey);
-      if (gptResult.status === 200) {
-        // GPT 응답을 Gemini 형식으로 변환해서 반환
-        const converted = convertGPTToGeminiFormat(gptResult.body);
-        return { statusCode: 200, headers, body: converted };
+    // Gemini 실패 → GPT 폴백 (503/429/타임아웃 모두 포함)
+    if (openaiKey) {
+      console.log('[Fallback] Gemini', geminiResult.status, '→ GPT-4o-mini');
+      try {
+        const gptResult = await callGPT(body, openaiKey);
+        console.log('[GPT] status:', gptResult.status);
+        if (gptResult.status === 200) {
+          const converted = convertGPTToGeminiFormat(gptResult.body);
+          return { statusCode: 200, headers, body: converted };
+        }
+      } catch(gptErr) {
+        console.log('[GPT] 오류:', gptErr.message);
       }
     }
 
