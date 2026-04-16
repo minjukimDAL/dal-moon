@@ -498,7 +498,16 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             <option value="eg" data-ko="🇪🇬 이집트 (카이로/룩소르)" data-en="🇪🇬 Egypt (Cairo/Luxor)">🇪🇬 이집트 (카이로/룩소르)</option>
             </optgroup>
           </select>
-          <input id="planPeople" type="number" min="1" max="20" value="2" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;" placeholder="인원">
+          <select id="planPeople" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;">
+            <option value="1">1인</option>
+            <option value="2" selected>2인</option>
+            <option value="3">3인</option>
+            <option value="4">4인</option>
+            <option value="5">5인</option>
+            <option value="6">6인</option>
+            <option value="7">7인</option>
+            <option value="8">8인+</option>
+          </select>
           <!-- 기간 선택 (1박~6박, 1주~4주 통합) -->
           <select id="planDuration" onchange="updatePlanInput()" style="flex:1;padding:8px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:11px;font-family:'DM Sans',sans-serif;text-align:center;">
             <option value="n1">1박</option>
@@ -3022,12 +3031,12 @@ function onLoginSuccess(user, token){
   _currentUserId=user.id;
   // 로그인 즉시 현재 코인 UI 표시 (서버 로드 전)
   updateCoinUI();
-  // 만료 데이터 정리 후 로드 (순서 중요: 정리 먼저)
-  cleanupExpiredData().then(function(){
-    loadCoinsFromServer();
-    loadTripsFromServer();
-    loadUnlockedFromServer();
-  });
+  // 코인/여행/잠금해제 즉시 로드 (cleanup과 분리)
+  loadCoinsFromServer();
+  loadTripsFromServer();
+  loadUnlockedFromServer();
+  // 만료 데이터 정리는 백그라운드에서 별도 실행
+  setTimeout(function(){ cleanupExpiredData(); }, 3000);
   // 로그인 전 시도한 액션 자동 실행
   setTimeout(function(){
     if(_pendingAction){
