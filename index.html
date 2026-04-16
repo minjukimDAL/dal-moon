@@ -3031,12 +3031,12 @@ function onLoginSuccess(user, token){
   _currentUserId=user.id;
   // 로그인 즉시 현재 코인 UI 표시 (서버 로드 전)
   updateCoinUI();
-  // 코인/여행/잠금해제 즉시 로드
-  loadCoinsFromServer();
-  loadTripsFromServer();
-  loadUnlockedFromServer();
-  // 만료 데이터 정리는 백그라운드에서 별도 실행
-  setTimeout(function(){ cleanupExpiredData(); }, 3000);
+  // 만료 데이터 정리 후 로드 (순서 중요: 정리 먼저)
+  cleanupExpiredData().then(function(){
+    loadCoinsFromServer();
+    loadTripsFromServer();
+    loadUnlockedFromServer();
+  });
   // 로그인 전 시도한 액션 자동 실행
   setTimeout(function(){
     if(_pendingAction){
