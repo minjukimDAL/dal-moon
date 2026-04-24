@@ -2508,7 +2508,7 @@ function selectStyle(style,el){
 // ══════════════════════════════════════════════
 // 페이지 네비게이션
 // ══════════════════════════════════════════════
-var pages=['home','luggage','trips','social','my'];
+var pages=['home','luggage','social','my'];
 function goPage(id){
   pages.forEach(function(p){
     var el=document.getElementById('page-'+p);
@@ -2517,12 +2517,6 @@ function goPage(id){
     if(bn) bn.classList.toggle('active',p===id);
   });
   if(id==='my') hideMyPage();
-  if(id==='trips'){
-    setTripsTab(currentTripsTab||'half');
-    if(_currentToken&&typeof loadTripsFromServer==='function'&&halfTrips.length===0){
-      loadTripsFromServer();
-    }
-  }
   if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
 }
 
