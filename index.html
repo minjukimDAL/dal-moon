@@ -353,6 +353,18 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
 .style-chip{padding:5px 11px;font-size:11px;border-radius:12px;border:1px solid var(--b2);background:var(--s1);color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .style-chip.active{background:rgba(91,143,255,.1);border-color:rgba(91,143,255,.3);color:var(--ac);}
+.dal-country-btn{padding:5px 11px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.dal-country-btn.active{border-color:rgba(196,175,135,.45);background:rgba(196,175,135,.09);color:var(--gold);}
+.dal-chip{padding:6px 11px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.dal-chip.active{border-color:rgba(196,175,135,.45);background:rgba(196,175,135,.09);color:var(--gold);}
+.dal-subchip{padding:4px 9px;border-radius:12px;border:1px solid var(--b1);background:var(--bg);font-size:9px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.dal-subchip.active{border-color:rgba(196,175,135,.35);background:rgba(196,175,135,.07);color:var(--gold);}
+.dal-subpanel{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:6px;}
+.dal-place-card{background:var(--s1);border:1px solid var(--b1);border-radius:4px;padding:9px 10px;cursor:pointer;position:relative;transition:all .15s;}
+.dal-place-card.active{border-color:rgba(196,175,135,.35);background:rgba(196,175,135,.05);}
+.dal-map-pin{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.dal-map-dot{width:9px;height:9px;border-radius:50%;}
+.dal-map-lbl{font-size:7px;color:var(--w);margin-top:1px;background:rgba(6,7,16,.75);padding:1px 4px;border-radius:2px;white-space:nowrap;}
 .full-chip{padding:5px 10px;font-size:10px;border-radius:10px;border:1px solid var(--b2);background:var(--s1);color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .full-chip.active{background:rgba(91,143,255,.1);border-color:rgba(91,143,255,.3);color:var(--ac);}
 .full-chip.avoid{border-color:rgba(240,96,96,.2);color:rgba(240,96,96,.6);}
@@ -393,41 +405,201 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-home" class="page active">
   <div class="home-wrap">
-    <div style="padding:10px 14px 0;">
-      <div style="font-size:11px;font-weight:500;color:var(--ac);padding:6px 0;">🌙 <span id='t-homeTabHalf'>AI 플래닝 · 무료</span></div>
-    </div>
     <div id="homeHalf" style="display:block;">
 
-      <!-- ① 여행 스타일 칩 -->
+      <!-- ① 나라 선택 -->
       <div style="padding:10px 14px 0;">
-        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">① 여행 스타일</div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;">
-          <button onclick="selectStyleChip(this,'couple')" class="style-chip active" data-ko="💑 커플" data-en="💑 Couple">💑 커플</button>
-          <button onclick="selectStyleChip(this,'family')" class="style-chip" data-ko="👨‍👩‍👧‍👦 가족" data-en="👨‍👩‍👧‍👦 Family">👨‍👩‍👧‍👦 가족</button>
-          <button onclick="selectStyleChip(this,'solo')" class="style-chip" data-ko="🧘 혼자" data-en="🧘 Solo">🧘 혼자</button>
-          <button onclick="selectStyleChip(this,'premium')" class="style-chip" data-ko="💎 프리미엄" data-en="💎 Premium">💎 프리미엄</button>
-          <button onclick="selectStyleChip(this,'value')" class="style-chip" data-ko="🎯 가성비" data-en="🎯 Value">🎯 가성비</button>
-          <button onclick="selectStyleChip(this,'backpacker')" class="style-chip" data-ko="🎒 배낭" data-en="🎒 Backpacker">🎒 배낭</button>
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:7px;">① 나라 선택</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;" id="countryBtns">
+          <button class="dal-country-btn active" onclick="selectCountry(this,'sg')" data-val="sg">🇸🇬 싱가포르</button>
+          <button class="dal-country-btn" onclick="selectCountry(this,'jp')" data-val="jp">🇯🇵 일본</button>
+          <button class="dal-country-btn" onclick="selectCountry(this,'th')" data-val="th">🇹🇭 태국</button>
+          <button class="dal-country-btn" onclick="selectCountry(this,'bali')" data-val="bali">🇮🇩 발리</button>
+          <button class="dal-country-btn" onclick="selectCountry(this,'vn')" data-val="vn">🇻🇳 베트남</button>
+          <button class="dal-country-btn" style="border-color:rgba(91,143,255,.3);color:var(--ac);">+ 더 보기</button>
         </div>
-        <div id="subStyleArea" style="display:none;margin-top:6px;">
-          <div class="sub-style-row" id="subStyleBtns"></div>
+        <!-- 지도 영역 -->
+        <div id="dalMapArea" style="height:150px;background:var(--s2);border:1px solid var(--b1);border-radius:4px;position:relative;overflow:hidden;margin-bottom:8px;">
+          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#08111f 0%,#0b1a30 100%);"></div>
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(91,143,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(91,143,255,.05) 1px,transparent 1px);background-size:20px 20px;"></div>
+          <div id="dalMapPins"></div>
+          <div id="dalMapBadge" style="position:absolute;bottom:7px;left:8px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:3px;padding:3px 8px;font-size:9px;color:var(--gold);">🇸🇬 싱가포르</div>
+          <div style="position:absolute;top:7px;right:8px;background:rgba(6,7,16,.7);border:1px solid var(--b1);border-radius:3px;padding:2px 6px;font-size:8px;color:var(--m);">핀 탭 → 상세보기</div>
         </div>
       </div>
 
-      <!-- ② 월별 이벤트 선택 -->
-      <div style="padding:10px 14px 0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <div style="font-size:9px;color:var(--m);letter-spacing:1px;"><span id='t-step-event'>② 이달의 여행 이벤트 <span style="color:var(--m);font-size:8px;">(선택시 목적지 자동)</span></span></div>
-          <select id="eventMonthFilter" onchange="renderEvents();updatePlanInput();" style="font-size:9px;padding:2px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-            <option value="all" data-ko="전체" data-en="All">전체</option>
-            <option value="1" data-ko="1월" data-en="Jan">1월</option><option value="2" data-ko="2월" data-en="Feb">2월</option><option value="3" data-ko="3월" data-en="Mar">3월</option>
-            <option value="4" data-ko="4월" data-en="Apr">4월</option><option value="5" data-ko="5월" data-en="May">5월</option><option value="6" data-ko="6월" data-en="Jun">6월</option>
-            <option value="7" data-ko="7월" data-en="Jul">7월</option><option value="8" data-ko="8월" data-en="Aug">8월</option><option value="9" data-ko="9월" data-en="Sep">9월</option>
-            <option value="10" data-ko="10월" data-en="Oct">10월</option><option value="11" data-ko="11월" data-en="Nov">11월</option><option value="12" data-ko="12월" data-en="Dec">12월</option>
-          </select>
-        </div>
-        <div id="eventList" style="max-height:160px;overflow-y:auto;"></div>
+      <!-- ② 관심 장소 -->
+      <div style="padding:0 14px 0;">
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:7px;">② 관심 장소 <span style="color:rgba(196,175,135,.4);font-size:8px;">탭하여 추가/상세보기</span></div>
+        <div id="dalPlacesGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px;"></div>
       </div>
+
+      <!-- 관심장소 상세 팝업 -->
+      <div id="dalPlacePopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.85);z-index:999;align-items:flex-end;justify-content:center;">
+        <div id="dalPlacePopupInner" style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:70vh;overflow-y:auto;padding:16px 16px 32px;">
+          <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+          <div id="dalPopupContent"></div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--b1);margin:8px 14px;"></div>
+
+      <!-- ③ 일정 설정 -->
+      <div style="padding:0 14px;">
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:8px;">③ 일정 설정 <span style="color:rgba(196,175,135,.4);font-size:8px;">복수 선택 가능</span></div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;letter-spacing:.5px;">박수</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;" id="dalNights">
+          <button class="dal-chip" data-val="당일치기">당일</button>
+          <button class="dal-chip" data-val="1박">1박</button>
+          <button class="dal-chip" data-val="2박">2박</button>
+          <button class="dal-chip" data-val="3박">3박</button>
+          <button class="dal-chip active" data-val="5박">5박</button>
+          <button class="dal-chip" data-val="7박">7박</button>
+          <button class="dal-chip" data-val="1주 이상">1주+</button>
+        </div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;letter-spacing:.5px;">여행 유형</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;" id="dalTripType">
+          <button class="dal-chip" data-val="커플">💑 커플</button>
+          <button class="dal-chip" data-val="가족">👨‍👩‍👧 가족</button>
+          <button class="dal-chip" data-val="혼자">🧘 혼자</button>
+          <button class="dal-chip" data-val="출장">💼 출장</button>
+          <button class="dal-chip" data-val="당일치기">🌅 당일</button>
+        </div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;letter-spacing:.5px;">항공</div>
+        <div style="display:flex;gap:5px;margin-bottom:10px;" id="dalFlight">
+          <button class="dal-chip active" data-val="직항">✈️ 직항</button>
+          <button class="dal-chip" data-val="경유">🔄 경유</button>
+        </div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;letter-spacing:.5px;">숙박</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;" id="dalStay">
+          <button class="dal-chip" data-val="호텔" onclick="toggleHotelStars(this)">🏨 호텔</button>
+          <button class="dal-chip" data-val="에어비앤비" onclick="toggleHotelStars(this)">🏡 에어비앤비</button>
+          <button class="dal-chip" data-val="호스텔" onclick="toggleHotelStars(this)">🛏 호스텔</button>
+          <button class="dal-chip" data-val="숙박없음" onclick="toggleHotelStars(this)">🚫 숙박없음</button>
+        </div>
+        <div id="dalHotelStars" style="display:none;background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:10px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">호텔 등급</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="3성">⭐⭐⭐ 3성</button>
+            <button class="dal-subchip active" data-val="4성">⭐⭐⭐⭐ 4성</button>
+            <button class="dal-subchip" data-val="5성">⭐⭐⭐⭐⭐ 5성</button>
+            <button class="dal-subchip" data-val="부티크">부티크</button>
+          </div>
+        </div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:6px;letter-spacing:.5px;">여행 테마</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;" id="dalThemes">
+          <button class="dal-chip" data-val="미식" data-sub="sub-food" onclick="toggleTheme(this)">🍜 미식</button>
+          <button class="dal-chip" data-val="쇼핑" data-sub="sub-shop" onclick="toggleTheme(this)">🛍 쇼핑</button>
+          <button class="dal-chip" data-val="자연" data-sub="sub-nature" onclick="toggleTheme(this)">🌿 자연</button>
+          <button class="dal-chip" data-val="문화" data-sub="sub-culture" onclick="toggleTheme(this)">🏛 문화</button>
+          <button class="dal-chip" data-val="액티비티" data-sub="sub-activity" onclick="toggleTheme(this)">🎢 액티비티</button>
+          <button class="dal-chip" data-val="나이트라이프" data-sub="sub-night" onclick="toggleTheme(this)">🌙 나이트라이프</button>
+          <button class="dal-chip" data-val="가족특화" data-sub="sub-kids" onclick="toggleTheme(this)">👶 가족특화</button>
+          <button class="dal-chip" data-val="웰니스" data-sub="sub-wellness" onclick="toggleTheme(this)">💆 웰니스</button>
+        </div>
+
+        <!-- 테마 하위 패널들 -->
+        <div id="sub-food" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🍜 미식</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="해산물">🦀 해산물</button>
+            <button class="dal-subchip" data-val="길거리음식">🍢 길거리</button>
+            <button class="dal-subchip" data-val="파인다이닝">🍽 파인다이닝</button>
+            <button class="dal-subchip" data-val="채식/비건">🌱 채식</button>
+            <button class="dal-subchip" data-val="디저트카페">🍰 디저트</button>
+            <button class="dal-subchip" data-val="야시장">🌙 야시장</button>
+            <button class="dal-subchip" data-val="로컬바">🍺 로컬바</button>
+          </div>
+        </div>
+        <div id="sub-shop" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🛍 쇼핑</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="명품">👜 명품</button>
+            <button class="dal-subchip" data-val="로컬마켓">🏪 로컬마켓</button>
+            <button class="dal-subchip" data-val="편집샵">✂️ 편집샵</button>
+            <button class="dal-subchip" data-val="면세점">🛫 면세</button>
+            <button class="dal-subchip" data-val="기념품">🎁 기념품</button>
+            <button class="dal-subchip" data-val="빈티지">👗 빈티지</button>
+          </div>
+        </div>
+        <div id="sub-nature" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🌿 자연</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="해변/바다">🏖 해변</button>
+            <button class="dal-subchip" data-val="공원/정원">🌳 공원</button>
+            <button class="dal-subchip" data-val="야경">🌆 야경</button>
+            <button class="dal-subchip" data-val="일출/일몰">🌄 일출</button>
+            <button class="dal-subchip" data-val="트레킹">🥾 트레킹</button>
+          </div>
+        </div>
+        <div id="sub-culture" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🏛 문화</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="역사유적">🏯 유적</button>
+            <button class="dal-subchip" data-val="박물관">🖼 박물관</button>
+            <button class="dal-subchip" data-val="사원">⛩ 사원</button>
+            <button class="dal-subchip" data-val="현대미술">🎨 미술</button>
+            <button class="dal-subchip" data-val="공연/축제">🎭 공연</button>
+            <button class="dal-subchip" data-val="포토스팟">📸 포토</button>
+          </div>
+        </div>
+        <div id="sub-activity" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🎢 액티비티</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="수상스포츠">🏄 수상</button>
+            <button class="dal-subchip" data-val="테마파크">🎡 테마파크</button>
+            <button class="dal-subchip" data-val="골프">⛳ 골프</button>
+            <button class="dal-subchip" data-val="자전거">🚴 자전거</button>
+            <button class="dal-subchip" data-val="보트/요트">🚤 보트</button>
+          </div>
+        </div>
+        <div id="sub-night" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">🌙 나이트라이프</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="루프탑바">🌃 루프탑</button>
+            <button class="dal-subchip" data-val="클럽">🎵 클럽</button>
+            <button class="dal-subchip" data-val="야경크루즈">🚢 크루즈</button>
+            <button class="dal-subchip" data-val="와인바">🍷 와인바</button>
+          </div>
+        </div>
+        <div id="sub-kids" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">👶 가족특화</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="동물원">🐘 동물원</button>
+            <button class="dal-subchip" data-val="아쿠아리움">🐠 아쿠아리움</button>
+            <button class="dal-subchip" data-val="놀이공원">🎠 놀이공원</button>
+            <button class="dal-subchip" data-val="워터파크">🏖 워터파크</button>
+          </div>
+        </div>
+        <div id="sub-wellness" class="dal-subpanel" style="display:none;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">💆 웰니스</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <button class="dal-subchip" data-val="스파/마사지">💆 스파</button>
+            <button class="dal-subchip" data-val="요가/명상">🧘 요가</button>
+            <button class="dal-subchip" data-val="온천">♨️ 온천</button>
+            <button class="dal-subchip" data-val="힐링리조트">🌿 리조트</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--b1);margin:10px 14px;"></div>
+
+      <!-- ④ 생성된 프롬프트 -->
+      <div style="padding:0 14px 10px;">
+        <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">④ 생성된 프롬프트</div>
+        <div style="background:rgba(91,143,255,.04);border:1px solid rgba(91,143,255,.18);border-radius:4px;padding:10px 12px;margin-bottom:8px;">
+          <div style="font-size:8px;color:var(--ac);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Claude / GPT에 붙여넣기</div>
+          <div id="dalPromptText" style="font-size:9px;color:rgba(240,236,228,.65);line-height:1.8;">나라와 조건을 선택하면 프롬프트가 자동 생성됩니다.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <button onclick="openInClaude()" style="padding:11px 6px;border-radius:4px;font-size:10px;border:1px solid rgba(196,175,135,.3);background:rgba(196,175,135,.08);color:var(--gold);font-family:'DM Sans',sans-serif;cursor:pointer;">🌙 Claude에서 열기</button>
+          <button onclick="openInGPT()" style="padding:11px 6px;border-radius:4px;font-size:10px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.06);color:var(--ac);font-family:'DM Sans',sans-serif;cursor:pointer;">⚡ GPT에서 열기</button>
+
 
       <!-- ③ 목적지 + 인원 + 박 -->
       <div style="padding:10px 14px 0;">
@@ -4307,9 +4479,175 @@ window.addFullMsg=addFullMsg; window.renderEvents=renderEvents; window.selectEve
 window.closeWithdrawModal=closeWithdrawModal; window.doWithdraw=doWithdraw;
 window.initSupabase=initSupabase; window.handleOAuthCallback=handleOAuthCallback;
 
-</script>
+// ══ DAL 새방향: 나라선택 / 관심장소 / 일정설정 / 프롬프트 ══
+var DAL_COUNTRY='sg';
+var DAL_PLACES={
+  sg:[
+    {id:'sg1',icon:'🚢',name:'클락키 크루저',tag:'야경 · 강변',desc:'클락키에서 출발하는 야경 크루즈. 싱가포르강을 따라 마리나베이까지 이동. 점보씨푸드와 도보 3분 거리.',hours:'17:00~23:00',price:'S$25~',tip:'vs 베이프런트: 점보씨푸드 근접, 강변뷰',nearby:['🦀 점보씨푸드 (도보 3분)','🍺 클락키 바거리']},
+    {id:'sg2',icon:'🦀',name:'점보씨푸드',tag:'맛집 · 칠리크랩',desc:'싱가포르 대표 칠리크랩 맛집. 예약 필수. 클락키 크루저와 함께 묶으면 최적의 저녁 코스.',hours:'12:00~22:00',price:'S$80~/인',tip:'예약 필수, 클락키점 추천',nearby:['🚢 클락키 크루저 (도보 3분)','🌆 마리나베이 뷰']},
+    {id:'sg3',icon:'🌳',name:'가든스 바이 더 베이',tag:'자연 · 야경',desc:'슈퍼트리 공원. 야간 빛 쇼(가든 랩소디)는 무료. 플라워 돔/클라우드 포레스트 유료.',hours:'05:00~02:00',price:'무료(야외)/S$28(실내)',tip:'야간 빛 쇼 19:45 / 20:45',nearby:['🏨 마리나베이샌즈 (도보 5분)','🐠 아쿠아리아']},
+    {id:'sg4',icon:'🏨',name:'마리나베이샌즈',tag:'랜드마크 · 뷰',desc:'57층 스카이파크에서 360도 파노라마 뷰. 카지노, 쇼핑몰, 레스토랑 완비.',hours:'24시간',price:'입장 S$28~',tip:'선셋 타임(18시) 방문 추천',nearby:['🌳 가든스 바이 더 베이 (도보 5분)','🎭 아트사이언스 뮤지엄']},
+    {id:'sg5',icon:'🦁',name:'싱가포르 동물원',tag:'가족 · 액티비티',desc:'세계 최고 수준 개방형 동물원. 나이트 사파리와 같은 단지 내 위치.',hours:'08:30~18:00',price:'S$48/성인',tip:'나이트 사파리와 패키지 추천',nearby:['🦅 주롱 버드 파라다이스','🌙 나이트 사파리']},
+    {id:'sg6',icon:'🎡',name:'센토사 & 유니버설',tag:'테마파크 · 가족',desc:'유니버설 스튜디오 싱가포르, 어드벤처 코브 워터파크. 하루 종일 즐길 수 있는 종합 리조트 섬.',hours:'10:00~19:00',price:'S$83/성인',tip:'평일 방문, 온라인 사전 예매 필수',nearby:['🏖 실로소 비치','🚠 케이블카']}
+  ],
+  jp:[
+    {id:'jp1',icon:'⛩',name:'아사쿠사 & 센소지',tag:'문화 · 역사',desc:'도쿄에서 가장 오래된 사원. 나카미세 상점가에서 전통 기념품 쇼핑 가능.',hours:'24시간',price:'무료',tip:'새벽 5-7시 방문 추천',nearby:['🛍 나카미세 거리','🗼 스카이트리']},
+    {id:'jp2',icon:'🌸',name:'신주쿠 골든가이',tag:'나이트라이프 · 문화',desc:'골목마다 개성 넘치는 소형 바들이 밀집한 술집 거리.',hours:'18:00~새벽',price:'¥500~',tip:'혼자 들어가기 좋은 카운터 바 많음',nearby:['🏙 신주쿠 야경','🍜 신주쿠 라멘거리']},
+    {id:'jp3',icon:'🍜',name:'도쿄 라멘 스트리트',tag:'미식 · 현지음식',desc:'도쿄역 지하에 위치한 유명 라멘 거리. 일본 전국 명물 라멘 8개 가게 집결.',hours:'10:30~23:00',price:'¥1000~',tip:'오픈런(10:30) 추천',nearby:['🏯 도쿄역','🚄 신칸센 탑승']},
+    {id:'jp4',icon:'🗼',name:'도쿄 스카이트리',tag:'야경 · 랜드마크',desc:'높이 634m. 전망대에서 후지산까지 보이는 날도 있음.',hours:'10:00~21:00',price:'¥2100~',tip:'구름 없는 맑은 날 방문',nearby:['⛩ 아사쿠사 (도보 15분)','🛍 소라마치']}
+  ],
+  th:[
+    {id:'th1',icon:'⛩',name:'왓포 사원',tag:'문화 · 역사',desc:'방콕에서 가장 오래된 왕실 사원. 46m 황금 와불상이 유명.',hours:'08:00~18:30',price:'200바트',tip:'왕궁과 묶어서 반나절 코스',nearby:['🏯 왕궁 (도보 5분)','🍜 카오산로드']},
+    {id:'th2',icon:'🌅',name:'카오산 로드',tag:'나이트라이프 · 거리',desc:'방콕 배낭여행의 성지. 저렴한 스트리트 푸드, 마사지, 바가 밀집.',hours:'24시간',price:'저렴',tip:'밤 10시 이후 가장 활기',nearby:['⛩ 왓포 (차로 10분)','🍺 루프탑바']},
+    {id:'th3',icon:'💆',name:'타이 마사지',tag:'웰니스 · 체험',desc:'왓포 사원 내 마사지 학교가 원조. 1시간 타이마사지 300-500바트.',hours:'09:00~22:00',price:'300바트~/시간',tip:'왓포 마사지 스쿨 공인샵 이용',nearby:['⛩ 왓포 사원','🍜 길거리음식']}
+  ],
+  bali:[
+    {id:'b1',icon:'🌊',name:'꾸따 & 스미냑 비치',tag:'해변 · 서핑',desc:'발리 대표 해변. 서핑 레슨 1-2만원대. 스미냑은 고급 리조트와 선셋 바 밀집.',hours:'24시간',price:'무료',tip:'서핑 레슨은 오전 추천',nearby:['🌅 선셋 바','🛍 스미냑 쇼핑']},
+    {id:'b2',icon:'⛩',name:'울루와투 & 사원',tag:'문화 · 자연',desc:'절벽 위 사원에서 바라보는 일몰이 압도적. 케차크 댄스 공연 필수 체험.',hours:'일출~일몰',price:'입장료 5만루피아~',tip:'울루와투 선셋 케차크 댄스 예약 필수',nearby:['🌾 떼갈랄랑 라이스 테라스','🐒 원숭이 숲']}
+  ],
+  vn:[
+    {id:'v1',icon:'🌊',name:'미케 비치 (다낭)',tag:'해변 · 휴양',desc:'세계 6대 해변 중 하나. 호이안과 함께 묶어서 일정 구성 추천.',hours:'24시간',price:'무료',tip:'아침 일찍 방문 (사람 적음)',nearby:['🌉 호이안 구시가지 (차 30분)','🏖 바나힐']},
+    {id:'v2',icon:'🏮',name:'호이안 구시가지',tag:'문화 · 야경',desc:'유네스코 세계문화유산. 노란 건물과 등불이 어우러진 올드타운.',hours:'24시간',price:'입장권 12만동',tip:'저녁 7시 이후 등불 켜질 때 방문',nearby:['🌊 미케 비치 (차 30분)','🛍 수공예 기념품']}
+  ]
+};
+var DAL_MAP_DATA={
+  sg:{label:'🇸🇬 싱가포르',pins:[{name:'마리나베이',top:'35%',left:'58%',color:'#c4af87'},{name:'클락키',top:'43%',left:'51%',color:'#c4af87'},{name:'센토사',top:'60%',left:'48%',color:'#5b8fff'},{name:'가든스',top:'28%',left:'63%',color:'#3ecf8e'},{name:'동물원',top:'18%',left:'40%',color:'#5b8fff'}]},
+  jp:{label:'🇯🇵 일본',pins:[{name:'도쿄',top:'30%',left:'58%',color:'#c4af87'},{name:'교토',top:'52%',left:'44%',color:'#5b8fff'},{name:'오사카',top:'56%',left:'42%',color:'#3ecf8e'}]},
+  th:{label:'🇹🇭 태국',pins:[{name:'방콕',top:'48%',left:'47%',color:'#c4af87'},{name:'치앙마이',top:'25%',left:'35%',color:'#5b8fff'},{name:'푸켓',top:'72%',left:'35%',color:'#3ecf8e'}]},
+  bali:{label:'🇮🇩 발리',pins:[{name:'꾸따',top:'58%',left:'52%',color:'#c4af87'},{name:'우붓',top:'42%',left:'57%',color:'#5b8fff'},{name:'울루와투',top:'68%',left:'46%',color:'#3ecf8e'}]},
+  vn:{label:'🇻🇳 베트남',pins:[{name:'다낭',top:'40%',left:'58%',color:'#c4af87'},{name:'호이안',top:'45%',left:'54%',color:'#5b8fff'},{name:'호치민',top:'72%',left:'50%',color:'#3ecf8e'}]}
+};
+var dalSelectedPlaces=[];
 
-<!-- 회원탈퇴 확인 모달 -->
+function selectCountry(btn,code){
+  document.querySelectorAll('.dal-country-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  DAL_COUNTRY=code;
+  dalSelectedPlaces=[];
+  renderDalMap();renderDalPlaces();buildDalPrompt();
+}
+function renderDalMap(){
+  var d=DAL_MAP_DATA[DAL_COUNTRY];if(!d)return;
+  var badge=document.getElementById('dalMapBadge');if(badge)badge.textContent=d.label;
+  var el=document.getElementById('dalMapPins');if(!el)return;
+  el.innerHTML='';
+  d.pins.forEach(function(p){
+    var div=document.createElement('div');
+    div.style.cssText='position:absolute;top:'+p.top+';left:'+p.left+';display:flex;flex-direction:column;align-items:center;cursor:pointer;';
+    div.innerHTML='<div style="width:9px;height:9px;border-radius:50%;background:'+p.color+';"></div><div style="font-size:7px;color:#f0ece4;margin-top:1px;background:rgba(6,7,16,.75);padding:1px 4px;border-radius:2px;white-space:nowrap;">'+p.name+'</div>';
+    el.appendChild(div);
+  });
+}
+function renderDalPlaces(){
+  var grid=document.getElementById('dalPlacesGrid');if(!grid)return;
+  var places=DAL_PLACES[DAL_COUNTRY]||[];
+  grid.innerHTML='';
+  places.forEach(function(p){
+    var card=document.createElement('div');
+    card.className='dal-place-card';
+    card.dataset.id=p.id;
+    card.innerHTML='<div style="font-size:18px;margin-bottom:3px;">'+p.icon+'</div><div style="font-size:10px;color:var(--w);margin-bottom:2px;">'+p.name+'</div><div style="font-size:8px;color:var(--m);">'+p.tag+'</div>';
+    card.addEventListener('click',function(){openDalPlacePopup(p,card);});
+    grid.appendChild(card);
+  });
+}
+function openDalPlacePopup(p,card){
+  var popup=document.getElementById('dalPlacePopup');
+  var content=document.getElementById('dalPopupContent');
+  if(!popup||!content)return;
+  var isSel=dalSelectedPlaces.indexOf(p.id)>-1;
+  var nearbyHtml=(p.nearby||[]).map(function(n){return '<span style="display:inline-block;padding:3px 8px;border-radius:10px;border:1px solid var(--b2);font-size:9px;color:var(--m);background:var(--s2);margin:2px;">'+n+'</span>';}).join('');
+  content.innerHTML='<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;"><div style="font-size:28px;">'+p.icon+'</div><div><div style="font-size:14px;color:var(--w);font-weight:500;">'+p.name+'</div><div style="font-size:9px;color:var(--m);">'+p.tag+'</div></div></div>'
+    +'<div style="width:100%;height:70px;background:var(--s2);border-radius:4px;border:1px solid var(--b1);margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--m);">📸 사진 (관광청 API 연동 예정)</div>'
+    +'<div style="font-size:10px;color:rgba(240,236,228,.65);line-height:1.8;margin-bottom:10px;">'+p.desc+'</div>'
+    +'<div style="background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:10px;">'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:9px;"><span style="color:var(--m);">운영시간</span><span style="color:var(--w);">'+(p.hours||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:9px;"><span style="color:var(--m);">가격</span><span style="color:var(--w);">'+(p.price||'-')+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:9px;"><span style="color:var(--m);">TIP</span><span style="color:var(--gold);text-align:right;max-width:60%;">'+(p.tip||'-')+'</span></div>'
+    +'</div>'
+    +(nearbyHtml?'<div style="font-size:8px;color:var(--m);margin-bottom:6px;">근처 함께 가기 좋은 곳</div><div style="margin-bottom:12px;">'+nearbyHtml+'</div>':'')
+    +'<button onclick="toggleDalPlace(\''+p.id+'\',\''+p.name+'\')" style="width:100%;padding:11px;background:'+(isSel?'rgba(62,207,142,.1)':'rgba(196,175,135,.1)')+';border:1px solid '+(isSel?'rgba(62,207,142,.3)':'rgba(196,175,135,.3)')+';border-radius:4px;font-size:10px;color:'+(isSel?'#3ecf8e':'var(--gold)')+';cursor:pointer;font-family:\'DM Sans\',sans-serif;margin-bottom:6px;">'+(isSel?'✓ 일정에서 제거':'+ 일정에 추가')+'</button>'
+    +'<button onclick="closeDalPlacePopup()" style="width:100%;padding:8px;background:transparent;border:1px solid var(--b2);border-radius:4px;font-size:10px;color:var(--m);cursor:pointer;font-family:\'DM Sans\',sans-serif;">닫기</button>';
+  popup.style.display='flex';
+}
+function closeDalPlacePopup(){var p=document.getElementById('dalPlacePopup');if(p)p.style.display='none';}
+function toggleDalPlace(id,name){
+  var idx=dalSelectedPlaces.indexOf(id);
+  if(idx>-1){dalSelectedPlaces.splice(idx,1);}else{dalSelectedPlaces.push(id);}
+  document.querySelectorAll('.dal-place-card').forEach(function(c){
+    var active=dalSelectedPlaces.indexOf(c.dataset.id)>-1;
+    c.classList.toggle('active',active);
+    var ck=c.querySelector('.dal-ck');
+    if(active&&!ck){var d=document.createElement('div');d.className='dal-ck';d.style.cssText='position:absolute;top:5px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:8px;color:#060710;';d.textContent='✓';c.appendChild(d);}
+    else if(!active&&ck){ck.remove();}
+  });
+  closeDalPlacePopup();buildDalPrompt();
+}
+function toggleHotelStars(btn){
+  btn.classList.toggle('active');
+  var starsEl=document.getElementById('dalHotelStars');if(!starsEl)return;
+  var hotelBtn=document.querySelector('#dalStay .dal-chip[data-val="호텔"]');
+  starsEl.style.display=(hotelBtn&&hotelBtn.classList.contains('active'))?'block':'none';
+  buildDalPrompt();
+}
+function toggleTheme(btn){
+  btn.classList.toggle('active');
+  var subId=btn.getAttribute('data-sub');
+  if(subId){var panel=document.getElementById(subId);if(panel)panel.style.display=btn.classList.contains('active')?'block':'none';}
+  buildDalPrompt();
+}
+function buildDalPrompt(){
+  var cmap={sg:'싱가포르',jp:'일본',th:'태국',bali:'발리',vn:'베트남'};
+  var cname=cmap[DAL_COUNTRY]||DAL_COUNTRY;
+  var nights=[],types=[],flights=[],stays=[],themes=[];
+  document.querySelectorAll('#dalNights .dal-chip.active').forEach(function(c){nights.push(c.dataset.val);});
+  document.querySelectorAll('#dalTripType .dal-chip.active').forEach(function(c){types.push(c.dataset.val);});
+  document.querySelectorAll('#dalFlight .dal-chip.active').forEach(function(c){flights.push(c.dataset.val);});
+  document.querySelectorAll('#dalStay .dal-chip.active').forEach(function(c){
+    if(c.dataset.val==='호텔'){var stars=[];document.querySelectorAll('#dalHotelStars .dal-subchip.active').forEach(function(s){stars.push(s.dataset.val);});stays.push(stars.length?'호텔('+stars.join('/')+')':'호텔');}
+    else{stays.push(c.dataset.val);}
+  });
+  document.querySelectorAll('#dalThemes .dal-chip.active').forEach(function(btn){
+    var v=btn.dataset.val,sid=btn.getAttribute('data-sub'),subs=[];
+    if(sid){document.querySelectorAll('#'+sid+' .dal-subchip.active').forEach(function(s){subs.push(s.dataset.val);});}
+    themes.push(subs.length?v+'('+subs.join('·')+')':v);
+  });
+  var pnames=[];var allp=DAL_PLACES[DAL_COUNTRY]||[];
+  dalSelectedPlaces.forEach(function(id){var p=allp.find(function(x){return x.id===id;});if(p)pnames.push(p.name);});
+  var lines=['목적지: '+cname];
+  if(nights.length)lines.push('기간: '+nights.join(' 또는 ')+' 여행');
+  if(types.length)lines.push('여행 유형: '+types.join(', '));
+  if(flights.length)lines.push('항공: '+flights.join(' 또는 ')+' 모두 고려');
+  if(stays.length)lines.push('숙박: '+stays.join(', '));
+  if(pnames.length)lines.push('방문하고 싶은 곳: '+pnames.join(', '));
+  if(themes.length)lines.push('테마: '+themes.join(' / '));
+  lines.push('위 조건을 모두 반영한 상세 여행 일정을 만들어줘.');
+  var el=document.getElementById('dalPromptText');if(el)el.innerHTML=lines.join('<br>');
+}
+function openInClaude(){
+  var el=document.getElementById('dalPromptText');var t=el?el.innerText:'';
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('프롬프트가 복사됐어요!\nClaude.ai를 열어 붙여넣기 하세요 🌙');});}
+  window.open('https://claude.ai','_blank');
+}
+function openInGPT(){
+  var el=document.getElementById('dalPromptText');var t=el?el.innerText:'';
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert('프롬프트가 복사됐어요!\nChatGPT를 열어 붙여넣기 하세요 ⚡');});}
+  window.open('https://chatgpt.com','_blank');
+}
+document.addEventListener('DOMContentLoaded',function(){
+  ['dalNights','dalTripType','dalFlight'].forEach(function(gid){
+    var g=document.getElementById(gid);if(!g)return;
+    g.querySelectorAll('.dal-chip').forEach(function(c){c.addEventListener('click',function(){this.classList.toggle('active');buildDalPrompt();});});
+  });
+  document.querySelectorAll('.dal-subchip').forEach(function(c){c.addEventListener('click',function(){this.classList.toggle('active');buildDalPrompt();});});
+  var popup=document.getElementById('dalPlacePopup');
+  if(popup){popup.addEventListener('click',function(e){if(e.target===popup)closeDalPlacePopup();});}
+  renderDalMap();renderDalPlaces();buildDalPrompt();
+});
+window.selectCountry=selectCountry;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.openInClaude=openInClaude;window.openInGPT=openInGPT;
+window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
+</script>
 <div id="withdrawModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:none;align-items:center;justify-content:center;">
   <div style="background:var(--s1);border:1px solid var(--b2);border-radius:4px;padding:24px;width:300px;max-width:90vw;">
     <div style="font-size:16px;font-weight:600;color:var(--w);margin-bottom:6px;">⚠️ 회원탈퇴</div>
