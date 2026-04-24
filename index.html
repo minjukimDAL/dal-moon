@@ -852,7 +852,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- PAGE: TRIPS — R2-7 폴더트리, R2-8 할인토글, R2-9 공유 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<div id="page-trips" class="page" style="touch-action:pan-y;">
+<div id="page-trips" class="page" style="touch-action:pan-y;display:none!important;">
   <!-- 목록 영역 -->
   <div id="tripsListWrap" class="page-wrap">
     <div style="margin-bottom:14px;">
@@ -1341,15 +1341,6 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <circle cx="12" cy="12" r="9.5"/>
     </svg></div>
     <span class="bn-label" id="t-nav-lug">수화물</span>
-  </button>
-  <button class="bn-tab" id="bn-trips" onclick="goPage('trips')">
-    <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-      <circle cx="12" cy="12" r="9.5"/>
-      <path d="M3 12h18" opacity=".3"/>
-      <path d="M12 2.5C9.5 5.5 8 8.5 8 12s1.5 6.5 4 9.5M12 2.5c2.5 3 4 6 4 9.5s-1.5 6.5-4 9.5" opacity=".3"/>
-      <path d="M8 8.5l2 2-1.5 2.5 3-1 2 2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg></div>
-    <span class="bn-label" id="t-nav-trips">내 여행</span>
   </button>
   <button class="bn-tab" id="bn-social" onclick="goPage('social')">
     <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
@@ -2419,12 +2410,12 @@ async function saveToTripSnap(snapText, snapJson, snapQuery){
   if(_currentToken&&typeof saveTripToServer==='function'){
     saveTripToServer(newTrip).then(function(serverId){
       if(serverId && halfTrips[0] && halfTrips[0].id.toString().startsWith('local_')) halfTrips[0].id=serverId;
-      setTimeout(function(){goPage('trips');},300);
+      setTimeout(function(){goPage('home');},300);
     }).catch(function(){
-      setTimeout(function(){goPage('trips');},300);
+      setTimeout(function(){goPage('home');},300);
     });
   } else {
-    setTimeout(function(){goPage('trips');},300);
+    setTimeout(function(){goPage('home');},300);
   }
 }
 async function saveToTrip(){
@@ -2470,7 +2461,7 @@ async function saveToTrip(){
   });
   if(isDup){
     addDalMsg(lang==='ko'?'이미 저장된 여행입니다.':'Already saved.');
-    setTimeout(function(){goPage('trips');},800);
+    setTimeout(function(){goPage('home');},800);
   } else {
     var newTrip={
       route:newRoute,
@@ -2492,7 +2483,7 @@ async function saveToTrip(){
     }
   }
   window._lastTripJson=null; window._lastTripText=null;
-  setTimeout(function(){goPage('trips');},800);
+  setTimeout(function(){goPage('home');},800);
 }
 
 function selectStyle(style,el){
@@ -3690,7 +3681,7 @@ var _unlockedOptions={}; // {tripIdx: {A:true, B:false, C:false}}
 
 function requestUnlockOption(opt){
   // 비로그인 시 로그인 유도
-  if(!requireLogin(function(){ goPage('trips'); setTimeout(function(){ showHalfDetail(currentHalfTripIdx); setTimeout(function(){ requestUnlockOption(opt); },300); },300); })) return;
+  if(!requireLogin(function(){ goPage('home'); setTimeout(function(){ showHalfDetail(currentHalfTripIdx); setTimeout(function(){ requestUnlockOption(opt); },300); },300); })) return;
   var tripIdx=currentHalfTripIdx;
   var t=halfTrips[tripIdx];
   if(!t){console.error('[Unlock] tripIdx='+tripIdx+' 없음');return;}
@@ -4135,7 +4126,7 @@ async function saveFullTrip(){
   fullTrips.unshift({route:dest,dates:new Date().toLocaleDateString('ko-KR'),ctx:window._lastFullCtx||'',text:fullText,insights:insights});
   earnCoinAmt+=5;updateCoinUI();
   addFullMsg('dal',lang==='ko'?'✅ 맞춤 플래닝 기록에 저장됐습니다! 🪙 5코인 적립!':'✅ Saved! +🪙 5 coins!');
-  setTimeout(function(){goPage('trips');setTripsTab('full');},800);
+  setTimeout(function(){goPage('home');setTripsTab('full');},800);
 }
 function backToFullInput(){
   var inp=document.getElementById('fullInputArea'),res=document.getElementById('fullResultArea');
@@ -4350,10 +4341,7 @@ window.onload=function(){
   setMode('half'); updateLimitBar(); initDailyReward();
   var mf=document.getElementById('eventMonthFilter');if(mf){mf.value=new Date().getMonth()+1;renderEvents();}
   updatePlanInput(); initSupabase();
-  // 비로그인 시 로그인 페이지로 자동 이동
-  setTimeout(function(){
-    if(!isLoggedIn) goPage('my');
-  },500);
+  // 비로그인 시에도 홈에 머뭄 (자동 이동 제거)
 };
 
 // 전역 함수 직접 등록
