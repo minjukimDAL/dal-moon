@@ -357,6 +357,11 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 .dal-country-btn.active{border-color:rgba(196,175,135,.45);background:rgba(196,175,135,.09);color:var(--gold);}
 .dal-chip{padding:6px 11px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .dal-chip.active{border-color:rgba(196,175,135,.45);background:rgba(196,175,135,.09);color:var(--gold);}
+.dal-chip.active-main{border-color:rgba(196,175,135,.6);background:rgba(196,175,135,.14);color:var(--gold);font-weight:600;}
+.dal-chip.active-option{border-color:rgba(91,143,255,.4);background:rgba(91,143,255,.07);color:var(--ac);border-style:dashed;}
+.dal-theme-badge{display:inline-block;font-size:7px;padding:1px 4px;border-radius:3px;margin-left:3px;vertical-align:middle;}
+.dal-theme-badge.main{background:rgba(196,175,135,.2);color:var(--gold);}
+.dal-theme-badge.opt{background:rgba(91,143,255,.15);color:var(--ac);}
 .dal-subchip{padding:4px 9px;border-radius:12px;border:1px solid var(--b1);background:var(--bg);font-size:9px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;}
 .dal-subchip.active{border-color:rgba(196,175,135,.35);background:rgba(196,175,135,.07);color:var(--gold);}
 .dal-subpanel{background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:6px;}
@@ -509,6 +514,36 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div id="sub-night" class="dal-subpanel" style="display:none;"><div style="font-size:8px;color:var(--m);margin-bottom:5px;">🌙 나이트라이프</div><div style="display:flex;flex-wrap:wrap;gap:4px;"><button class="dal-subchip" data-val="루프탑바">🌃 루프탑</button><button class="dal-subchip" data-val="클럽">🎵 클럽</button><button class="dal-subchip" data-val="야경크루즈">🚢 크루즈</button><button class="dal-subchip" data-val="와인바">🍷 와인바</button></div></div>
         <div id="sub-kids" class="dal-subpanel" style="display:none;"><div style="font-size:8px;color:var(--m);margin-bottom:5px;">👶 가족특화</div><div style="display:flex;flex-wrap:wrap;gap:4px;"><button class="dal-subchip" data-val="동물원">🐘 동물원</button><button class="dal-subchip" data-val="아쿠아리움">🐠 아쿠아리움</button><button class="dal-subchip" data-val="놀이공원">🎠 놀이공원</button><button class="dal-subchip" data-val="워터파크">🏖 워터파크</button></div></div>
         <div id="sub-wellness" class="dal-subpanel" style="display:none;"><div style="font-size:8px;color:var(--m);margin-bottom:5px;">💆 웰니스</div><div style="display:flex;flex-wrap:wrap;gap:4px;"><button class="dal-subchip" data-val="스파/마사지">💆 스파</button><button class="dal-subchip" data-val="요가/명상">🧘 요가</button><button class="dal-subchip" data-val="온천">♨️ 온천</button><button class="dal-subchip" data-val="힐링리조트">🌿 리조트</button></div></div>
+      </div>
+
+      <!-- 여행 페이스 -->
+      <div style="padding:0 14px;margin-top:10px;">
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;">여행 페이스</div>
+        <div style="display:flex;gap:5px;margin-bottom:10px;" id="dalPace">
+          <button class="dal-chip" data-val="빡세게">⚡ 빡세게</button>
+          <button class="dal-chip active" data-val="균형있게">⚖️ 균형</button>
+          <button class="dal-chip" data-val="여유롭게">🌿 여유롭게</button>
+        </div>
+
+        <div style="font-size:8px;color:var(--m);margin-bottom:5px;">출발 도시 + 시기</div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <select id="dalDepartCity" style="flex:1;padding:6px 8px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);color:var(--m);font-family:'DM Sans',sans-serif;font-size:10px;" onchange="buildDalPrompt()">
+            <option value="인천">✈️ 인천</option>
+            <option value="김포">✈️ 김포</option>
+            <option value="김해(부산)">✈️ 김해(부산)</option>
+            <option value="제주">✈️ 제주</option>
+            <option value="대구">✈️ 대구</option>
+          </select>
+          <select id="dalTravelMonth" style="flex:1;padding:6px 8px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);color:var(--m);font-family:'DM Sans',sans-serif;font-size:10px;" onchange="buildDalPrompt()">
+            <option value="">월 선택</option>
+            <option value="1월">1월</option><option value="2월">2월</option>
+            <option value="3월">3월</option><option value="4월">4월</option>
+            <option value="5월">5월</option><option value="6월">6월</option>
+            <option value="7월">7월</option><option value="8월">8월</option>
+            <option value="9월">9월</option><option value="10월">10월</option>
+            <option value="11월">11월</option><option value="12월">12월</option>
+          </select>
+        </div>
       </div>
 
       <div style="height:1px;background:var(--b1);margin:10px 14px;"></div>
@@ -4387,15 +4422,65 @@ function toggleHotelStars(btn){
   buildDalPrompt();
 }
 function toggleTheme(btn){
-  btn.classList.toggle('active');
+  // 현재 선택된 테마 수 계산
+  var allThemeBtns=document.querySelectorAll('#dalThemes .dal-chip');
+  var mainCount=0, optCount=0;
+  allThemeBtns.forEach(function(b){
+    if(b.classList.contains('active-main')) mainCount++;
+    if(b.classList.contains('active-option')) optCount++;
+  });
+  var isMainActive=btn.classList.contains('active-main');
+  var isOptActive=btn.classList.contains('active-option');
   var subId=btn.getAttribute('data-sub');
-  if(subId){var panel=document.getElementById(subId);if(panel)panel.style.display=btn.classList.contains('active')?'block':'none';}
+
+  if(isMainActive||isOptActive){
+    // 선택 해제
+    btn.classList.remove('active-main','active-option','active');
+    btn.querySelector('.dal-theme-badge') && btn.querySelector('.dal-theme-badge').remove();
+    if(subId){var p=document.getElementById(subId);if(p)p.style.display='none';}
+    // 나머지 재정렬
+    reorderThemeBadges();
+  } else {
+    // 새로 선택
+    if(mainCount<3){
+      btn.classList.add('active-main','active');
+      addThemeBadge(btn,'MAIN','main');
+    } else {
+      btn.classList.add('active-option','active');
+      addThemeBadge(btn,'OPTION','opt');
+    }
+    if(subId){var p=document.getElementById(subId);if(p)p.style.display='block';}
+  }
   buildDalPrompt();
+}
+
+function addThemeBadge(btn, text, cls){
+  var old=btn.querySelector('.dal-theme-badge');if(old)old.remove();
+  var badge=document.createElement('span');
+  badge.className='dal-theme-badge '+cls;
+  badge.textContent=text;
+  btn.appendChild(badge);
+}
+
+function reorderThemeBadges(){
+  var allThemeBtns=document.querySelectorAll('#dalThemes .dal-chip');
+  var mainCount=0;
+  allThemeBtns.forEach(function(btn){
+    var badge=btn.querySelector('.dal-theme-badge');if(!badge)return;
+    if(mainCount<3){
+      btn.classList.remove('active-option');btn.classList.add('active-main');
+      badge.className='dal-theme-badge main';badge.textContent='MAIN';
+      mainCount++;
+    } else {
+      btn.classList.remove('active-main');btn.classList.add('active-option');
+      badge.className='dal-theme-badge opt';badge.textContent='OPTION';
+    }
+  });
 }
 function buildDalPrompt(){
   var cmap={sg:'싱가포르',jp:'일본',th:'태국',bali:'발리',vn:'베트남'};
   var cname=cmap[DAL_COUNTRY]||DAL_COUNTRY;
-  var nights=[],types=[],flights=[],stays=[],themes=[];
+  var nights=[],types=[],flights=[],stays=[];
   document.querySelectorAll('#dalNights .dal-chip.active').forEach(function(c){nights.push(c.dataset.val);});
   document.querySelectorAll('#dalTripType .dal-chip.active').forEach(function(c){types.push(c.dataset.val);});
   document.querySelectorAll('#dalFlight .dal-chip.active').forEach(function(c){flights.push(c.dataset.val);});
@@ -4403,20 +4488,33 @@ function buildDalPrompt(){
     if(c.dataset.val==='호텔'){var stars=[];document.querySelectorAll('#dalHotelStars .dal-subchip.active').forEach(function(s){stars.push(s.dataset.val);});stays.push(stars.length?'호텔('+stars.join('/')+')':'호텔');}
     else{stays.push(c.dataset.val);}
   });
-  document.querySelectorAll('#dalThemes .dal-chip.active').forEach(function(btn){
+  var mainThemes=[],optThemes=[];
+  document.querySelectorAll('#dalThemes .dal-chip.active-main').forEach(function(btn){
     var v=btn.dataset.val,sid=btn.getAttribute('data-sub'),subs=[];
     if(sid){document.querySelectorAll('#'+sid+' .dal-subchip.active').forEach(function(s){subs.push(s.dataset.val);});}
-    themes.push(subs.length?v+'('+subs.join('·')+')':v);
+    mainThemes.push(subs.length?v+'('+subs.join('·')+')':v);
+  });
+  document.querySelectorAll('#dalThemes .dal-chip.active-option').forEach(function(btn){
+    var v=btn.dataset.val,sid=btn.getAttribute('data-sub'),subs=[];
+    if(sid){document.querySelectorAll('#'+sid+' .dal-subchip.active').forEach(function(s){subs.push(s.dataset.val);});}
+    optThemes.push(subs.length?v+'('+subs.join('·')+')':v);
   });
   var pnames=[];var allp=DAL_PLACES[DAL_COUNTRY]||[];
   dalSelectedPlaces.forEach(function(id){var p=allp.find(function(x){return x.id===id;});if(p)pnames.push(p.name);});
+  var pace='';
+  document.querySelectorAll('#dalPace .dal-chip.active').forEach(function(c){pace=c.dataset.val;});
+  var departCity=document.getElementById('dalDepartCity')?document.getElementById('dalDepartCity').value:'인천';
+  var travelMonth=document.getElementById('dalTravelMonth')?document.getElementById('dalTravelMonth').value:'';
   var lines=['목적지: '+cname];
+  if(departCity) lines.push('출발: '+departCity+(travelMonth?' · '+travelMonth:''));
   if(nights.length)lines.push('기간: '+nights.join(' 또는 ')+' 여행');
   if(types.length)lines.push('여행 유형: '+types.join(', '));
   if(flights.length)lines.push('항공: '+flights.join(' 또는 ')+' 모두 고려');
   if(stays.length)lines.push('숙박: '+stays.join(', '));
   if(pnames.length)lines.push('방문하고 싶은 곳: '+pnames.join(', '));
-  if(themes.length)lines.push('테마: '+themes.join(' / '));
+  if(pace) lines.push('여행 페이스: '+pace);
+  if(mainThemes.length)lines.push('핵심 테마: '+mainThemes.join(' / '));
+  if(optThemes.length)lines.push('추가로 고려: '+optThemes.join(' / ')+' (시간 여유 있으면 포함)');
   lines.push('위 조건을 모두 반영한 상세 여행 일정을 만들어줘.');
   var el=document.getElementById('dalPromptText');if(el)el.innerHTML=lines.join('<br>');
 }
@@ -4431,7 +4529,7 @@ function openInGPT(){
   window.open('https://chatgpt.com','_blank');
 }
 document.addEventListener('DOMContentLoaded',function(){
-  ['dalNights','dalTripType','dalFlight'].forEach(function(gid){
+  ['dalNights','dalTripType','dalFlight','dalPace'].forEach(function(gid){
     var g=document.getElementById(gid);if(!g)return;
     g.querySelectorAll('.dal-chip').forEach(function(c){c.addEventListener('click',function(){this.classList.toggle('active');buildDalPrompt();});});
   });
