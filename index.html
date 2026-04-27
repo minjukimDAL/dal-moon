@@ -5039,6 +5039,8 @@ function mytLoadSchedules() {
     var list = document.getElementById('myt-schedule-list');
     if (!list) return;
     if (!scheds || scheds.length===0) { list.innerHTML=''; return; }
+    // 캐시에 저장
+    (scheds||[]).forEach(function(s){ _mytSchedCache[s.id]=s; });
     var pendingAlarms = [];
     var html = scheds.map(function(s) {
       var statusCls = s.booking_status==='예약완료' ? 'booked' : (s.booking_status==='예약필요' ? 'pending' : 'none');
@@ -5048,7 +5050,7 @@ function mytLoadSchedules() {
       var timeStr = s.start_time ? s.start_time : '';
       if (s.end_time) timeStr += (timeStr ? ' ~ '+s.end_time : s.end_time);
       var amountStr = s.actual_amount!=null ? s.actual_amount.toLocaleString() : (s.planned_amount ? '~'+s.planned_amount.toLocaleString() : '');
-      return '<div class="mytrip-sched '+statusCls+'" onclick="mytOpenSchedPopup('+JSON.stringify(s)+')" style="cursor:pointer;">'
+      return '<div class="mytrip-sched '+statusCls+'" data-schedid="'+s.id+'" onclick="mytOpenSchedById(this)" style="cursor:pointer;">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'
         +'<div><div style="font-size:11px;color:var(--w);font-weight:500;">'+s.title+'</div>'
         +(timeStr?'<div style="font-size:9px;color:var(--m);margin-top:1px;">'+timeStr+'</div>':'')+'</div>'
@@ -5242,8 +5244,10 @@ function mytLoadRecords(dateStr) {
     var list = document.getElementById('myt-record-list');
     if (!list) return;
     if (!recs||recs.length===0) { list.innerHTML='<div style="font-size:10px;color:var(--m);padding:10px 0;">아직 기록이 없어요. + 기록 버튼을 눌러주세요.</div>'; return; }
+    // 캐시에 저장
+    (recs||[]).forEach(function(r){ _mytRecCache[r.id]=r; });
     list.innerHTML = recs.map(function(r) {
-      return '<div class="mytrip-record" onclick="mytOpenRecPopup(event,r)" style="cursor:pointer;">'
+      return '<div class="mytrip-record" data-recid="'+r.id+'" onclick="mytOpenRecById(this)" style="cursor:pointer;">'
         +(r.image_url?'<div style="height:120px;overflow:hidden;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>':'')
         +'<div style="padding:8px 10px;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
@@ -5592,6 +5596,57 @@ function mytLoadRecPhoto(input) {
   reader.readAsDataURL(input.files[0]);
 }
 
+
+// ── id 기반 팝업 열기 ──
+var _mytSchedCache = {};  // 일정 데이터 캐시
+var _mytRecCache = {};    // 기록 데이터 캐시
+
+function mytOpenSchedById(el) {
+  var id = el.getAttribute('data-schedid');
+  if (_mytSchedCache[id]) {
+    mytOpenSchedPopup(_mytSchedCache[id]);
+  } else {
+    _sfGet('/rest/v1/trip_schedules?id=eq.'+id).then(function(data) {
+      if (data && data[0]) {
+        _mytSchedCache[id] = data[0];
+        mytOpenSchedPopup(data[0]);
+      }
+    });
+  }
+}
+
+function mytOpenRecById(el) {
+  var id = el.getAttribute('data-recid');
+  if (_mytRecCache[id]) {
+    mytOpenRecPopupData(_mytRecCache[id]);
+  } else {
+    _sfGet('/rest/v1/trip_records?id=eq.'+id).then(function(data) {
+      if (data && data[0]) {
+        _mytRecCache[id] = data[0];
+        mytOpenRecPopupData(data[0]);
+      }
+    });
+  }
+}
+
+function mytOpenRecPopupData(r) {
+  _mytCurrentRec = r;
+  var html = '';
+  if (r.image_url) html += '<div style="height:180px;overflow:hidden;border-radius:6px;margin-bottom:10px;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+  html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">';
+  html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
+  html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
+  html += '</div>';
+  html += '<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
+  if (r.tip) html += '<div style="font-size:10px;color:var(--ac);padding:6px 10px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);margin-top:8px;">TIP: '+r.tip+'</div>';
+  var contentEl = document.getElementById('myt-rec-popup-content');
+  if (contentEl) contentEl.innerHTML = html;
+  var popup = document.getElementById('myt-rec-popup');
+  if (popup) popup.style.display = 'flex';
+}
+
+window.mytOpenSchedById=mytOpenSchedById; window.mytOpenRecById=mytOpenRecById;
+window.mytOpenRecPopupData=mytOpenRecPopupData;
 window.mytOpenSchedPopup=mytOpenSchedPopup; window.mytCloseSchedPopup=mytCloseSchedPopup;
 window.mytSaveActualAmount=mytSaveActualAmount; window.mytDeleteSched=mytDeleteSched;
 window.mytEditSchedFromPopup=mytEditSchedFromPopup;
