@@ -891,12 +891,12 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <div style="font-size:8px;color:var(--m);margin-bottom:4px;">일정 이름</div>
           <input id="myt-sched-title" type="text" placeholder="예: 싱가포르항공 SQ601" style="width:100%;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
         </div>
-        <div>
-          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">시간</div>
-          <div style="display:flex;gap:6px;align-items:center;">
+        <div id="myt-time-wrap">
+          <div id="myt-time-label" style="font-size:8px;color:var(--m);margin-bottom:4px;">시간</div>
+          <div id="myt-time-single" style="display:flex;gap:6px;align-items:center;">
             <input id="myt-sched-stime" type="time" style="flex:1;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--gold);font-family:'DM Sans',sans-serif;">
-            <span style="font-size:10px;color:var(--m);">~</span>
-            <input id="myt-sched-etime" type="time" style="flex:1;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--gold);font-family:'DM Sans',sans-serif;">
+            <span style="font-size:10px;color:var(--m);display:none;" id="myt-time-tilde">~</span>
+            <input id="myt-sched-etime" type="time" style="display:none;flex:1;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--gold);font-family:'DM Sans',sans-serif;">
           </div>
         </div>
         <div>
@@ -924,9 +924,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             <div style="font-size:8px;color:var(--m);margin-bottom:4px;">예약확정번호</div>
             <input id="myt-sched-ref" type="text" placeholder="예: SQ-2026-3X9F" style="width:100%;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
           </div>
-          <div>
+          <div style="margin-bottom:7px;">
             <div style="font-size:8px;color:var(--m);margin-bottom:4px;">예약 링크 (URL)</div>
             <input id="myt-sched-url" type="url" placeholder="https://..." style="width:100%;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--ac);font-family:'DM Sans',sans-serif;">
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--m);margin-bottom:4px;">QR / 바코드 이미지</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <label style="flex:1;padding:8px;background:var(--s1);border:1px dashed var(--b2);border-radius:4px;font-size:9px;color:var(--m);text-align:center;cursor:pointer;">
+                + 이미지 선택
+                <input type="file" accept="image/*" id="myt-sched-qr-file" style="display:none;" onchange="mytLoadQRImage(this)">
+              </label>
+              <div id="myt-qr-preview" style="display:none;width:50px;height:50px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);"><img id="myt-qr-img" style="width:100%;height:100%;object-fit:cover;"></div>
+            </div>
           </div>
         </div>
         <div>
@@ -994,6 +1004,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <div id="myt-blog-title" style="font-size:13px;color:var(--w);font-weight:500;"></div>
           <div id="myt-blog-sub" style="font-size:9px;color:var(--ok);"></div>
         </div>
+        <button onclick="mytShowRecordFromBlog()" style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">+ 기록</button>
       </div>
       <div style="flex:1;overflow-y:auto;padding:10px 14px 0;">
         <!-- 예산 비교 -->
@@ -1048,6 +1059,16 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
               <option value="USD">$ 달러</option>
               <option value="THB">฿ 바트</option>
             </select>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">커버 사진 (선택)</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <label style="flex:1;padding:9px;background:var(--s1);border:1px dashed var(--b2);border-radius:4px;font-size:9px;color:var(--m);text-align:center;cursor:pointer;">
+              + 커버 사진 선택
+              <input type="file" accept="image/*" id="myt-new-cover-file" style="display:none;" onchange="mytLoadCoverImage(this)">
+            </label>
+            <div id="myt-cover-preview" style="display:none;width:50px;height:50px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);"><img id="myt-cover-img" style="width:100%;height:100%;object-fit:cover;"></div>
           </div>
         </div>
         <button onclick="mytCreateTrip()" style="padding:13px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;">여행 만들기</button>
@@ -4888,6 +4909,9 @@ function mytLoadList() {
       html += '<div class="mytrip-badge '+status+'">'+badgeMap[status]+'</div>';
       html += '<div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:2px;">'+t.title+'</div>';
       html += '<div style="font-size:10px;color:var(--m);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
+      if (t.cover_image) {
+        html += '<div style="height:60px;background:var(--s2);border-radius:4px;margin-bottom:8px;overflow:hidden;"><img src="'+t.cover_image+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+      }
       if (t.total_budget > 0) {
         html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b1);font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
       }
@@ -5067,6 +5091,19 @@ function mytSelCat(el, val) {
     d.style.borderColor='var(--b2)'; d.style.color='var(--m)'; d.style.background='var(--s1)';
   });
   el.style.borderColor='rgba(196,175,135,.4)'; el.style.color='var(--gold)'; el.style.background='rgba(196,175,135,.09)';
+  // 항공이면 출발~도착 시간, 나머지는 단일 시간
+  var lbl = document.getElementById('myt-time-label');
+  var tilde = document.getElementById('myt-time-tilde');
+  var etime = document.getElementById('myt-sched-etime');
+  if (val === '항공') {
+    if (lbl) lbl.textContent = '출발 ~ 도착 시간';
+    if (tilde) tilde.style.display = 'inline';
+    if (etime) etime.style.display = 'flex';
+  } else {
+    if (lbl) lbl.textContent = '예약 시간';
+    if (tilde) tilde.style.display = 'none';
+    if (etime) { etime.style.display = 'none'; etime.value = ''; }
+  }
 }
 function mytSelBooking(el, val) {
   _mytSchedBooking = val;
@@ -5087,17 +5124,20 @@ function mytSaveSched() {
   if (!_mytCurrentTrip || !_mytSelectedDate) return;
   var title = document.getElementById('myt-sched-title').value.trim();
   if (!title) { alert('일정 이름을 입력해주세요'); return; }
+  var qrImg = document.getElementById('myt-qr-img');
+  var qrData = (qrImg && qrImg.src && qrImg.src.startsWith('data:')) ? qrImg.src : null;
   var payload = {
     trip_id: _mytCurrentTrip.id,
     user_id: _currentUserId,
     title: title,
     schedule_date: _mytSelectedDate,
     start_time: document.getElementById('myt-sched-stime').value||null,
-    end_time: document.getElementById('myt-sched-etime').value||null,
+    end_time: (_mytSchedCat==='항공' && document.getElementById('myt-sched-etime').value) ? document.getElementById('myt-sched-etime').value : null,
     category: _mytSchedCat,
     booking_status: _mytSchedBooking,
     booking_ref: document.getElementById('myt-sched-ref').value||null,
     booking_url: document.getElementById('myt-sched-url').value||null,
+    qr_image_url: qrData,
     planned_amount: parseFloat(document.getElementById('myt-sched-planned').value)||0,
     actual_amount: document.getElementById('myt-sched-actual').value ? parseFloat(document.getElementById('myt-sched-actual').value) : null,
     memo: document.getElementById('myt-sched-memo').value||null,
@@ -5289,6 +5329,8 @@ function mytCreateTrip() {
   if (!title) { alert('여행 이름을 입력해주세요'); return; }
   if (!start||!end) { alert('여행 기간을 선택해주세요'); return; }
   if (!_currentToken) { alert('로그인이 필요해요'); return; }
+  var coverImg = document.getElementById('myt-cover-img');
+  var coverData = (coverImg && coverImg.src && coverImg.src.startsWith('data:')) ? coverImg.src : null;
   var payload = {
     user_id: _currentUserId,
     title: title,
@@ -5296,7 +5338,8 @@ function mytCreateTrip() {
     start_date: start,
     end_date: end,
     total_budget: parseFloat(document.getElementById('myt-new-budget').value)||0,
-    currency: document.getElementById('myt-new-currency').value||'KRW'
+    currency: document.getElementById('myt-new-currency').value||'KRW',
+    cover_image: coverData
   };
   fetch(SUPA_URL+'/rest/v1/my_trips', {
     method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY},
@@ -5320,6 +5363,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 });
+
+// QR 이미지 로드
+function mytLoadQRImage(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('myt-qr-img');
+    var preview = document.getElementById('myt-qr-preview');
+    if (img) img.src = e.target.result;
+    if (preview) preview.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// 커버 이미지 로드
+function mytLoadCoverImage(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('myt-cover-img');
+    var preview = document.getElementById('myt-cover-preview');
+    if (img) img.src = e.target.result;
+    if (preview) preview.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// 완료여행에서 기록 추가
+function mytShowRecordFromBlog() {
+  mytShowRecord();
+}
 
 window.mytLoadList=mytLoadList; window.mytShowNewTrip=mytShowNewTrip; window.mytCreateTrip=mytCreateTrip;
 window.mytOpenTrip=mytOpenTrip; window.mytCalPrev=mytCalPrev; window.mytCalNext=mytCalNext;
