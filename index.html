@@ -4869,7 +4869,7 @@ function mytLoadList() {
     document.getElementById('myt-trip-list').innerHTML = '<div style="padding:20px;text-align:center;font-size:11px;color:var(--m);">로그인 후 이용 가능해요 🌙</div>';
     return;
   }
-  _sfGet('my_trips?user_id=eq.'+_currentUserId+'&order=start_date.asc').then(function(trips) {
+  _sfGet('/rest/v1/my_trips?user_id=eq.'+_currentUserId+'&order=start_date.asc').then(function(trips) {
     var el = document.getElementById('myt-trip-list');
     if (!trips || trips.length === 0) {
       el.innerHTML = '<div style="padding:30px 0;text-align:center;"><div style="font-size:11px;color:var(--m);margin-bottom:12px;">아직 여행이 없어요</div><button onclick="mytShowNewTrip()" style="padding:8px 16px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;">+ 첫 여행 만들기</button></div>';
@@ -4899,7 +4899,7 @@ function mytLoadList() {
 
 // ── 여행 열기 ──
 function mytOpenTrip(tripId) {
-  _sfGet('my_trips?id=eq.'+tripId).then(function(data) {
+  _sfGet('/rest/v1/my_trips?id=eq.'+tripId).then(function(data) {
     if (!data || !data[0]) return;
     _mytCurrentTrip = data[0];
     var today = new Date(); today.setHours(0,0,0,0);
@@ -4968,7 +4968,7 @@ function mytLoadSchedules() {
   var dayNum = Math.round((selDate-tripStart)/(1000*60*60*24))+1;
   if (label) label.textContent = parts[1]+'월 '+parts[2]+'일 ('+dayName+') — '+dayNum+'일차';
 
-  _sfGet('trip_schedules?trip_id=eq.'+_mytCurrentTrip.id+'&schedule_date=eq.'+_mytSelectedDate+'&order=start_time.asc').then(function(scheds) {
+  _sfGet('/rest/v1/trip_schedules?trip_id=eq.'+_mytCurrentTrip.id+'&schedule_date=eq.'+_mytSelectedDate+'&order=start_time.asc').then(function(scheds) {
     var list = document.getElementById('myt-schedule-list');
     if (!list) return;
     if (!scheds || scheds.length===0) { list.innerHTML=''; return; }
@@ -5012,7 +5012,7 @@ function mytUpdateBudget() {
   if (!_mytCurrentTrip) return;
   var t = _mytCurrentTrip;
   var currency = t.currency || '';
-  _sfGet('trip_schedules?trip_id=eq.'+t.id).then(function(scheds) {
+  _sfGet('/rest/v1/trip_schedules?trip_id=eq.'+t.id).then(function(scheds) {
     var totalPlanned = 0, totalActual = 0;
     (scheds||[]).forEach(function(s) {
       totalPlanned += (s.planned_amount||0);
@@ -5104,7 +5104,7 @@ function mytSaveSched() {
     alarm_days: _mytSchedAlarm
   };
   fetch(SUPA_URL+'/rest/v1/trip_schedules', {
-    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_ANON},
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY},
     body: JSON.stringify(payload)
   }).then(function() {
     mytBack('myt-detail');
@@ -5155,7 +5155,7 @@ function mytLoadRecords(dateStr) {
   var dayNum = Math.round((new Date(dateStr)-start)/(1000*60*60*24))+1;
   var lbl = document.getElementById('myt-record-date-label');
   if (lbl) lbl.textContent = parts[1]+'월 '+parts[2]+'일 ('+dayName+') — '+dayNum+'일차';
-  _sfGet('trip_records?trip_id=eq.'+_mytCurrentTrip.id+'&record_date=eq.'+dateStr+'&order=created_at.asc').then(function(recs) {
+  _sfGet('/rest/v1/trip_records?trip_id=eq.'+_mytCurrentTrip.id+'&record_date=eq.'+dateStr+'&order=created_at.asc').then(function(recs) {
     var list = document.getElementById('myt-record-list');
     if (!list) return;
     if (!recs||recs.length===0) { list.innerHTML='<div style="font-size:10px;color:var(--m);padding:10px 0;">아직 기록이 없어요. + 기록 버튼을 눌러주세요.</div>'; return; }
@@ -5206,7 +5206,7 @@ function mytSaveRecord() {
     category: _mytRecCat
   };
   fetch(SUPA_URL+'/rest/v1/trip_records', {
-    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_ANON},
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY},
     body: JSON.stringify(payload)
   }).then(function() {
     mytBack('myt-record');
@@ -5219,8 +5219,8 @@ function mytOpenBlog() {
   var t = _mytCurrentTrip;
   document.getElementById('myt-blog-title').textContent = t.title;
   Promise.all([
-    _sfGet('trip_schedules?trip_id=eq.'+t.id),
-    _sfGet('trip_records?trip_id=eq.'+t.id+'&order=record_date.asc,created_at.asc')
+    _sfGet('/rest/v1/trip_schedules?trip_id=eq.'+t.id),
+    _sfGet('/rest/v1/trip_records?trip_id=eq.'+t.id+'&order=record_date.asc,created_at.asc')
   ]).then(function(results) {
     var scheds = results[0]||[], recs = results[1]||[];
     var totalPlanned=0, totalActual=0;
@@ -5299,7 +5299,7 @@ function mytCreateTrip() {
     currency: document.getElementById('myt-new-currency').value||'KRW'
   };
   fetch(SUPA_URL+'/rest/v1/my_trips', {
-    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_ANON},
+    method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY},
     body: JSON.stringify(payload)
   }).then(function(res) {
     if (res.ok) { mytBack('myt-list'); mytLoadList(); }
