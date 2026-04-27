@@ -5248,7 +5248,7 @@ function mytLoadRecords(dateStr) {
     (recs||[]).forEach(function(r){ _mytRecCache[r.id]=r; });
     list.innerHTML = recs.map(function(r) {
       return '<div class="mytrip-record" data-recid="'+r.id+'" onclick="mytOpenRecById(this)" style="cursor:pointer;">'
-        +(r.image_url?'<div style="height:120px;overflow:hidden;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>':'')
+        +(r.image_url?'<div style="max-height:200px;overflow:hidden;background:#000;"><img src="'+r.image_url+'" style="width:100%;max-height:200px;object-fit:contain;display:block;"></div>':'')
         +'<div style="padding:8px 10px;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
         +'<span style="font-size:8px;color:var(--m);">'+(r.record_time||'')+'</span>'
@@ -5339,11 +5339,16 @@ function mytOpenBlog() {
       var dateStr = d.toISOString().split('T')[0];
       var dayRecs = recs.filter(function(r) { return r.record_date===dateStr; });
       daysHtml += '<div style="background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:10px;margin-bottom:6px;">';
-      daysHtml += '<div style="font-size:9px;color:var(--gold);margin-bottom:6px;">Day'+(i+1)+' — '+d.getMonth()+'/'+(d.getDate())+'('+dayNames[d.getDay()]+')</div>';
+      daysHtml += '<div style="font-size:9px;color:var(--gold);margin-bottom:6px;">Day'+(i+1)+' — '+(d.getMonth()+1)+'월 '+(d.getDate())+'일 ('+dayNames[d.getDay()]+')</div>';
       if (dayRecs.length>0) {
         dayRecs.forEach(function(r) {
+          _mytRecCache[r.id] = r;  // 캐시 저장
+          daysHtml += '<div data-recid="'+r.id+'" onclick="mytOpenRecById(this)" style="cursor:pointer;background:var(--s2);border-radius:4px;margin-bottom:6px;overflow:hidden;">';
+          if (r.image_url) daysHtml += '<div style="height:100px;overflow:hidden;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:contain;background:#000;"></div>';
+          daysHtml += '<div style="padding:6px 8px;">';
           daysHtml += '<div style="font-size:10px;color:rgba(240,236,228,.65);line-height:1.7;margin-bottom:'+(r.tip?'5px':'0')+';">'+r.content+'</div>';
-          if (r.tip) daysHtml += '<div style="font-size:9px;color:var(--ac);padding:4px 8px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);margin-bottom:4px;">TIP: '+r.tip+'</div>';
+          if (r.tip) daysHtml += '<div style="font-size:9px;color:var(--ac);padding:4px 8px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);">TIP: '+r.tip+'</div>';
+          daysHtml += '</div></div>';
         });
       } else {
         daysHtml += '<div style="font-size:9px;color:var(--m);">기록 없음</div>';
@@ -5553,7 +5558,7 @@ function mytOpenRecPopup(e, recData) {
   _mytCurrentRec = recData;
   var r = recData;
   var html = '';
-  if (r.image_url) html += '<div style="height:180px;overflow:hidden;border-radius:6px;margin-bottom:10px;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+  if (r.image_url) html += '<div style="max-height:280px;overflow:hidden;border-radius:6px;margin-bottom:10px;background:#000;text-align:center;"><img src="'+r.image_url+'" style="max-width:100%;max-height:280px;object-fit:contain;display:inline-block;"></div>';
   html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">';
   html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
   html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
@@ -5632,7 +5637,7 @@ function mytOpenRecById(el) {
 function mytOpenRecPopupData(r) {
   _mytCurrentRec = r;
   var html = '';
-  if (r.image_url) html += '<div style="height:180px;overflow:hidden;border-radius:6px;margin-bottom:10px;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+  if (r.image_url) html += '<div style="max-height:280px;overflow:hidden;border-radius:6px;margin-bottom:10px;background:#000;text-align:center;"><img src="'+r.image_url+'" style="max-width:100%;max-height:280px;object-fit:contain;display:inline-block;"></div>';
   html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">';
   html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
   html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
