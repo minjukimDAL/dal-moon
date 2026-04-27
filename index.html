@@ -985,6 +985,18 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <textarea id="myt-rec-content" placeholder="오늘의 경험을 기록해주세요..." style="width:100%;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;min-height:80px;"></textarea>
         </div>
         <div>
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">사진</div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <label style="flex:1;padding:9px;background:var(--s1);border:1px dashed var(--b2);border-radius:4px;font-size:9px;color:var(--m);text-align:center;cursor:pointer;">
+              📷 사진 선택
+              <input type="file" accept="image/*" id="myt-rec-photo-file" style="display:none;" onchange="mytLoadRecPhoto(this)">
+            </label>
+            <div id="myt-rec-photo-preview" style="display:none;width:60px;height:60px;border-radius:4px;overflow:hidden;border:1px solid var(--b2);flex-shrink:0;">
+              <img id="myt-rec-photo-img" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+          </div>
+        </div>
+        <div>
           <div style="font-size:8px;color:var(--m);margin-bottom:4px;">TIP (다음 여행자에게)</div>
           <input id="myt-rec-tip" type="text" placeholder="예: 크루저 저녁 8시 출발편이 야경 제일 예쁨" style="width:100%;padding:9px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
         </div>
@@ -1076,6 +1088,37 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     </div>
 
   </div>
+  <!-- 일정 상세/수정 팝업 -->
+  <div id="myt-sched-popup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:1000;align-items:flex-end;justify-content:center;" onclick="mytCloseSchedPopup()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+      <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div id="myt-popup-title" style="font-size:14px;color:var(--w);font-weight:500;"></div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="mytEditSchedFromPopup()" style="padding:4px 10px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:9px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">수정</button>
+          <button onclick="mytDeleteSched()" style="padding:4px 10px;background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.2);border-radius:4px;font-size:9px;color:var(--red);cursor:pointer;font-family:'DM Sans',sans-serif;">삭제</button>
+          <button onclick="mytCloseSchedPopup()" style="padding:4px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:9px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">✕</button>
+        </div>
+      </div>
+      <div id="myt-popup-content"></div>
+    </div>
+  </div>
+
+  <!-- 기록 상세 팝업 -->
+  <div id="myt-rec-popup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:1000;align-items:flex-end;justify-content:center;" onclick="mytCloseRecPopup()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+      <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:14px;color:var(--w);font-weight:500;">여행 기록</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="mytDeleteRecord()" style="padding:4px 10px;background:rgba(240,96,96,.08);border:1px solid rgba(240,96,96,.2);border-radius:4px;font-size:9px;color:var(--red);cursor:pointer;font-family:'DM Sans',sans-serif;">삭제</button>
+          <button onclick="mytCloseRecPopup()" style="padding:4px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:9px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">✕</button>
+        </div>
+      </div>
+      <div id="myt-rec-popup-content"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- PAGE: SOCIAL — R2-2 별도 탭 -->
@@ -5005,7 +5048,7 @@ function mytLoadSchedules() {
       var timeStr = s.start_time ? s.start_time : '';
       if (s.end_time) timeStr += (timeStr ? ' ~ '+s.end_time : s.end_time);
       var amountStr = s.actual_amount!=null ? s.actual_amount.toLocaleString() : (s.planned_amount ? '~'+s.planned_amount.toLocaleString() : '');
-      return '<div class="mytrip-sched '+statusCls+'">'
+      return '<div class="mytrip-sched '+statusCls+'" onclick="mytOpenSchedPopup('+JSON.stringify(s)+')" style="cursor:pointer;">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">'
         +'<div><div style="font-size:11px;color:var(--w);font-weight:500;">'+s.title+'</div>'
         +(timeStr?'<div style="font-size:9px;color:var(--m);margin-top:1px;">'+timeStr+'</div>':'')+'</div>'
@@ -5200,7 +5243,8 @@ function mytLoadRecords(dateStr) {
     if (!list) return;
     if (!recs||recs.length===0) { list.innerHTML='<div style="font-size:10px;color:var(--m);padding:10px 0;">아직 기록이 없어요. + 기록 버튼을 눌러주세요.</div>'; return; }
     list.innerHTML = recs.map(function(r) {
-      return '<div class="mytrip-record">'
+      return '<div class="mytrip-record" onclick="mytOpenRecPopup(event,r)" style="cursor:pointer;">'
+        +(r.image_url?'<div style="height:120px;overflow:hidden;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>':'')
         +'<div style="padding:8px 10px;">'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
         +'<span style="font-size:8px;color:var(--m);">'+(r.record_time||'')+'</span>'
@@ -5236,12 +5280,15 @@ function mytSaveRecord() {
   if (!content) { alert('내용을 입력해주세요'); return; }
   var now = new Date();
   var timeStr = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  var recPhotoImg = document.getElementById('myt-rec-photo-img');
+  var recPhotoData = (recPhotoImg && recPhotoImg.src && recPhotoImg.src.startsWith('data:')) ? recPhotoImg.src : null;
   var payload = {
     trip_id: _mytCurrentTrip.id,
     user_id: _currentUserId,
     record_date: _mytCurrentRecordDay,
     record_time: timeStr,
     content: content,
+    image_url: recPhotoData,
     tip: document.getElementById('myt-rec-tip').value||null,
     category: _mytRecCat
   };
@@ -5395,6 +5442,161 @@ function mytShowRecordFromBlog() {
   mytShowRecord();
 }
 
+
+// ── 일정 팝업 ──
+var _mytCurrentSched = null;
+
+function mytOpenSchedPopup(schedData) {
+  _mytCurrentSched = schedData;
+  var s = schedData;
+  var statusColor = s.booking_status==='예약완료' ? 'var(--ok)' : (s.booking_status==='예약필요' ? 'var(--red)' : 'var(--m)');
+  var timeStr = s.start_time || '';
+  if (s.end_time) timeStr += ' ~ '+s.end_time;
+  var amountStr = s.actual_amount!=null ? s.actual_amount.toLocaleString() : (s.planned_amount ? s.planned_amount.toLocaleString() : '-');
+
+  var titleEl = document.getElementById('myt-popup-title');
+  if (titleEl) titleEl.textContent = s.title;
+
+  var html = '';
+  // 기본 정보
+  html += '<div style="background:var(--s2);border-radius:4px;padding:10px;margin-bottom:10px;">';
+  html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:10px;"><span style="color:var(--m);">카테고리</span><span style="color:var(--w);">'+s.category+'</span></div>';
+  if (timeStr) html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:10px;"><span style="color:var(--m);">시간</span><span style="color:var(--gold);">'+timeStr+'</span></div>';
+  html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:10px;"><span style="color:var(--m);">예약 여부</span><span style="color:'+statusColor+';">'+s.booking_status+'</span></div>';
+  html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:10px;"><span style="color:var(--m);">예상 금액</span><span style="color:var(--w);">'+(s.planned_amount||0).toLocaleString()+'</span></div>';
+  html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10px;"><span style="color:var(--m);">실제 금액</span><span style="color:var(--ok);">'+(s.actual_amount!=null?s.actual_amount.toLocaleString():'미입력')+'</span></div>';
+  html += '</div>';
+  // 예약 정보
+  if (s.booking_ref || s.booking_url || s.qr_image_url) {
+    html += '<div style="background:var(--s2);border-radius:4px;padding:10px;margin-bottom:10px;">';
+    html += '<div style="font-size:9px;color:var(--gold);margin-bottom:8px;">예약 정보</div>';
+    if (s.booking_ref) html += '<div style="font-size:9px;color:var(--m);margin-bottom:5px;">예약번호: <span style="color:var(--w);">'+s.booking_ref+'</span></div>';
+    if (s.booking_url) {
+      var safeUrl = (s.booking_url||'').replace(/'/g, '%27');
+      html += '<div style="margin-bottom:8px;"><a href="'+safeUrl+'" target="_blank" style="display:inline-block;padding:6px 12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:9px;color:var(--gold);text-decoration:none;">🔗 예약 링크 열기</a></div>';
+    }
+    if (s.qr_image_url) html += '<div style="margin-bottom:4px;"><img src="'+s.qr_image_url+'" style="max-width:150px;border-radius:4px;border:1px solid var(--b2);"></div>';
+    html += '</div>';
+  }
+  // 메모
+  if (s.memo) {
+    html += '<div style="background:var(--s2);border-radius:4px;padding:10px;margin-bottom:10px;">';
+    html += '<div style="font-size:9px;color:var(--m);margin-bottom:4px;">메모</div>';
+    html += '<div style="font-size:10px;color:rgba(240,236,228,.7);line-height:1.6;">'+s.memo+'</div>';
+    html += '</div>';
+  }
+  // 실제 금액 빠른 입력
+  html += '<div style="margin-bottom:10px;">';
+  html += '<div style="font-size:8px;color:var(--m);margin-bottom:4px;">실제 금액 입력 (여행 후)</div>';
+  html += '<div style="display:flex;gap:6px;">';
+  html += '<input id="myt-popup-actual" type="number" placeholder="0" data-cur="'+(s.actual_amount!=null?s.actual_amount:'')+'" style="flex:1;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);">';
+  html += '<button onclick="mytSaveActualAmount()" style="padding:8px 14px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:10px;color:var(--gold);cursor:pointer;">저장</button>';
+  html += '</div></div>';
+
+  var contentEl = document.getElementById('myt-popup-content');
+  if (contentEl) contentEl.innerHTML = html;
+  var popup = document.getElementById('myt-sched-popup');
+  if (popup) popup.style.display = 'flex';
+  // data-cur를 value로 설정
+  setTimeout(function(){
+    var inp = document.getElementById('myt-popup-actual');
+    if (inp && inp.dataset.cur) inp.value = inp.dataset.cur;
+  }, 50);
+}
+
+function mytCloseSchedPopup() {
+  var p = document.getElementById('myt-sched-popup');
+  if (p) p.style.display = 'none';
+}
+
+function mytSaveActualAmount() {
+  if (!_mytCurrentSched) return;
+  var val = parseFloat(document.getElementById('myt-popup-actual').value);
+  fetch(SUPA_URL+'/rest/v1/trip_schedules?id=eq.'+_mytCurrentSched.id, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY,'Prefer':'return=minimal'},
+    body: JSON.stringify({actual_amount: val})
+  }).then(function() {
+    mytCloseSchedPopup();
+    mytLoadSchedules();
+    mytUpdateBudget();
+  });
+}
+
+function mytDeleteSched() {
+  if (!_mytCurrentSched || !confirm('이 일정을 삭제할까요?')) return;
+  fetch(SUPA_URL+'/rest/v1/trip_schedules?id=eq.'+_mytCurrentSched.id, {
+    method: 'DELETE',
+    headers: {'Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY}
+  }).then(function() {
+    mytCloseSchedPopup();
+    mytLoadSchedules();
+    mytUpdateBudget();
+  });
+}
+
+function mytEditSchedFromPopup() {
+  // 수정 기능: 팝업 닫고 일정 추가 화면을 수정 모드로 열기 (향후 구현)
+  mytCloseSchedPopup();
+  mytShowAddSched();
+}
+
+// ── 기록 팝업 ──
+var _mytCurrentRec = null;
+
+function mytOpenRecPopup(e, recData) {
+  e.stopPropagation();
+  _mytCurrentRec = recData;
+  var r = recData;
+  var html = '';
+  if (r.image_url) html += '<div style="height:180px;overflow:hidden;border-radius:6px;margin-bottom:10px;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:cover;"></div>';
+  html += '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">';
+  html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
+  html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
+  html += '</div>';
+  html += '<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
+  if (r.tip) html += '<div style="font-size:10px;color:var(--ac);padding:6px 10px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);">TIP: '+r.tip+'</div>';
+
+  var contentEl = document.getElementById('myt-rec-popup-content');
+  if (contentEl) contentEl.innerHTML = html;
+  var popup = document.getElementById('myt-rec-popup');
+  if (popup) popup.style.display = 'flex';
+}
+
+function mytCloseRecPopup() {
+  var p = document.getElementById('myt-rec-popup');
+  if (p) p.style.display = 'none';
+}
+
+function mytDeleteRecord() {
+  if (!_mytCurrentRec || !confirm('이 기록을 삭제할까요?')) return;
+  fetch(SUPA_URL+'/rest/v1/trip_records?id=eq.'+_mytCurrentRec.id, {
+    method: 'DELETE',
+    headers: {'Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY}
+  }).then(function() {
+    mytCloseRecPopup();
+    mytLoadRecords(_mytCurrentRecordDay);
+  });
+}
+
+// ── 기록 사진 로드 ──
+function mytLoadRecPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('myt-rec-photo-img');
+    var preview = document.getElementById('myt-rec-photo-preview');
+    if (img) img.src = e.target.result;
+    if (preview) preview.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+window.mytOpenSchedPopup=mytOpenSchedPopup; window.mytCloseSchedPopup=mytCloseSchedPopup;
+window.mytSaveActualAmount=mytSaveActualAmount; window.mytDeleteSched=mytDeleteSched;
+window.mytEditSchedFromPopup=mytEditSchedFromPopup;
+window.mytOpenRecPopup=mytOpenRecPopup; window.mytCloseRecPopup=mytCloseRecPopup;
+window.mytDeleteRecord=mytDeleteRecord; window.mytLoadRecPhoto=mytLoadRecPhoto;
 window.mytLoadList=mytLoadList; window.mytShowNewTrip=mytShowNewTrip; window.mytCreateTrip=mytCreateTrip;
 window.mytOpenTrip=mytOpenTrip; window.mytCalPrev=mytCalPrev; window.mytCalNext=mytCalNext;
 window.mytSelDate=mytSelDate; window.mytShowAddSched=mytShowAddSched; window.mytSaveSched=mytSaveSched;
