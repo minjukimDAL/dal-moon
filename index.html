@@ -825,12 +825,13 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <!-- 화면 2: 여행 상세 (캘린더 + 일정) -->
     <div id="myt-detail" style="display:none;flex-direction:column;height:100%;">
       <div style="padding:10px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <button onclick="mytBack('myt-list')" style="font-size:12px;color:var(--gold);background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">← 목록</button>
+        <button onclick="mytBack('myt-detail')" style="font-size:12px;color:var(--gold);background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">← 상세</button>
         <div style="flex:1;">
           <div id="myt-detail-title" style="font-size:13px;color:var(--w);font-weight:500;"></div>
           <div id="myt-detail-dates" style="font-size:9px;color:var(--m);"></div>
         </div>
         <button onclick="mytShowRecord()" style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">기록</button>
+        <button id="myt-blog-btn" onclick="mytOpenBlog()" style="display:none;font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">블로그</button>
       </div>
       <div style="flex:1;overflow-y:auto;">
         <!-- 예산 요약 -->
@@ -4971,11 +4972,8 @@ function mytOpenTrip(tripId) {
     _mytCurrentTrip = data[0];
     var today = new Date(); today.setHours(0,0,0,0);
     var end = new Date(_mytCurrentTrip.end_date);
-    if (end < today) {
-      mytOpenBlog();
-    } else {
-      mytShowDetailScreen();
-    }
+    // 과거/미래 모두 상세 화면으로 열기
+    mytShowDetailScreen();
   });
 }
 
@@ -4985,6 +4983,10 @@ function mytShowDetailScreen() {
   var start = new Date(t.start_date), end = new Date(t.end_date);
   var nights = Math.round((end-start)/(1000*60*60*24));
   document.getElementById('myt-detail-dates').textContent = t.start_date+' ~ '+t.end_date+' · '+nights+'박';
+  // 완료 여행이면 블로그 버튼 표시
+  var today = new Date(); today.setHours(0,0,0,0);
+  var blogBtn = document.getElementById('myt-blog-btn');
+  if (blogBtn) blogBtn.style.display = end < today ? 'inline-block' : 'none';
   var d = new Date(t.start_date);
   _mytCalYear = d.getFullYear(); _mytCalMonth = d.getMonth();
   _mytSelectedDate = t.start_date;
