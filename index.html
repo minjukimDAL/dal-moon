@@ -440,57 +440,107 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button class="dal-country-btn" onclick="selectCountry(this,'vn')" data-val="vn">🇻🇳 베트남</button>
           <button class="dal-country-btn" style="border-color:rgba(91,143,255,.3);color:var(--ac);">+ 더 보기</button>
         </div>
-        <div id="dalMapArea" style="height:200px;border-radius:4px;overflow:hidden;margin-bottom:8px;border:1px solid var(--b1);">
+        <div id="dalMapArea" style="height:350px;border-radius:4px;overflow:hidden;margin-bottom:8px;border:1px solid var(--b1);">
           <div id="dalLeafletMap" style="height:100%;width:100%;"></div>
         </div>
         <!-- 핀 저장 팝업 -->
         <div id="dalPinPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePinPopup()">
-          <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
-            <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
-            <div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:12px;">📍 이 장소 저장하기</div>
-            <div style="margin-bottom:10px;">
-              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">장소 이름</div>
-              <input id="dalPinName" type="text" placeholder="장소 이름 입력" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+          <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;height:90vh;overflow-y:auto;padding:16px 16px 0;" onclick="event.stopPropagation()">
+            <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div style="font-size:13px;color:var(--w);font-weight:500;">📍 이 장소 저장하기</div>
+              <button onclick="dalClosePinPopup()" style="background:transparent;border:none;color:var(--m);font-size:16px;cursor:pointer;padding:4px 8px;">✕</button>
             </div>
+
+            <!-- 장소 이름 -->
             <div style="margin-bottom:10px;">
-              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">카테고리</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;" id="dalPinCats">
-                <div onclick="dalSelPinCat(this,'가고싶은 곳')" style="padding:7px;border:1px solid rgba(196,175,135,.4);background:rgba(196,175,135,.08);border-radius:4px;font-size:10px;color:var(--gold);text-align:center;cursor:pointer;">📍 가고싶은 곳</div>
-                <div onclick="dalSelPinCat(this,'다녀온 곳')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">✅ 다녀온 곳</div>
-                <div onclick="dalSelPinCat(this,'즐겨찾는 곳')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">⭐ 즐겨찾는 곳</div>
-                <div onclick="dalSelPinCat(this,'맛집')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🍽️ 맛집</div>
-                <div onclick="dalSelPinCat(this,'숙소')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🏨 숙소</div>
-                <div onclick="dalSelPinCat(this,'액티비티')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🎯 액티비티</div>
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">장소 이름 *</div>
+              <input id="dalPinName" type="text" placeholder="장소 이름 입력" style="width:100%;padding:9px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:12px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+            </div>
+
+            <!-- 상태 (3개 고정) -->
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:5px;">상태</div>
+              <div style="display:flex;gap:5px;" id="dalPinStatus">
+                <div onclick="dalSelPinStatus(this,'가고싶은 곳')" style="flex:1;padding:8px 4px;border:1px solid rgba(91,143,255,.4);background:rgba(91,143,255,.08);border-radius:4px;font-size:10px;color:var(--ac);text-align:center;cursor:pointer;">📍 가고싶은 곳</div>
+                <div onclick="dalSelPinStatus(this,'다녀온 곳')" style="flex:1;padding:8px 4px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">✅ 다녀온 곳</div>
+                <div onclick="dalSelPinStatus(this,'즐겨찾는 곳')" style="flex:1;padding:8px 4px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">⭐ 즐겨찾는 곳</div>
               </div>
             </div>
+
+            <!-- 카테고리 (스크롤) -->
             <div style="margin-bottom:10px;">
-              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">아이콘</div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;" id="dalPinIcons">
-                <span onclick="dalSelPinIcon(this,'📍')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid rgba(196,175,135,.4);background:rgba(196,175,135,.1);">📍</span>
-                <span onclick="dalSelPinIcon(this,'🦀')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🦀</span>
-                <span onclick="dalSelPinIcon(this,'🍜')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🍜</span>
-                <span onclick="dalSelPinIcon(this,'🏨')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🏨</span>
-                <span onclick="dalSelPinIcon(this,'⛩️')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">⛩️</span>
-                <span onclick="dalSelPinIcon(this,'🌳')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🌳</span>
-                <span onclick="dalSelPinIcon(this,'🎡')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🎡</span>
-                <span onclick="dalSelPinIcon(this,'🌊')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🌊</span>
+              <div style="font-size:8px;color:var(--m);margin-bottom:5px;">카테고리</div>
+              <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;" id="dalPinCats">
+                <div onclick="dalSelPinCat(this,'맛집')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🍽️ 맛집</div>
+                <div onclick="dalSelPinCat(this,'숙소')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🏨 숙소</div>
+                <div onclick="dalSelPinCat(this,'액티비티')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🎯 액티비티</div>
+                <div onclick="dalSelPinCat(this,'핫플')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🔥 핫플</div>
+                <div onclick="dalSelPinCat(this,'자연')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🌿 자연</div>
+                <div onclick="dalSelPinCat(this,'동물원')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🦁 동물원</div>
+                <div onclick="dalSelPinCat(this,'놀이공원')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🎡 놀이공원</div>
+                <div onclick="dalSelPinCat(this,'마사지/스파')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">💆 마사지/스파</div>
+                <div onclick="dalSelPinCat(this,'쇼핑')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🛍️ 쇼핑</div>
+                <div onclick="dalSelPinCat(this,'카페')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">☕ 카페</div>
+                <div onclick="dalSelPinCat(this,'바/나이트라이프')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🍺 바/나이트</div>
+                <div onclick="dalSelPinCat(this,'해변')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🏖️ 해변</div>
+                <div onclick="dalSelPinCat(this,'문화/역사')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🏛️ 문화/역사</div>
+                <div onclick="dalSelPinCat(this,'야경')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">🌆 야경</div>
+                <div onclick="dalSelPinCat(this,'기타')" style="flex-shrink:0;padding:6px 10px;border:1px solid var(--b2);background:var(--s2);border-radius:20px;font-size:10px;color:var(--m);cursor:pointer;white-space:nowrap;">📌 기타</div>
               </div>
             </div>
+
+            <!-- 아이콘 (카테고리별 자동 + 수동 선택) -->
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:5px;">아이콘</div>
+              <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;" id="dalPinIcons">
+                <span onclick="dalSelPinIcon(this,'📍')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid rgba(196,175,135,.4);background:rgba(196,175,135,.1);">📍</span>
+                <span onclick="dalSelPinIcon(this,'🍜')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🍜</span>
+                <span onclick="dalSelPinIcon(this,'🦀')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🦀</span>
+                <span onclick="dalSelPinIcon(this,'🍣')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🍣</span>
+                <span onclick="dalSelPinIcon(this,'☕')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">☕</span>
+                <span onclick="dalSelPinIcon(this,'🍺')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🍺</span>
+                <span onclick="dalSelPinIcon(this,'🏨')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🏨</span>
+                <span onclick="dalSelPinIcon(this,'🏡')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🏡</span>
+                <span onclick="dalSelPinIcon(this,'⛩️')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">⛩️</span>
+                <span onclick="dalSelPinIcon(this,'🏛️')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🏛️</span>
+                <span onclick="dalSelPinIcon(this,'🌳')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🌳</span>
+                <span onclick="dalSelPinIcon(this,'🌊')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🌊</span>
+                <span onclick="dalSelPinIcon(this,'🏖️')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🏖️</span>
+                <span onclick="dalSelPinIcon(this,'🎡')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🎡</span>
+                <span onclick="dalSelPinIcon(this,'🦁')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🦁</span>
+                <span onclick="dalSelPinIcon(this,'💆')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">💆</span>
+                <span onclick="dalSelPinIcon(this,'🛍️')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🛍️</span>
+                <span onclick="dalSelPinIcon(this,'🔥')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🔥</span>
+                <span onclick="dalSelPinIcon(this,'🌆')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🌆</span>
+                <span onclick="dalSelPinIcon(this,'🎯')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🎯</span>
+                <span onclick="dalSelPinIcon(this,'🚢')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🚢</span>
+                <span onclick="dalSelPinIcon(this,'🤿')" style="flex-shrink:0;font-size:22px;cursor:pointer;padding:5px;border-radius:6px;border:1px solid var(--b1);">🤿</span>
+              </div>
+            </div>
+
+            <!-- 평점 -->
             <div style="margin-bottom:10px;">
               <div style="font-size:8px;color:var(--m);margin-bottom:4px;">평점</div>
               <div style="display:flex;gap:4px;" id="dalPinStars">
-                <span onclick="dalSetStar(1)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
-                <span onclick="dalSetStar(2)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
-                <span onclick="dalSetStar(3)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
-                <span onclick="dalSetStar(4)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
-                <span onclick="dalSetStar(5)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(1)" style="font-size:24px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(2)" style="font-size:24px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(3)" style="font-size:24px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(4)" style="font-size:24px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(5)" style="font-size:24px;cursor:pointer;opacity:.3;">⭐</span>
               </div>
             </div>
-            <div style="margin-bottom:14px;">
+
+            <!-- 메모 -->
+            <div style="margin-bottom:12px;">
               <div style="font-size:8px;color:var(--m);margin-bottom:4px;">메모 (선택)</div>
-              <textarea id="dalPinMemo" placeholder="예: 칠리크랩 강추! 예약 필수." style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:50px;box-sizing:border-box;"></textarea>
+              <textarea id="dalPinMemo" placeholder="예: 칠리크랩 강추! 예약 필수." style="width:100%;padding:9px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:52px;box-sizing:border-box;"></textarea>
             </div>
-            <button onclick="dalSavePin()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">📍 저장하기</button>
+
+            <!-- 저장 버튼 (항상 보이게 sticky) -->
+            <div style="position:sticky;bottom:0;background:var(--s1);padding:12px 0 24px;">
+              <button onclick="dalSavePin()" style="width:100%;padding:13px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.4);border-radius:4px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">📍 저장하기</button>
+            </div>
           </div>
         </div>
       </div>
@@ -4847,6 +4897,15 @@ function dalOpenPinPopup() {
   _dalPinIcon = '📍';
   _dalPinRating = 0;
   document.querySelectorAll('#dalPinStars span').forEach(function(s){s.style.opacity='.3';});
+  // 상태 초기화
+  document.querySelectorAll('#dalPinStatus div').forEach(function(d,i){
+    if(i===0){d.style.borderColor='rgba(91,143,255,.4)';d.style.background='rgba(91,143,255,.08)';d.style.color='var(--ac)';}
+    else{d.style.borderColor='var(--b2)';d.style.background='var(--s2)';d.style.color='var(--m)';}
+  });
+  // 카테고리 초기화
+  document.querySelectorAll('#dalPinCats div').forEach(function(d){
+    d.style.borderColor='var(--b2)';d.style.background='var(--s2)';d.style.color='var(--m)';
+  });
   document.getElementById('dalPinPopup').style.display = 'flex';
 }
 
@@ -4854,10 +4913,19 @@ function dalClosePinPopup() {
   document.getElementById('dalPinPopup').style.display = 'none';
 }
 
+function dalSelPinStatus(el, status) {
+  _dalPinCategory = status;
+  document.querySelectorAll('#dalPinStatus div').forEach(function(d){
+    d.style.borderColor='var(--b2)'; d.style.background='var(--s2)'; d.style.color='var(--m)';
+  });
+  el.style.borderColor='rgba(91,143,255,.4)'; el.style.background='rgba(91,143,255,.08)'; el.style.color='var(--ac)';
+}
+
 function dalSelPinCat(el, cat) {
   _dalPinCategory = cat;
   document.querySelectorAll('#dalPinCats div').forEach(function(d){
     d.style.borderColor='var(--b2)'; d.style.background='var(--s2)'; d.style.color='var(--m)';
+    d.style.borderRadius='20px';
   });
   el.style.borderColor='rgba(196,175,135,.4)'; el.style.background='rgba(196,175,135,.08)'; el.style.color='var(--gold)';
 }
@@ -5091,7 +5159,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderDalMap();buildDalPrompt();
   loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
-window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
