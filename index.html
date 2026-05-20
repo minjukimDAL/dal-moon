@@ -4839,7 +4839,7 @@ function renderDalMap(){
 function initDalMap(center) {
   _dalMap = L.map('dalLeafletMap', {zoomControl:true, attributionControl:false})
     .setView([center.lat, center.lng], center.zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18}).addTo(_dalMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {maxZoom:18, attribution:'&copy; OpenStreetMap &copy; CartoDB'}).addTo(_dalMap);
 
   // 지도 클릭 → 핀 저장 팝업
   _dalMap.on('click', function(e) {
