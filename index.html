@@ -3469,6 +3469,8 @@ function onLoginSuccess(user, token){
   loadCoinsFromServer();
   loadTripsFromServer();
   loadUnlockedFromServer();
+  // 유저 핀 로드 (지도에 표시)
+  if (typeof loadUserPins === 'function') loadUserPins();
   // 만료 데이터 정리는 백그라운드에서 별도 실행
   setTimeout(function(){ cleanupExpiredData(); }, 3000);
   // 로그인 전 시도한 액션 자동 실행
@@ -3499,6 +3501,11 @@ function onLogoutSuccess(){
   isLoggedIn=false; _clearSession();
   _currentToken=null; _currentUserId=null;
   halfTrips=[]; _unlockedOptions={};
+  // 핀 마커 제거
+  if (typeof _dalUserPinMarkers !== 'undefined') {
+    _dalUserPinMarkers.forEach(function(m){ if(_dalMap) _dalMap.removeLayer(m); });
+    _dalUserPinMarkers = [];
+  }
   bonusCoinAmt=0; earnCoinAmt=0; paidCoinAmt=0;
   if(typeof renderHalfTripsList==='function') renderHalfTripsList();
   // D옵션: 코인 배지 비활성화 + 유저 아이콘 원복
