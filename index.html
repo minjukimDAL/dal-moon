@@ -2,6 +2,7 @@
 <html lang="ko" id="htmlRoot">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DAL · Design AI Life</title>
 <meta name="mobile-web-app-capable" content="yes">
@@ -439,12 +440,58 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button class="dal-country-btn" onclick="selectCountry(this,'vn')" data-val="vn">🇻🇳 베트남</button>
           <button class="dal-country-btn" style="border-color:rgba(91,143,255,.3);color:var(--ac);">+ 더 보기</button>
         </div>
-        <div id="dalMapArea" style="height:150px;background:var(--s2);border:1px solid var(--b1);border-radius:4px;position:relative;overflow:hidden;margin-bottom:8px;">
-          <div style="position:absolute;inset:0;background:linear-gradient(135deg,#08111f 0%,#0b1a30 100%);"></div>
-          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(91,143,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(91,143,255,.05) 1px,transparent 1px);background-size:20px 20px;"></div>
-          <div id="dalMapPins"></div>
-          <div id="dalMapBadge" style="position:absolute;bottom:7px;left:8px;background:rgba(196,175,135,.15);border:1px solid rgba(196,175,135,.3);border-radius:3px;padding:3px 8px;font-size:9px;color:var(--gold);">🇸🇬 싱가포르</div>
-          <div style="position:absolute;top:7px;right:8px;background:rgba(6,7,16,.7);border:1px solid var(--b1);border-radius:3px;padding:2px 6px;font-size:8px;color:var(--m);">핀 탭 → 상세보기</div>
+        <div id="dalMapArea" style="height:200px;border-radius:4px;overflow:hidden;margin-bottom:8px;border:1px solid var(--b1);">
+          <div id="dalLeafletMap" style="height:100%;width:100%;"></div>
+        </div>
+        <!-- 핀 저장 팝업 -->
+        <div id="dalPinPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePinPopup()">
+          <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+            <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
+            <div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:12px;">📍 이 장소 저장하기</div>
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">장소 이름</div>
+              <input id="dalPinName" type="text" placeholder="장소 이름 입력" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">카테고리</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;" id="dalPinCats">
+                <div onclick="dalSelPinCat(this,'가고싶은 곳')" style="padding:7px;border:1px solid rgba(196,175,135,.4);background:rgba(196,175,135,.08);border-radius:4px;font-size:10px;color:var(--gold);text-align:center;cursor:pointer;">📍 가고싶은 곳</div>
+                <div onclick="dalSelPinCat(this,'다녀온 곳')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">✅ 다녀온 곳</div>
+                <div onclick="dalSelPinCat(this,'즐겨찾는 곳')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">⭐ 즐겨찾는 곳</div>
+                <div onclick="dalSelPinCat(this,'맛집')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🍽️ 맛집</div>
+                <div onclick="dalSelPinCat(this,'숙소')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🏨 숙소</div>
+                <div onclick="dalSelPinCat(this,'액티비티')" style="padding:7px;border:1px solid var(--b2);background:var(--s2);border-radius:4px;font-size:10px;color:var(--m);text-align:center;cursor:pointer;">🎯 액티비티</div>
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">아이콘</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;" id="dalPinIcons">
+                <span onclick="dalSelPinIcon(this,'📍')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid rgba(196,175,135,.4);background:rgba(196,175,135,.1);">📍</span>
+                <span onclick="dalSelPinIcon(this,'🦀')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🦀</span>
+                <span onclick="dalSelPinIcon(this,'🍜')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🍜</span>
+                <span onclick="dalSelPinIcon(this,'🏨')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🏨</span>
+                <span onclick="dalSelPinIcon(this,'⛩️')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">⛩️</span>
+                <span onclick="dalSelPinIcon(this,'🌳')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🌳</span>
+                <span onclick="dalSelPinIcon(this,'🎡')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🎡</span>
+                <span onclick="dalSelPinIcon(this,'🌊')" style="font-size:20px;cursor:pointer;padding:4px;border-radius:6px;border:1px solid var(--b1);">🌊</span>
+              </div>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">평점</div>
+              <div style="display:flex;gap:4px;" id="dalPinStars">
+                <span onclick="dalSetStar(1)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(2)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(3)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(4)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+                <span onclick="dalSetStar(5)" style="font-size:22px;cursor:pointer;opacity:.3;">⭐</span>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div style="font-size:8px;color:var(--m);margin-bottom:4px;">메모 (선택)</div>
+              <textarea id="dalPinMemo" placeholder="예: 칠리크랩 강추! 예약 필수." style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:50px;box-sizing:border-box;"></textarea>
+            </div>
+            <button onclick="dalSavePin()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">📍 저장하기</button>
+          </div>
         </div>
       </div>
 
@@ -4703,17 +4750,171 @@ function selectCountry(btn,code){
   }
   buildDalPrompt();
 }
+var _dalMap = null;
+var _dalPinLat = 0, _dalPinLng = 0;
+var _dalPinCategory = '가고싶은 곳';
+var _dalPinIcon = '📍';
+var _dalPinRating = 0;
+var _dalUserPinMarkers = [];
+
+var DAL_MAP_CENTERS = {
+  sg:{lat:1.3521,lng:103.8198,zoom:12},
+  jp:{lat:35.6762,lng:139.6503,zoom:10},
+  th:{lat:13.7563,lng:100.5018,zoom:11},
+  bali:{lat:-8.4095,lng:115.1889,zoom:11},
+  vn:{lat:15.8801,lng:108.3380,zoom:12}
+};
+
 function renderDalMap(){
-  var d=DAL_MAP_DATA[DAL_COUNTRY];if(!d)return;
-  var badge=document.getElementById('dalMapBadge');if(badge)badge.textContent=d.label;
-  var el=document.getElementById('dalMapPins');if(!el)return;
-  el.innerHTML='';
-  d.pins.forEach(function(p){
-    var div=document.createElement('div');
-    div.style.cssText='position:absolute;top:'+p.top+';left:'+p.left+';display:flex;flex-direction:column;align-items:center;cursor:pointer;';
-    div.innerHTML='<div style="width:9px;height:9px;border-radius:50%;background:'+p.color+';"></div><div style="font-size:7px;color:#f0ece4;margin-top:1px;background:rgba(6,7,16,.75);padding:1px 4px;border-radius:2px;white-space:nowrap;">'+p.name+'</div>';
-    el.appendChild(div);
+  var mapEl = document.getElementById('dalLeafletMap');
+  if (!mapEl) return;
+  var center = DAL_MAP_CENTERS[DAL_COUNTRY] || DAL_MAP_CENTERS.sg;
+
+  if (!_dalMap) {
+    // Leaflet 스크립트 로드 후 초기화
+    if (typeof L === 'undefined') {
+      var script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = function() { initDalMap(center); };
+      document.head.appendChild(script);
+    } else {
+      initDalMap(center);
+    }
+  } else {
+    _dalMap.setView([center.lat, center.lng], center.zoom);
+    loadUserPins();
+  }
+}
+
+function initDalMap(center) {
+  _dalMap = L.map('dalLeafletMap', {zoomControl:true, attributionControl:false})
+    .setView([center.lat, center.lng], center.zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18}).addTo(_dalMap);
+
+  // 지도 클릭 → 핀 저장 팝업
+  _dalMap.on('click', function(e) {
+    if (!_currentToken) { alert('로그인 후 핀을 저장할 수 있어요!'); return; }
+    _dalPinLat = e.latlng.lat;
+    _dalPinLng = e.latlng.lng;
+    dalOpenPinPopup();
   });
+  loadUserPins();
+}
+
+function dalMakePinIcon(emoji) {
+  return L.divIcon({
+    html: '<div style="background:#060710;border:2px solid #c4af87;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:15px;">'+emoji+'</div>',
+    iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-18], className:''
+  });
+}
+
+function loadUserPins() {
+  if (!_dalMap || !_currentToken) return;
+  _dalUserPinMarkers.forEach(function(m){_dalMap.removeLayer(m);});
+  _dalUserPinMarkers = [];
+  _sfGet('/rest/v1/user_pins?user_id=eq.'+_currentUserId+'&order=created_at.desc').then(function(pins) {
+    if (!pins || !Array.isArray(pins)) return;
+    pins.forEach(function(p) {
+      var catColors = {'가고싶은 곳':'#5b8fff','다녀온 곳':'#3ecf8e','즐겨찾는 곳':'#c4af87','맛집':'#f06060','숙소':'#c4af87','액티비티':'#5b8fff'};
+      var color = catColors[p.category] || '#c4af87';
+      var icon = L.divIcon({
+        html: '<div style="background:#060710;border:2px solid '+color+';border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:15px;">'+(p.icon||'📍')+'</div>',
+        iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-18], className:''
+      });
+      var m = L.marker([p.lat, p.lng], {icon:icon})
+        .addTo(_dalMap)
+        .bindPopup('<div style="font-family:sans-serif;min-width:130px;">'
+          +'<div style="font-size:13px;font-weight:500;margin-bottom:3px;">'+(p.icon||'📍')+' '+p.name+'</div>'
+          +'<div style="font-size:10px;color:#888;margin-bottom:4px;">'+p.category+'</div>'
+          +(p.memo?'<div style="font-size:10px;color:#555;margin-bottom:4px;">'+p.memo+'</div>':'')
+          +(p.rating?'<div style="font-size:11px;">'+'⭐'.repeat(p.rating)+'</div>':'')
+          +'<button class="dal-del-pin" style="margin-top:6px;padding:3px 8px;background:#fee;border:1px solid #fcc;border-radius:4px;font-size:10px;color:#c00;cursor:pointer;">삭제</button>'
+          +'</div>');
+      // 팝업 열릴 때 삭제 버튼 이벤트 바인딩
+      m.on('popupopen', function(ev) {
+        var btn = ev.popup.getElement().querySelector('.dal-del-pin');
+        if (btn) btn.onclick = function() { dalDeletePin(p.id); };
+      });
+      _dalUserPinMarkers.push(m);
+    });
+  });
+}
+
+function dalOpenPinPopup() {
+  document.getElementById('dalPinName').value = '';
+  document.getElementById('dalPinMemo').value = '';
+  _dalPinCategory = '가고싶은 곳';
+  _dalPinIcon = '📍';
+  _dalPinRating = 0;
+  document.querySelectorAll('#dalPinStars span').forEach(function(s){s.style.opacity='.3';});
+  document.getElementById('dalPinPopup').style.display = 'flex';
+}
+
+function dalClosePinPopup() {
+  document.getElementById('dalPinPopup').style.display = 'none';
+}
+
+function dalSelPinCat(el, cat) {
+  _dalPinCategory = cat;
+  document.querySelectorAll('#dalPinCats div').forEach(function(d){
+    d.style.borderColor='var(--b2)'; d.style.background='var(--s2)'; d.style.color='var(--m)';
+  });
+  el.style.borderColor='rgba(196,175,135,.4)'; el.style.background='rgba(196,175,135,.08)'; el.style.color='var(--gold)';
+}
+
+function dalSelPinIcon(el, icon) {
+  _dalPinIcon = icon;
+  document.querySelectorAll('#dalPinIcons span').forEach(function(s){
+    s.style.border='1px solid var(--b1)'; s.style.background='transparent';
+  });
+  el.style.border='1px solid rgba(196,175,135,.4)'; el.style.background='rgba(196,175,135,.1)';
+}
+
+function dalSetStar(n) {
+  _dalPinRating = n;
+  document.querySelectorAll('#dalPinStars span').forEach(function(s,i){
+    s.style.opacity = i < n ? '1' : '.3';
+  });
+}
+
+function dalSavePin() {
+  var name = document.getElementById('dalPinName').value.trim();
+  if (!name) { alert('장소 이름을 입력해주세요'); return; }
+  if (!_currentToken) { alert('로그인이 필요해요'); return; }
+  var payload = {
+    user_id: _currentUserId,
+    name: name,
+    lat: _dalPinLat,
+    lng: _dalPinLng,
+    country_code: DAL_COUNTRY,
+    category: _dalPinCategory,
+    icon: _dalPinIcon,
+    rating: _dalPinRating,
+    memo: document.getElementById('dalPinMemo').value || null
+  };
+  fetch(SUPA_URL+'/rest/v1/user_pins', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY},
+    body: JSON.stringify(payload)
+  }).then(function(res) {
+    if (res.ok) {
+      dalClosePinPopup();
+      loadUserPins();
+      // 관심 장소 목록에도 추가
+      var place = {id:'pin_'+Date.now(), icon:_dalPinIcon, name:name, tag:_dalPinCategory, desc:'', hours:'', price:'', tip:'', nearby:[]};
+      if (!DAL_PLACES[DAL_COUNTRY]) DAL_PLACES[DAL_COUNTRY] = [];
+      DAL_PLACES[DAL_COUNTRY].unshift(place);
+      renderDalPlaces();
+    } else { alert('저장 실패. 다시 시도해주세요'); }
+  });
+}
+
+function dalDeletePin(id) {
+  if (!confirm('이 핀을 삭제할까요?')) return;
+  fetch(SUPA_URL+'/rest/v1/user_pins?id=eq.'+id, {
+    method: 'DELETE',
+    headers: {'Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY}
+  }).then(function() { loadUserPins(); });
 }
 function renderDalPlaces(){
   var grid=document.getElementById('dalPlacesGrid');if(!grid)return;
@@ -4890,7 +5091,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderDalMap();buildDalPrompt();
   loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
-window.selectCountry=selectCountry; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
