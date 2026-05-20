@@ -825,7 +825,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <!-- 화면 2: 여행 상세 (캘린더 + 일정) -->
     <div id="myt-detail" style="display:none;flex-direction:column;height:100%;">
       <div style="padding:10px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <button onclick="mytBack('myt-detail')" style="font-size:12px;color:var(--gold);background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">← 상세</button>
+        <button onclick="mytBack('myt-list')" style="font-size:12px;color:var(--gold);background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;">← 목록</button>
         <div style="flex:1;">
           <div id="myt-detail-title" style="font-size:13px;color:var(--w);font-weight:500;"></div>
           <div id="myt-detail-dates" style="font-size:9px;color:var(--m);"></div>
@@ -4645,35 +4645,41 @@ window.initSupabase=initSupabase; window.handleOAuthCallback=handleOAuthCallback
 
 // ══ DAL 새방향: 나라선택/관심장소/일정설정/프롬프트 ══
 var DAL_COUNTRY='sg';
-var DAL_PLACES={
-  sg:[
-    {id:'sg1',icon:'🚢',name:'클락키 크루저',tag:'야경 · 강변',desc:'클락키에서 출발하는 야경 크루즈. 싱가포르강을 따라 마리나베이까지 이동. 점보씨푸드와 도보 3분 거리.',hours:'17:00~23:00',price:'S$25~',tip:'vs 베이프런트: 점보씨푸드 근접, 강변뷰',nearby:['🦀 점보씨푸드 (도보 3분)','🍺 클락키 바거리']},
-    {id:'sg2',icon:'🦀',name:'점보씨푸드',tag:'맛집 · 칠리크랩',desc:'싱가포르 대표 칠리크랩 맛집. 예약 필수. 클락키 크루저와 함께 묶으면 최적의 저녁 코스.',hours:'12:00~22:00',price:'S$80~/인',tip:'예약 필수, 클락키점 추천',nearby:['🚢 클락키 크루저 (도보 3분)','🌆 마리나베이 뷰']},
-    {id:'sg3',icon:'🌳',name:'가든스 바이 더 베이',tag:'자연 · 야경',desc:'슈퍼트리 공원. 야간 빛 쇼(가든 랩소디)는 무료. 플라워 돔/클라우드 포레스트 유료.',hours:'05:00~02:00',price:'무료(야외)/S$28(실내)',tip:'야간 빛 쇼 19:45 / 20:45',nearby:['🏨 마리나베이샌즈 (도보 5분)','🐠 아쿠아리아']},
-    {id:'sg4',icon:'🏨',name:'마리나베이샌즈',tag:'랜드마크 · 뷰',desc:'57층 스카이파크에서 360도 파노라마 뷰. 카지노, 쇼핑몰, 레스토랑 완비.',hours:'24시간',price:'입장 S$28~',tip:'선셋 타임(18시) 방문 추천',nearby:['🌳 가든스 바이 더 베이 (도보 5분)','🎭 아트사이언스 뮤지엄']},
-    {id:'sg5',icon:'🦁',name:'싱가포르 동물원',tag:'가족 · 액티비티',desc:'세계 최고 수준 개방형 동물원. 나이트 사파리와 같은 단지 내 위치.',hours:'08:30~18:00',price:'S$48/성인',tip:'나이트 사파리와 패키지 추천',nearby:['🦅 주롱 버드 파라다이스','🌙 나이트 사파리']},
-    {id:'sg6',icon:'🎡',name:'센토사 & 유니버설',tag:'테마파크 · 가족',desc:'유니버설 스튜디오 싱가포르. 하루 종일 즐길 수 있는 종합 리조트 섬.',hours:'10:00~19:00',price:'S$83/성인',tip:'평일 방문, 온라인 사전 예매 필수',nearby:['🏖 실로소 비치','🚠 케이블카']}
-  ],
-  jp:[
-    {id:'jp1',icon:'⛩',name:'아사쿠사 & 센소지',tag:'문화 · 역사',desc:'도쿄에서 가장 오래된 사원. 나카미세 상점가에서 전통 기념품 쇼핑 가능.',hours:'24시간',price:'무료',tip:'새벽 5-7시 방문 추천',nearby:['🛍 나카미세 거리','🗼 스카이트리']},
-    {id:'jp2',icon:'🌸',name:'신주쿠 골든가이',tag:'나이트라이프 · 문화',desc:'골목마다 개성 넘치는 소형 바들이 밀집한 술집 거리.',hours:'18:00~새벽',price:'¥500~',tip:'혼자 들어가기 좋은 카운터 바 많음',nearby:['🏙 신주쿠 야경','🍜 신주쿠 라멘거리']},
-    {id:'jp3',icon:'🍜',name:'도쿄 라멘 스트리트',tag:'미식 · 현지음식',desc:'도쿄역 지하에 위치한 유명 라멘 거리. 일본 전국 명물 라멘 8개 가게 집결.',hours:'10:30~23:00',price:'¥1000~',tip:'오픈런(10:30) 추천',nearby:['🏯 도쿄역','🚄 신칸센 탑승']},
-    {id:'jp4',icon:'🗼',name:'도쿄 스카이트리',tag:'야경 · 랜드마크',desc:'높이 634m. 전망대에서 후지산까지 보이는 날도 있음.',hours:'10:00~21:00',price:'¥2100~',tip:'구름 없는 맑은 날 방문',nearby:['⛩ 아사쿠사 (도보 15분)','🛍 소라마치']}
-  ],
-  th:[
-    {id:'th1',icon:'⛩',name:'왓포 사원',tag:'문화 · 역사',desc:'방콕에서 가장 오래된 왕실 사원. 46m 황금 와불상이 유명.',hours:'08:00~18:30',price:'200바트',tip:'왕궁과 묶어서 반나절 코스',nearby:['🏯 왕궁 (도보 5분)','🍜 카오산로드']},
-    {id:'th2',icon:'🌅',name:'카오산 로드',tag:'나이트라이프 · 거리',desc:'방콕 배낭여행의 성지. 저렴한 스트리트 푸드, 마사지, 바가 밀집.',hours:'24시간',price:'저렴',tip:'밤 10시 이후 가장 활기',nearby:['⛩ 왓포 (차로 10분)','🍺 루프탑바']},
-    {id:'th3',icon:'💆',name:'타이 마사지',tag:'웰니스 · 체험',desc:'왓포 사원 내 마사지 학교가 원조. 1시간 타이마사지 300-500바트.',hours:'09:00~22:00',price:'300바트~/시간',tip:'왓포 마사지 스쿨 공인샵 이용',nearby:['⛩ 왓포 사원','🍜 길거리음식']}
-  ],
-  bali:[
-    {id:'b1',icon:'🌊',name:'꾸따 & 스미냑 비치',tag:'해변 · 서핑',desc:'발리 대표 해변. 서핑 레슨 1-2만원대. 스미냑은 고급 리조트와 선셋 바 밀집.',hours:'24시간',price:'무료',tip:'서핑 레슨은 오전 추천',nearby:['🌅 선셋 바','🛍 스미냑 쇼핑']},
-    {id:'b2',icon:'⛩',name:'울루와투 & 사원',tag:'문화 · 자연',desc:'절벽 위 사원에서 바라보는 일몰이 압도적. 케차크 댄스 공연 필수 체험.',hours:'일출~일몰',price:'5만루피아~',tip:'울루와투 선셋 케차크 댄스 예약 필수',nearby:['🌾 떼갈랄랑 라이스 테라스','🐒 원숭이 숲']}
-  ],
-  vn:[
-    {id:'v1',icon:'🌊',name:'미케 비치 (다낭)',tag:'해변 · 휴양',desc:'세계 6대 해변 중 하나. 호이안과 함께 묶어서 일정 구성 추천.',hours:'24시간',price:'무료',tip:'아침 일찍 방문 (사람 적음)',nearby:['🌉 호이안 구시가지 (차 30분)','🏖 바나힐']},
-    {id:'v2',icon:'🏮',name:'호이안 구시가지',tag:'문화 · 야경',desc:'유네스코 세계문화유산. 노란 건물과 등불이 어우러진 올드타운.',hours:'24시간',price:'12만동',tip:'저녁 7시 이후 등불 켜질 때 방문',nearby:['🌊 미케 비치 (차 30분)','🛍 수공예 기념품']}
-  ]
-};
+var DAL_PLACES={sg:[],jp:[],th:[],bali:[],vn:[]};  // DB에서 로드됨
+
+// dal_places 테이블에서 장소 데이터 로드
+function loadDalPlaces(countryCode) {
+  return fetch(SUPA_URL+'/rest/v1/dal_places?country_code=eq.'+countryCode+'&is_active=eq.true&order=sort_order.asc', {
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data) {
+    if (!data || !Array.isArray(data)) return;
+    DAL_PLACES[countryCode] = data.map(function(p) {
+      return {
+        id: p.id,
+        icon: p.icon||'📍',
+        name: p.name,
+        tag: p.tag||'',
+        desc: p.description||'',
+        hours: p.hours||'',
+        price: p.price||'',
+        tip: p.tip||'',
+        nearby: Array.isArray(p.nearby) ? p.nearby : (p.nearby ? JSON.parse(p.nearby) : []),
+        image_url: p.image_url||null
+      };
+    });
+    if (DAL_COUNTRY === countryCode) renderDalPlaces();
+    return data;
+  });
+}
+
+// 모든 나라 데이터 미리 로드
+function loadAllDalPlaces() {
+  ['sg','jp','th','bali','vn'].forEach(function(code) {
+    loadDalPlaces(code);
+  });
+}
 var DAL_MAP_DATA={
   sg:{label:'🇸🇬 싱가포르',pins:[{name:'마리나베이',top:'35%',left:'58%',color:'#c4af87'},{name:'클락키',top:'43%',left:'51%',color:'#c4af87'},{name:'센토사',top:'60%',left:'48%',color:'#5b8fff'},{name:'가든스',top:'28%',left:'63%',color:'#3ecf8e'},{name:'동물원',top:'18%',left:'40%',color:'#5b8fff'}]},
   jp:{label:'🇯🇵 일본',pins:[{name:'도쿄',top:'30%',left:'58%',color:'#c4af87'},{name:'교토',top:'52%',left:'44%',color:'#5b8fff'},{name:'오사카',top:'56%',left:'42%',color:'#3ecf8e'}]},
@@ -4688,7 +4694,14 @@ function selectCountry(btn,code){
   btn.classList.add('active');
   DAL_COUNTRY=code;
   dalSelectedPlaces=[];
-  renderDalMap();renderDalPlaces();buildDalPrompt();
+  renderDalMap();
+  // DB에서 장소 로드 (캐시 있으면 바로, 없으면 로드)
+  if (DAL_PLACES[code] && DAL_PLACES[code].length > 0) {
+    renderDalPlaces();
+  } else {
+    loadDalPlaces(code);
+  }
+  buildDalPrompt();
 }
 function renderDalMap(){
   var d=DAL_MAP_DATA[DAL_COUNTRY];if(!d)return;
@@ -4874,9 +4887,10 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('.dal-subchip').forEach(function(c){c.addEventListener('click',function(){this.classList.toggle('active');buildDalPrompt();});});
   var popup=document.getElementById('dalPlacePopup');
   if(popup){popup.addEventListener('click',function(e){if(e.target===popup)closeDalPlacePopup();});}
-  renderDalMap();renderDalPlaces();buildDalPrompt();
+  renderDalMap();buildDalPrompt();
+  loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
-window.selectCountry=selectCountry;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
