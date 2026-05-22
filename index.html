@@ -640,13 +640,21 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
         <div style="font-size:8px;color:var(--m);margin-bottom:5px;">출발 도시 + 시기</div>
         <div style="display:flex;gap:6px;margin-bottom:10px;">
-          <select id="dalDepartCity" style="flex:1;padding:6px 8px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);color:var(--m);font-family:'DM Sans',sans-serif;font-size:10px;" onchange="buildDalPrompt()">
-            <option value="인천">✈️ 인천</option>
-            <option value="김포">✈️ 김포</option>
-            <option value="김해(부산)">✈️ 김해(부산)</option>
-            <option value="제주">✈️ 제주</option>
-            <option value="대구">✈️ 대구</option>
-          </select>
+          <div style="flex:1;position:relative;">
+            <select id="dalDepartCity" style="width:100%;padding:6px 8px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);color:var(--m);font-family:'DM Sans',sans-serif;font-size:10px;" onchange="dalDepartCityChange(this)">
+              <option value="인천">✈️ 인천</option>
+              <option value="김포">✈️ 김포</option>
+              <option value="김해(부산)">✈️ 김해(부산)</option>
+              <option value="제주">✈️ 제주</option>
+              <option value="대구">✈️ 대구</option>
+              <option value="도쿄(나리타)">✈️ 도쿄(나리타)</option>
+              <option value="오사카(간사이)">✈️ 오사카(간사이)</option>
+              <option value="싱가포르(창이)">✈️ 싱가포르(창이)</option>
+              <option value="방콕(수완나품)">✈️ 방콕(수완나품)</option>
+              <option value="직접입력">✏️ 직접입력</option>
+            </select>
+          </div>
+          <input id="dalDepartCustom" type="text" placeholder="출발 도시 입력" style="display:none;flex:1;padding:6px 10px;border-radius:20px;border:1px solid rgba(196,175,135,.3);background:var(--s1);color:var(--w);font-family:'DM Sans',sans-serif;font-size:10px;" oninput="buildDalPrompt()">
           <select id="dalTravelMonth" style="flex:1;padding:6px 8px;border-radius:20px;border:1px solid var(--b2);background:var(--s1);color:var(--m);font-family:'DM Sans',sans-serif;font-size:10px;" onchange="buildDalPrompt()">
             <option value="">월 선택</option>
             <option value="1월">1월</option><option value="2월">2월</option>
@@ -664,6 +672,11 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <!-- ④ 생성된 프롬프트 -->
       <div style="padding:0 14px 16px;">
         <div style="font-size:9px;color:var(--m);letter-spacing:1px;margin-bottom:6px;">④ 생성된 프롬프트</div>
+        <!-- 방문 장소 직접 입력 -->
+        <div style="margin-bottom:8px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">방문하고 싶은 곳 <span style="color:rgba(196,175,135,.4);">직접 입력 (선택)</span></div>
+          <input id="dalPlacesManual" type="text" placeholder="예: 마리나베이샌즈, 클락키, 점보씨푸드" style="width:100%;padding:8px 10px;background:var(--s1);border:1px solid var(--b2);border-radius:4px;font-size:10px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;" oninput="buildDalPrompt()">
+        </div>
         <div style="background:rgba(91,143,255,.04);border:1px solid rgba(91,143,255,.18);border-radius:4px;padding:10px 12px;margin-bottom:8px;">
           <div style="font-size:8px;color:var(--ac);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Claude / GPT에 붙여넣기</div>
           <div id="dalPromptText" style="font-size:9px;color:rgba(240,236,228,.65);line-height:1.8;">나라와 조건을 선택하면 자동 생성됩니다.</div>
@@ -5272,15 +5285,27 @@ function buildDalPrompt(){
   var pnames=[];
   var allp=DAL_PLACES[DAL_COUNTRY]||[];
   dalSelectedPlaces.forEach(function(id){
-    // dal_places에서 찾기
     var p=allp.find(function(x){return x.id===id;});
     if(p){pnames.push(p.name);return;}
-    // 유저 핀 캐시에서 찾기
     if(_dalPinNameCache&&_dalPinNameCache[id]) pnames.push(_dalPinNameCache[id]);
   });
+  // 직접 입력 장소 추가
+  var manualEl=document.getElementById('dalPlacesManual');
+  if(manualEl&&manualEl.value.trim()){
+    manualEl.value.split(',').forEach(function(s){
+      var t=s.trim(); if(t) pnames.push(t);
+    });
+  }
   var pace='';
   document.querySelectorAll('#dalPace .dal-chip.active').forEach(function(c){pace=c.dataset.val;});
-  var departCity=document.getElementById('dalDepartCity')?document.getElementById('dalDepartCity').value:'인천';
+  var departCityEl=document.getElementById('dalDepartCity');
+  var departCustomEl=document.getElementById('dalDepartCustom');
+  var departCity='인천';
+  if(departCustomEl&&departCustomEl.style.display!=='none'&&departCustomEl.value.trim()){
+    departCity=departCustomEl.value.trim();
+  } else if(departCityEl&&departCityEl.value!=='직접입력'){
+    departCity=departCityEl.value;
+  }
   var travelMonth=document.getElementById('dalTravelMonth')?document.getElementById('dalTravelMonth').value:'';
   var lines=['목적지: '+cname];
   if(departCity) lines.push('출발: '+departCity+(travelMonth?' · '+travelMonth:''));
@@ -5316,6 +5341,29 @@ document.addEventListener('DOMContentLoaded',function(){
   renderDalMap();buildDalPrompt();
   loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
+function dalDepartCityChange(sel){
+  var custom=document.getElementById('dalDepartCustom');
+  if(sel.value==='직접입력'){
+    sel.style.display='none';
+    if(custom){custom.style.display='block';custom.focus();}
+  } else {
+    buildDalPrompt();
+  }
+}
+// 직접입력에서 select로 돌아오기
+document.addEventListener('DOMContentLoaded',function(){
+  var custom=document.getElementById('dalDepartCustom');
+  if(custom){
+    custom.addEventListener('blur',function(){
+      if(!custom.value.trim()){
+        custom.style.display='none';
+        var sel=document.getElementById('dalDepartCity');
+        if(sel) sel.style.display='block';
+      }
+    });
+  }
+});
+
 window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderAllPlaces=renderAllPlaces; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
