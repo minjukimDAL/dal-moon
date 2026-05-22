@@ -1235,75 +1235,53 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- PAGE: SOCIAL — R2-2 별도 탭 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-social" class="page">
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="showSocialTab('msg',this)" id="t-tab-msg">메신저</button>
-    <button class="tab-btn" onclick="showSocialTab('feed',this)" id="t-tab-feed">피드</button>
-    <button class="tab-btn" onclick="showSocialTab('follow',this)" id="t-tab-follow">팔로잉</button>
-    <button class="tab-btn" onclick="showSocialTab('info',this)" id="t-tab-info"><span id='t-tab-info-label'>정보</span></button>
+  <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b1);flex-shrink:0;">
+    <div style="font-size:9px;color:var(--m);letter-spacing:1px;">여행 피드</div>
+    <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;">🔄 새로고침</button>
   </div>
-  <!-- 메신저 -->
-  <div id="social-msg" style="padding:14px 18px;">
-    <div style="padding:10px;margin-bottom:12px;background:rgba(196,175,135,.06);border:1px solid rgba(196,175,135,.2);border-radius:4px;text-align:center;">
-      <div style="font-size:10px;color:var(--gold);margin-bottom:3px;">🌙 DAL 메신저 안내</div>
-      <div style="font-size:9px;color:var(--m);line-height:1.7;">대화는 <strong style="color:var(--sb);">48시간 후 자동 삭제</strong>됩니다.<br>개인정보 보호를 위해 민감한 정보는 공유하지 마세요.</div>
-    </div>
-    <div id="msgRoomList" style="font-size:11px;color:var(--m);text-align:center;padding:20px 0;line-height:2;">
-      아직 대화가 없어요.<br>팔로우 중인 여행자와 메시지를 시작해보세요 🌙
-    </div>
-    <button class="action-btn btn-gold" style="margin-top:14px;" onclick="openNewChat()" id="t-new-msg">+ 새 메시지</button>
-  </div>
-  <!-- 피드 -->
-  <div id="social-feed" style="padding:14px 18px;display:none;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <div style="font-size:9px;color:var(--m);">새 글은 새로고침 후 표시됩니다</div>
-      <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;color:var(--m);cursor:pointer;">🔄 새로고침</button>
-    </div>
+
+  <!-- 피드 목록 -->
+  <div id="social-feed" style="flex:1;overflow-y:auto;padding:10px 14px;">
     <div id="socialFeed" style="margin-bottom:10px;">
-      <div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
+      <div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">
         아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙
       </div>
     </div>
-        <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post">+ 여행 정보 공유하기</button>
+    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">+ 여행 정보 공유하기</button>
   </div>
-  <!-- 팔로잉 -->
-  <div id="social-follow" style="padding:14px 18px;display:none;">
-    <div style="font-size:10px;color:var(--m);margin-bottom:12px;line-height:1.8;" id="t-follow-sub">팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.</div>
-    <div id="followList" style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);line-height:2;">
-      아직 팔로우한 여행자가 없어요.<br>다른 여행자를 팔로우하면 피드에서 정보를 받아볼 수 있어요 🌙
-    </div>
-
-  </div>
-  <div id="social-info" style="display:none;padding:14px 18px;">
-    <div style="margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--sb);font-weight:500;">🎉 Local Main Events</div>
-        <select id="infoEventFilter" onchange="renderInfoEvents()" style="font-size:9px;padding:3px 6px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--m);font-family:'DM Sans',sans-serif;">
-          <option value="all" data-ko="전체" data-en="All">전체</option>
-          <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option><option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
-          <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option><option value="fr" data-ko="🇫🇷 프랑스" data-en="🇫🇷 France">🇫🇷 프랑스</option>
-          <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option><option value="us" data-ko="🇺🇸 미국" data-en="🇺🇸 USA">🇺🇸 미국</option>
-          <option value="sp" data-ko="🇪🇸 스페인" data-en="🇪🇸 Spain">🇪🇸 스페인</option><option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
+  <!-- 글쓰기 팝업 -->
+  <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePostPopup()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+      <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--w);font-weight:500;">여행 정보 공유하기</div>
+        <button onclick="dalClosePostPopup()" style="background:transparent;border:none;color:var(--m);font-size:16px;cursor:pointer;">✕</button>
+      </div>
+      <!-- 나라 선택 -->
+      <div style="margin-bottom:10px;">
+        <div style="font-size:8px;color:var(--m);margin-bottom:4px;">여행지 (선택)</div>
+        <select id="dalPostCountry" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
+          <option value="">선택 안 함</option>
+          <option value="🇸🇬 싱가포르">🇸🇬 싱가포르</option>
+          <option value="🇯🇵 일본">🇯🇵 일본</option>
+          <option value="🇹🇭 태국">🇹🇭 태국</option>
+          <option value="🇮🇩 발리">🇮🇩 발리</option>
+          <option value="🇻🇳 베트남">🇻🇳 베트남</option>
+          <option value="🇫🇷 프랑스">🇫🇷 프랑스</option>
+          <option value="🇬🇧 영국">🇬🇧 영국</option>
+          <option value="🇺🇸 미국">🇺🇸 미국</option>
+          <option value="🇪🇸 스페인">🇪🇸 스페인</option>
+          <option value="기타">기타</option>
         </select>
       </div>
-      <div id="infoEventList"></div>
-    </div>
-    <div style="margin-bottom:14px;">
-      <div style="font-size:12px;color:var(--sb);font-weight:500;margin-bottom:10px;" id="t-checklist-title">✅ 여행 준비 체크리스트</div>
-      <div class="checklist" id="infoChecklist"></div>
-    </div>
-    <div style="background:var(--s1);border:1px solid var(--b1);border-radius:2px;padding:12px;">
-      <div style="font-size:11px;color:var(--sb);margin-bottom:4px;" id="t-safety-title">⚠️ 안전 정보</div>
-      <div style="font-size:10px;color:var(--m);margin-bottom:8px;" id="t-safety-desc">전쟁·재해·여행경보는 외교부 공식 채널에서 실시간 확인하세요.</div>
-      <button onclick="openLink('https://www.0404.go.kr')" style="width:100%;padding:8px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:10px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;" id="t-safety-btn">외교부 해외안전여행 바로가기 →</button>
-    </div>
-  </div>
-  <!-- 채팅방 (서브) -->
-  <div id="chatRoom" style="display:none;position:absolute;inset:0;background:var(--bg);z-index:10;">
-    <div class="sub-header"><button class="back-btn" onclick="closeChatRoom()">←</button><div class="sub-title" id="chatRoomName">채팅방</div></div>
-    <div style="flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:8px;height:calc(100% - 120px);" id="chatMessages"></div>
-    <div style="padding:8px 14px;border-top:1px solid var(--b1);display:flex;gap:8px;background:var(--bg);">
-      <input style="flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:2px;padding:10px 13px;color:var(--w);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;" id="chatSendInput" placeholder="메시지 입력..." onkeydown="if(event.key==='Enter')sendChatMsg()">
-      <button style="padding:10px 16px;background:var(--gold);border:none;border-radius:2px;font-size:12px;cursor:pointer;" onclick="sendChatMsg()">↑</button>
+      <!-- 내용 -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:8px;color:var(--m);margin-bottom:4px;">내용 *</div>
+        <textarea id="dalPostContent" placeholder="여행 팁, 후기, 추천 장소를 자유롭게 공유해주세요 🌙" style="width:100%;padding:9px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:100px;box-sizing:border-box;line-height:1.7;"></textarea>
+        <div style="font-size:8px;color:var(--m);margin-top:4px;">하루 최대 5개까지 공유 가능</div>
+      </div>
+      <!-- 저장 버튼 -->
+      <button onclick="dalSubmitPost()" style="width:100%;padding:12px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:4px;font-size:11px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">공유하기</button>
     </div>
   </div>
 </div>
@@ -3176,18 +3154,50 @@ function refreshFeed(){ if(typeof loadPostsFromServer==='function') loadPostsFro
 
 function openNewPost(){
   if(!requireLogin(function(){ openNewPost(); })) return;
-  var text=prompt(lang==='ko'?'여행 정보를 공유해주세요':'Share your travel tip');
-  if(text&&text.trim()){
-    var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
-    if(_currentToken&&typeof savePostToServer==='function'){
-      savePostToServer(text, myNick).then(function(ok){
-        if(ok){ loadPostsFromServer(); alert(lang==='ko'?'✅ 피드에 게시되었습니다!':'✅ Posted!'); }
-        else { alert(lang==='ko'?'게시 중 오류가 발생했습니다.':'Failed to post.'); }
-      });
-    } else {
-      alert(lang==='ko'?'✅ 게시되었습니다! (로그인 후 서버 저장)':'✅ Posted! (Login to save to server)');
-    }
+  // 하루 5개 제한 체크
+  var today=new Date().toDateString();
+  var postKey='dal_post_count_'+today;
+  var postCount=parseInt(localStorage.getItem(postKey)||'0');
+  if(postCount>=5){ alert('하루 최대 5개까지 공유할 수 있어요 🌙'); return; }
+  // 글쓰기 팝업 열기
+  var popup=document.getElementById('dalPostPopup');
+  if(popup){
+    document.getElementById('dalPostContent').value='';
+    document.getElementById('dalPostCountry').value='';
+    popup.style.display='flex';
   }
+}
+
+function dalSubmitPost(){
+  var text=document.getElementById('dalPostContent').value.trim();
+  var country=document.getElementById('dalPostCountry').value;
+  if(!text){ alert('내용을 입력해주세요'); return; }
+  var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+  var fullText=(country?'['+country+'] ':'')+text;
+  savePostToServer(fullText, myNick).then(function(ok){
+    if(ok){
+      // 하루 게시 횟수 증가
+      var today=new Date().toDateString();
+      var postKey='dal_post_count_'+today;
+      localStorage.setItem(postKey, (parseInt(localStorage.getItem(postKey)||'0')+1).toString());
+      dalClosePostPopup();
+      loadPostsFromServer();
+    } else { alert('게시 중 오류가 발생했습니다.'); }
+  });
+}
+
+function dalClosePostPopup(){
+  var p=document.getElementById('dalPostPopup');
+  if(p) p.style.display='none';
+}
+
+function reportPost(postId){
+  if(!confirm('이 게시물을 신고할까요?')) return;
+  fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({reported:true})
+  }).then(function(){ alert('신고가 접수됐어요. 검토 후 처리됩니다.'); });
 }
 function openShareFeed(btn){
   var card=btn.closest('.feed-card');
@@ -3383,50 +3393,52 @@ async function saveUnlockedToServer(tripId, optKey, content){
 
 // ══ 소셜 피드 서버 연동 ══
 async function loadPostsFromServer(){
-  if(!_currentToken) return;
+  var feedEl=document.getElementById('socialFeed');
+  if(!feedEl) return;
   try{
-    var r=await _sfGet('/rest/v1/posts?order=created_at.desc&limit=20&select=*');
-    if(r&&Array.isArray(r)&&r.length>0){
-      var feedEl=document.getElementById('socialFeed');
-      if(!feedEl) return;
-      feedEl.innerHTML=''; r.map(function(p){
-        var isMe=(_currentUserId&&p.user_id===_currentUserId);
-        var cardDiv=document.createElement('div');
-        cardDiv.className='feed-card';
-        var followHtml=isMe
-          ?'<span style="font-size:9px;color:var(--m);padding:3px 8px;border:1px solid var(--b2);border-radius:10px;">'+(lang==='ko'?'나':'Me')+'</span>'
-          :'<span class="feed-follow-placeholder" data-uid="'+p.user_id+'" data-nick="'+p.nickname+'"></span>';
-        cardDiv.innerHTML='<div class="feed-user">'
-          +'<div class="feed-avatar">👤</div>'
-          +'<div style="flex:1;"><div style="font-size:11px;color:var(--sb);">'+p.nickname+'</div><div style="font-size:9px;color:var(--m);">'+new Date(p.created_at).toLocaleDateString(lang==='ko'?'ko-KR':'en-US')+'</div></div>'
-          +followHtml
-          +'</div>'
-          +'<div style="font-size:11px;color:var(--m);line-height:1.8;margin-bottom:10px;">'+p.content+'</div>'
-          +'<div class="feed-actions"></div>';
-        // 팔로우 버튼 동적 생성
-        if(!isMe){
-          var ph=cardDiv.querySelector('.feed-follow-placeholder');
-          var uid=p.user_id, nick=p.nickname;
-          var fb=document.createElement('button');
-          fb.className='follow-btn'; fb.style.cssText='font-size:9px;padding:4px 10px;';
-          fb.textContent=lang==='ko'?'팔로우':'Follow';
-          fb.onclick=function(){ toggleFollowUser(fb,uid,nick); };
-          if(ph) ph.parentNode.replaceChild(fb,ph);
-        }
-        // 좋아요 버튼 동적 생성
-        var likeBtn=document.createElement('button');
-        likeBtn.className='feed-btn';
-        likeBtn.textContent='❤️ '+(p.likes||0);
-        var pid=p.id;
-        likeBtn.onclick=function(){ likeFeedPost(likeBtn,pid); };
-        cardDiv.querySelector('.feed-actions').appendChild(likeBtn);
-        feedEl.appendChild(cardDiv);
-        return null;
-      });
-      var dummy=null;
-      if(false) [].join('');
-      console.log('[Posts] 서버에서 로드:', r.length+'개');
+    // 로그인 여부 무관하게 피드는 누구나 볼 수 있음
+    var r=await fetch(SUPA_URL+'/rest/v1/posts?order=created_at.desc&limit=50&reported=neq.true&select=*',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
+    }).then(function(res){return res.json();});
+
+    if(!r||!Array.isArray(r)||r.length===0){
+      feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙</div>';
+      return;
     }
+    feedEl.innerHTML='';
+    r.forEach(function(p){
+      var isMe=(_currentUserId&&p.user_id===_currentUserId);
+      var date=new Date(p.created_at);
+      var dateStr=date.getFullYear()+'.'+(date.getMonth()+1)+'.'+date.getDate();
+      // 나라 태그 파싱 ([싱가포르] 형태)
+      var countryTag='', contentText=p.content||'';
+      var tagMatch=contentText.match(/^\[([^\]]+)\]\s*/);
+      if(tagMatch){ countryTag=tagMatch[1]; contentText=contentText.replace(tagMatch[0],''); }
+
+      var card=document.createElement('div');
+      card.className='feed-card';
+      card.style.cssText='background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:11px 12px;margin-bottom:8px;';
+      card.innerHTML=
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+        +'<div style="display:flex;align-items:center;gap:7px;">'
+        +'<div style="width:28px;height:28px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div>'
+        +'<div><div style="font-size:11px;color:var(--w);font-weight:500;">'+(p.nickname||'DAL User')+'</div>'
+        +'<div style="font-size:9px;color:var(--m);">'+dateStr+'</div></div>'
+        +'</div>'
+        +(countryTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);">'+countryTag+'</span>':'')
+        +'</div>'
+        +'<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:10px;">'+contentText+'</div>'
+        +'<div style="display:flex;gap:6px;align-items:center;">'
+        +'<button class="dal-like-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--m);cursor:pointer;">❤️ '+(p.likes||0)+'</button>'
+        +(!isMe?'<button data-pid="'+p.id+'" onclick="reportPost(this.dataset.pid)" style="background:transparent;border:none;font-size:9px;color:rgba(240,96,96,.5);cursor:pointer;margin-left:auto;">신고</button>':'<span style="margin-left:auto;font-size:9px;color:var(--m);">내 글</span>')
+        +'</div>';
+      // 좋아요 버튼 이벤트
+      var likeBtn=card.querySelector('.dal-like-btn');
+      var pid=p.id;
+      likeBtn.onclick=function(){ likeFeedPost(likeBtn,pid); };
+      feedEl.appendChild(card);
+    });
+    console.log('[Posts] 로드:', r.length+'개');
   }catch(e){ console.warn('[Posts] 로드 실패:', e.message); }
 }
 async function savePostToServer(text, nickname){
@@ -4652,7 +4664,7 @@ window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
 window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollowUser=toggleFollowUser; window.likeFeedPost=likeFeedPost; window.refreshFeed=refreshFeed; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
-window.searchUsers=searchUsers; window.openNewPost=openNewPost;
+window.searchUsers=searchUsers; window.openNewPost=openNewPost; window.dalSubmitPost=dalSubmitPost; window.dalClosePostPopup=dalClosePostPopup; window.reportPost=reportPost;
 window.openShareFeed=openShareFeed; window.collapseHero=collapseHero;
 window.expandHero=expandHero; window.selectOption=selectOption;
 window.doBookTrip=doBookTrip; window.openShareModal=openShareModal;
