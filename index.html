@@ -4871,8 +4871,8 @@ function loadUserPins() {
   _dalUserPinMarkers = [];
   _sfGet('/rest/v1/user_pins?user_id=eq.'+_currentUserId+'&order=created_at.desc').then(function(pins) {
     if (!pins || !Array.isArray(pins)) return;
-    // 핀 로드 후 관심 장소 목록도 갱신
-    renderUserPinsInGrid();
+    // 핀 로드 후 관심 장소 목록 전체 재렌더링
+    renderAllPlaces();
     pins.forEach(function(p) {
       var catColors = {'가고싶은 곳':'#5b8fff','다녀온 곳':'#3ecf8e','즐겨찾는 곳':'#c4af87','맛집':'#f06060','숙소':'#c4af87','액티비티':'#5b8fff'};
       var color = catColors[p.category] || '#c4af87';
@@ -4994,24 +4994,56 @@ function dalDeletePin(id) {
   }).then(function() { loadUserPins(); });
 }
 function renderDalPlaces(){
+  // 유저 핀까지 포함해서 한번에 그리기
+  renderAllPlaces();
+}
+
+function renderAllPlaces(){
   var grid=document.getElementById('dalPlacesGrid');if(!grid)return;
-  var places=DAL_PLACES[DAL_COUNTRY]||[];
   grid.innerHTML='';
 
-  // dal_places DB 데이터가 있으면 표시
-  if(places.length>0){
-    places.forEach(function(p){
+  // dal_places DB 데이터
+  var places=DAL_PLACES[DAL_COUNTRY]||[];
+  places.forEach(function(p){
+    var card=document.createElement('div');
+    card.className='dal-place-card';
+    card.dataset.id=p.id;
+    card.innerHTML='<div style="font-size:18px;margin-bottom:3px;">'+p.icon+'</div><div style="font-size:10px;color:var(--w);margin-bottom:2px;">'+p.name+'</div><div style="font-size:8px;color:var(--m);">'+p.tag+'</div>';
+    card.addEventListener('click',function(){openDalPlacePopup(p);});
+    grid.appendChild(card);
+  });
+
+  // 유저 핀 (로그인 상태일 때만)
+  if(!_currentToken||!_currentUserId){
+    if(places.length===0) grid.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;font-size:10px;color:var(--m);">지도를 탭해서 관심 장소를 추가해보세요 📍</div>';
+    return;
+  }
+  _sfGet('/rest/v1/user_pins?user_id=eq.'+_currentUserId+'&country_code=eq.'+DAL_COUNTRY+'&order=created_at.desc').then(function(pins){
+    // 핀 추가 전에 그리드 초기화 (중복 방지)
+    var existingIds = {};
+    grid.querySelectorAll('[data-pinid]').forEach(function(el){ existingIds[el.dataset.pinid]=true; });
+
+    if(!pins||!Array.isArray(pins)||pins.length===0){
+      if(places.length===0) grid.innerHTML='<div style="grid-column:1/-1;padding:16px;text-align:center;font-size:10px;color:var(--m);">지도를 탭해서 관심 장소를 추가해보세요 📍</div>';
+      return;
+    }
+    pins.forEach(function(p){
+      if(existingIds[p.id]) return; // 중복 방지
+      _dalPinNameCache[p.id]=p.name;
+      var catColors={'가고싶은 곳':'var(--ac)','다녀온 곳':'var(--ok)','즐겨찾는 곳':'var(--gold)'};
+      var color=catColors[p.category]||'var(--m)';
       var card=document.createElement('div');
       card.className='dal-place-card';
-      card.dataset.id=p.id;
-      card.innerHTML='<div style="font-size:18px;margin-bottom:3px;">'+p.icon+'</div><div style="font-size:10px;color:var(--w);margin-bottom:2px;">'+p.name+'</div><div style="font-size:8px;color:var(--m);">'+p.tag+'</div>';
-      card.addEventListener('click',function(){openDalPlacePopup(p);});
+      card.dataset.pinid=p.id;
+      card.style.position='relative';
+      card.innerHTML='<div style="font-size:18px;margin-bottom:3px;">'+(p.icon||'📍')+'</div>'
+        +'<div style="font-size:10px;color:var(--w);margin-bottom:2px;">'+p.name+'</div>'
+        +'<div style="font-size:8px;color:'+color+';">'+p.category+'</div>'
+        +(p.rating?'<div style="font-size:8px;margin-top:2px;">'+'⭐'.repeat(p.rating)+'</div>':'');
+      card.addEventListener('click',function(){ dalTogglePinSelect(card,p); });
       grid.appendChild(card);
     });
-  }
-
-  // 유저 핀도 관심 장소에 표시
-  renderUserPinsInGrid();
+  });
 }
 
 function renderUserPinsInGrid(){
@@ -5284,7 +5316,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderDalMap();buildDalPrompt();
   loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
-window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderAllPlaces=renderAllPlaces; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
