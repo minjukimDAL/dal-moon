@@ -1251,37 +1251,56 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 글쓰기 팝업 -->
   <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePostPopup()">
-    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:16px 16px 32px;" onclick="event.stopPropagation()">
-      <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-size:13px;color:var(--w);font-weight:500;">여행 정보 공유하기</div>
-        <button onclick="dalClosePostPopup()" style="background:transparent;border:none;color:var(--m);font-size:16px;cursor:pointer;">✕</button>
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+      <!-- 고정 헤더 -->
+      <div style="padding:14px 16px 10px;flex-shrink:0;">
+        <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;color:var(--w);font-weight:500;">여행 정보 공유하기</div>
+          <button onclick="dalClosePostPopup()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+        </div>
       </div>
-      <!-- 나라 선택 -->
-      <div style="margin-bottom:10px;">
-        <div style="font-size:8px;color:var(--m);margin-bottom:4px;">여행지 (선택)</div>
-        <select id="dalPostCountry" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
-          <option value="">선택 안 함</option>
-          <option value="🇸🇬 싱가포르">🇸🇬 싱가포르</option>
-          <option value="🇯🇵 일본">🇯🇵 일본</option>
-          <option value="🇹🇭 태국">🇹🇭 태국</option>
-          <option value="🇮🇩 발리">🇮🇩 발리</option>
-          <option value="🇻🇳 베트남">🇻🇳 베트남</option>
-          <option value="🇫🇷 프랑스">🇫🇷 프랑스</option>
-          <option value="🇬🇧 영국">🇬🇧 영국</option>
-          <option value="🇺🇸 미국">🇺🇸 미국</option>
-          <option value="🇪🇸 스페인">🇪🇸 스페인</option>
-          <option value="기타">기타</option>
-        </select>
+      <!-- 스크롤 영역 -->
+      <div style="flex:1;overflow-y:auto;padding:0 16px;">
+        <!-- 나라 선택 -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">여행지 (선택)</div>
+          <select id="dalPostCountry" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;">
+            <option value="">선택 안 함</option>
+            <option value="🇸🇬 싱가포르">🇸🇬 싱가포르</option>
+            <option value="🇯🇵 일본">🇯🇵 일본</option>
+            <option value="🇹🇭 태국">🇹🇭 태국</option>
+            <option value="🇮🇩 발리">🇮🇩 발리</option>
+            <option value="🇻🇳 베트남">🇻🇳 베트남</option>
+            <option value="🇫🇷 프랑스">🇫🇷 프랑스</option>
+            <option value="🇬🇧 영국">🇬🇧 영국</option>
+            <option value="🇺🇸 미국">🇺🇸 미국</option>
+            <option value="🇪🇸 스페인">🇪🇸 스페인</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <!-- 내용 -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">내용 *</div>
+          <textarea id="dalPostContent" placeholder="여행 팁, 후기, 추천 장소를 자유롭게 공유해주세요 🌙" style="width:100%;padding:9px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:90px;box-sizing:border-box;line-height:1.7;"></textarea>
+          <div style="font-size:8px;color:var(--m);margin-top:3px;">하루 최대 5개까지 공유 가능</div>
+        </div>
+        <!-- 사진 업로드 (최대 3장) -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:5px;">사진 (최대 3장, 선택)</div>
+          <div style="display:flex;gap:6px;" id="dalPostPhotoRow">
+            <label style="width:70px;height:70px;background:var(--s2);border:1px dashed var(--b2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <span style="font-size:20px;color:var(--m);">📷</span>
+              <input type="file" accept="image/*" multiple style="display:none;" id="dalPostPhotos" onchange="dalLoadPostPhotos(this)">
+            </label>
+            <div id="dalPostPhotoPreview" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+          </div>
+        </div>
       </div>
-      <!-- 내용 -->
-      <div style="margin-bottom:14px;">
-        <div style="font-size:8px;color:var(--m);margin-bottom:4px;">내용 *</div>
-        <textarea id="dalPostContent" placeholder="여행 팁, 후기, 추천 장소를 자유롭게 공유해주세요 🌙" style="width:100%;padding:9px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:100px;box-sizing:border-box;line-height:1.7;"></textarea>
-        <div style="font-size:8px;color:var(--m);margin-top:4px;">하루 최대 5개까지 공유 가능</div>
+      <!-- 고정 하단 버튼 -->
+      <div style="padding:12px 16px 24px;flex-shrink:0;border-top:1px solid var(--b1);">
+        <button onclick="dalSubmitPost()" style="width:100%;padding:13px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:4px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">공유하기</button>
       </div>
-      <!-- 저장 버튼 -->
-      <button onclick="dalSubmitPost()" style="width:100%;padding:12px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:4px;font-size:11px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">공유하기</button>
     </div>
   </div>
 </div>
@@ -3427,10 +3446,14 @@ async function loadPostsFromServer(){
         +'</div>'
         +(countryTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);">'+countryTag+'</span>':'')
         +'</div>'
-        +'<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:10px;">'+contentText+'</div>'
+        +'<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:8px;">'+contentText+'</div>'
+        +(p.images&&p.images.length>0?'<div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;">'+p.images.map(function(img){return '<img src="'+img+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;">';}).join('')+'</div>':'')
         +'<div style="display:flex;gap:6px;align-items:center;">'
-        +'<button class="dal-like-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:10px;color:var(--m);cursor:pointer;">❤️ '+(p.likes||0)+'</button>'
-        +(!isMe?'<button data-pid="'+p.id+'" onclick="reportPost(this.dataset.pid)" style="background:transparent;border:none;font-size:9px;color:rgba(240,96,96,.5);cursor:pointer;margin-left:auto;">신고</button>':'<span style="margin-left:auto;font-size:9px;color:var(--m);">내 글</span>')
+        +'<button class="dal-like-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;">❤️ '+(p.likes||0)+'</button>'
+        +(isMe
+          ?'<button data-pid="'+p.id+'" onclick="dalDeletePost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;">삭제</button>'
+          :'<button data-pid="'+p.id+'" onclick="reportPost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;font-size:9px;color:var(--m);cursor:pointer;">신고</button>'
+        )
         +'</div>';
       // 좋아요 버튼 이벤트
       var likeBtn=card.querySelector('.dal-like-btn');
@@ -3447,7 +3470,7 @@ async function savePostToServer(text, nickname){
     var r=await fetch(SUPA_URL+'/rest/v1/posts',{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify({user_id:_currentUserId,nickname:nickname||'DAL User',content:text})
+      body:JSON.stringify(Object.assign({user_id:_currentUserId,nickname:nickname||'DAL User',content:text}, (photos&&photos.length?{images:photos}:{})))
     });
     console.log('[Posts] 서버 저장 완료');
     return r.ok;
@@ -4664,7 +4687,14 @@ window.showSocialTab=showSocialTab; window.addDalMsg=addDalMsg;
 window.saveToTrip=saveToTrip; window.saveToTripSnap=saveToTripSnap; window.toggleFollowUser=toggleFollowUser; window.likeFeedPost=likeFeedPost; window.refreshFeed=refreshFeed; window.toggleFollow=toggleFollow;
 window.openChat=openChat; window.closeChatRoom=closeChatRoom;
 window.sendChatMsg=sendChatMsg; window.openNewChat=openNewChat;
-window.searchUsers=searchUsers; window.openNewPost=openNewPost; window.dalSubmitPost=dalSubmitPost; window.dalClosePostPopup=dalClosePostPopup; window.reportPost=reportPost;
+window.searchUsers=searchUsers; window.openNewPost=openNewPost; function dalDeletePost(postId){
+  if(!confirm('이 게시물을 삭제할까요?')) return;
+  fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
+    method:'DELETE',
+    headers:{'Authorization':'Bearer '+_currentToken,'apikey':SUPA_KEY}
+  }).then(function(){ loadPostsFromServer(); });
+}
+window.dalSubmitPost=dalSubmitPost; window.dalClosePostPopup=dalClosePostPopup; window.dalLoadPostPhotos=dalLoadPostPhotos; window.dalRemovePhoto=dalRemovePhoto; window.dalDeletePost=dalDeletePost; window.reportPost=reportPost;
 window.openShareFeed=openShareFeed; window.collapseHero=collapseHero;
 window.expandHero=expandHero; window.selectOption=selectOption;
 window.doBookTrip=doBookTrip; window.openShareModal=openShareModal;
