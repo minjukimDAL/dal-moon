@@ -5039,8 +5039,8 @@ function renderUserPinsInGrid(){
         +'<div style="font-size:8px;color:'+color+';">'+p.category+'</div>'
         +(p.rating?'<div style="font-size:8px;margin-top:2px;">'+'⭐'.repeat(p.rating)+'</div>':'');
       card.addEventListener('click',function(){
-        // 유저 핀 상세 팝업
-        openUserPinPopup(p);
+        // 탭 → 선택/해제 토글 (길게 누르면 상세)
+        dalTogglePinSelect(card, p);
       });
       grid.appendChild(card);
     });
@@ -5112,6 +5112,34 @@ function openDalPlacePopup(p){
   popup.style.display='flex';
 }
 function closeDalPlacePopup(){var p=document.getElementById('dalPlacePopup');if(p)p.style.display='none';}
+// 유저 핀 이름 캐시 (프롬프트 생성용)
+var _dalPinNameCache = {};
+
+function dalTogglePinSelect(card, p) {
+  // 핀 이름 캐시에 저장
+  _dalPinNameCache[p.id] = p.name;
+  var idx = dalSelectedPlaces.indexOf(p.id);
+  if(idx > -1){
+    // 해제
+    dalSelectedPlaces.splice(idx, 1);
+    card.classList.remove('active');
+    var ck = card.querySelector('.dal-ck');
+    if(ck) ck.remove();
+  } else {
+    // 선택
+    dalSelectedPlaces.push(p.id);
+    card.classList.add('active');
+    if(!card.querySelector('.dal-ck')){
+      var d=document.createElement('div');
+      d.className='dal-ck';
+      d.style.cssText='position:absolute;top:5px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:8px;color:#060710;';
+      d.textContent='✓';
+      card.appendChild(d);
+    }
+  }
+  buildDalPrompt();
+}
+
 function toggleDalPlace(id,name){
   var idx=dalSelectedPlaces.indexOf(id);
   if(idx>-1){dalSelectedPlaces.splice(idx,1);}else{dalSelectedPlaces.push(id);}
@@ -5209,8 +5237,15 @@ function buildDalPrompt(){
     if(sid){document.querySelectorAll('#'+sid+' .dal-subchip.active').forEach(function(s){subs.push(s.dataset.val);});}
     optThemes.push(subs.length?v+'('+subs.join('·')+')':v);
   });
-  var pnames=[];var allp=DAL_PLACES[DAL_COUNTRY]||[];
-  dalSelectedPlaces.forEach(function(id){var p=allp.find(function(x){return x.id===id;});if(p)pnames.push(p.name);});
+  var pnames=[];
+  var allp=DAL_PLACES[DAL_COUNTRY]||[];
+  dalSelectedPlaces.forEach(function(id){
+    // dal_places에서 찾기
+    var p=allp.find(function(x){return x.id===id;});
+    if(p){pnames.push(p.name);return;}
+    // 유저 핀 캐시에서 찾기
+    if(_dalPinNameCache&&_dalPinNameCache[id]) pnames.push(_dalPinNameCache[id]);
+  });
   var pace='';
   document.querySelectorAll('#dalPace .dal-chip.active').forEach(function(c){pace=c.dataset.val;});
   var departCity=document.getElementById('dalDepartCity')?document.getElementById('dalDepartCity').value:'인천';
@@ -5249,7 +5284,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderDalMap();buildDalPrompt();
   loadAllDalPlaces();  // DB에서 장소 데이터 로드
 });
-window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
