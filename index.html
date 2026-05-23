@@ -419,6 +419,30 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
 </div>
 
+<!-- ══ 게시물 상세/댓글 팝업 ══ -->
+<div id="dalDetailPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="dalCloseDetail()">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
+    <!-- 헤더 -->
+    <div style="padding:14px 16px 10px;flex-shrink:0;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:13px;color:var(--w);font-weight:500;">게시물</div>
+      <button onclick="dalCloseDetail()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+    </div>
+    <!-- 본문 스크롤 -->
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;">
+      <div id="dalDetailBody"></div>
+      <div style="margin-top:14px;border-top:1px solid var(--b1);padding-top:12px;">
+        <div style="font-size:10px;color:var(--m);margin-bottom:8px;">댓글</div>
+        <div id="dalCommentList" style="margin-bottom:10px;"></div>
+        <div id="dalCommentInput" style="display:none;gap:6px;align-items:flex-end;">
+          <textarea id="dalCommentText" placeholder="댓글을 입력하세요" style="flex:1;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;resize:none;height:60px;box-sizing:border-box;line-height:1.6;"></textarea>
+          <button onclick="dalSubmitComment()" style="padding:8px 14px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:6px;font-size:11px;color:var(--gold);cursor:pointer;white-space:nowrap;flex-shrink:0;">등록</button>
+        </div>
+        <div id="dalCommentLoginNotice" style="display:none;font-size:10px;color:var(--m);text-align:center;padding:8px 0;">댓글을 달려면 로그인이 필요해요</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- PAGE: HOME -->
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -1236,7 +1260,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-social" class="page">
   <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b1);flex-shrink:0;">
-    <div style="font-size:9px;color:var(--m);letter-spacing:1px;">여행 피드</div>
+    <div style="display:flex;gap:6px;">
+      <button class="feed-filter-btn" data-f="all" onclick="setFeedFilter('all')" style="background:transparent;border:1px solid var(--gold);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--gold);cursor:pointer;">전체</button>
+      <button class="feed-filter-btn" data-f="mine" onclick="setFeedFilter('mine')" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;">내 글</button>
+    </div>
     <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;">🔄 새로고침</button>
   </div>
 
@@ -1278,6 +1305,11 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
             <option value="🇪🇸 스페인">🇪🇸 스페인</option>
             <option value="기타">기타</option>
           </select>
+        </div>
+        <!-- 장소 태그 -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:8px;color:var(--m);margin-bottom:4px;">장소 (선택)</div>
+          <input id="dalPostPlace" type="text" placeholder="예: 도쿄 신주쿠, 방콕 카오산로드" style="width:100%;padding:8px 10px;background:var(--s2);border:1px solid var(--b2);border-radius:4px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;">
         </div>
         <!-- 내용 -->
         <div style="margin-bottom:10px;">
@@ -3154,18 +3186,205 @@ function toggleFollowUser(btn, userId, nickname){
   }
 }
 // ══ 피드 좋아요 ══
+// ══ 상세/댓글 팝업 ══
+var _detailPostId=null;
+
+async function dalOpenDetail(postId){
+  _detailPostId=postId;
+  var popup=document.getElementById('dalDetailPopup');
+  var body=document.getElementById('dalDetailBody');
+  var commentList=document.getElementById('dalCommentList');
+  var commentInput=document.getElementById('dalCommentInput');
+  var commentLoginNotice=document.getElementById('dalCommentLoginNotice');
+  if(!popup||!body) return;
+
+  body.innerHTML='<div style="text-align:center;padding:20px;color:var(--m);font-size:11px;">불러오는 중...</div>';
+  commentList.innerHTML='';
+  popup.style.display='flex';
+
+  try{
+    // 게시물 로드
+    var posts=await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId+'&select=*',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
+    }).then(function(r){return r.json();});
+    var p=posts&&posts[0];
+    if(!p){ body.innerHTML='<div style="text-align:center;color:var(--m);font-size:11px;">게시물을 찾을 수 없어요</div>'; return; }
+
+    var date=new Date(p.created_at);
+    var dateStr=date.getFullYear()+'.'+(date.getMonth()+1)+'.'+date.getDate();
+    var timeLeft=_timeLeft(p.created_at);
+    var countryTag='', placeTag='', contentText=p.content||'';
+    var tagMatch=contentText.match(/^\[([^\]]+)\]\s*/);
+    if(tagMatch){ countryTag=tagMatch[1]; contentText=contentText.replace(tagMatch[0],''); }
+    var placeMatch=contentText.match(/^📍([^\s].*?)\s/);
+    if(placeMatch){ placeTag=placeMatch[1]; contentText=contentText.replace(placeMatch[0],''); }
+
+    var likedSet=new Set(JSON.parse(localStorage.getItem('dal_liked')||'[]'));
+    var liked=likedSet.has(p.id);
+    var isMe=(_currentUserId&&p.user_id===_currentUserId);
+
+    // 상세 본문 렌더링 (DOM 방식으로 따옴표 충돌 방지)
+    var likeStyle='background:transparent;border:1px solid '+(liked?'rgba(240,96,96,.5)':'var(--b2)')+';border-radius:10px;padding:5px 14px;font-size:10px;color:'+(liked?'var(--red)':'var(--m)')+';cursor:pointer;';
+    var imagesHtml=p.images&&p.images.length>0
+      ?'<div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;">'
+        +p.images.map(function(img){return '<img src="'+img+'" style="width:100px;height:100px;object-fit:cover;border-radius:8px;flex-shrink:0;">';}).join('')
+        +'</div>':'';
+    var tagsHtml=countryTag||placeTag
+      ?'<div style="display:flex;gap:4px;margin-bottom:8px;">'
+        +(countryTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);">'+countryTag+'</span>':'')
+        +(placeTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.2);border-radius:10px;color:#7bb8f0;">📍'+placeTag+'</span>':'')
+        +'</div>':'';
+    body.innerHTML=
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">'
+        +'<div style="width:32px;height:32px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:14px;">👤</div>'
+        +'<div><div style="font-size:12px;color:var(--w);font-weight:500;">'+(p.nickname||'DAL User')+'</div>'
+        +'<div style="font-size:9px;color:var(--m);">'+dateStr+(timeLeft?' · ⏳ '+timeLeft:'')+'</div></div>'
+      +'</div>'
+      +tagsHtml
+      +'<div style="font-size:12px;color:rgba(240,236,228,.85);line-height:1.9;margin-bottom:12px;">'+contentText+'</div>'
+      +imagesHtml
+      +'<div style="display:flex;gap:6px;" id="dalDetailActionBar"></div>';
+    // 좋아요 버튼 — DOM으로 추가해서 따옴표 충돌 방지
+    var likeBtn=document.createElement('button');
+    likeBtn.id='dalDetailLikeBtn';
+    likeBtn.dataset.pid=p.id;
+    likeBtn.dataset.liked=String(liked);
+    likeBtn.setAttribute('style',likeStyle);
+    likeBtn.textContent='❤️ '+(p.likes||0);
+    likeBtn.onclick=function(){ likeFeedPost(likeBtn,p.id); };
+    document.getElementById('dalDetailActionBar').appendChild(likeBtn);
+    if(isMe){
+      var delBtn=document.createElement('button');
+      delBtn.setAttribute('style','margin-left:auto;padding:5px 12px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;');
+      delBtn.textContent='삭제';
+      delBtn.onclick=function(){ dalDeletePost(p.id); dalCloseDetail(); };
+      document.getElementById('dalDetailActionBar').appendChild(delBtn);
+    }
+
+    // 댓글 로드
+    dalLoadComments(postId);
+
+    // 댓글 입력란 표시
+    if(_currentToken){ commentInput.style.display='flex'; commentLoginNotice.style.display='none'; }
+    else { commentInput.style.display='none'; commentLoginNotice.style.display='block'; }
+  }catch(e){ body.innerHTML='<div style="color:var(--m);font-size:11px;">불러오기 실패</div>'; console.warn('[Detail]',e); }
+}
+
+async function dalLoadComments(postId){
+  var list=document.getElementById('dalCommentList');
+  if(!list) return;
+  try{
+    var comments=await fetch(SUPA_URL+'/rest/v1/comments?post_id=eq.'+postId+'&order=created_at.asc&select=*',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
+    }).then(function(r){return r.json();});
+    if(!comments||!comments.length){
+      list.innerHTML='<div style="font-size:10px;color:var(--m);text-align:center;padding:8px 0;">아직 댓글이 없어요</div>';
+      return;
+    }
+    var frag=document.createDocumentFragment();
+    comments.forEach(function(c){
+      var isMe=(_currentUserId&&c.user_id===_currentUserId);
+      var cDate=new Date(c.created_at);
+      var cDateStr=(cDate.getMonth()+1)+'.'+cDate.getDate();
+      var row=document.createElement('div');
+      row.style.cssText='padding:8px 0;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:flex-start;';
+      var left=document.createElement('div');
+      left.style.flex='1';
+      left.innerHTML='<div style="font-size:10px;color:var(--w);font-weight:500;margin-bottom:2px;">'+(c.nickname||'DAL User')+'<span style="font-weight:400;color:var(--m);margin-left:6px;">'+cDateStr+'</span></div>'
+        +'<div style="font-size:11px;color:rgba(240,236,228,.8);line-height:1.6;">'+c.content+'</div>';
+      row.appendChild(left);
+      if(isMe){
+        var xBtn=document.createElement('button');
+        xBtn.setAttribute('style','background:transparent;border:none;color:var(--m);font-size:11px;cursor:pointer;padding:0 4px;flex-shrink:0;');
+        xBtn.textContent='✕';
+        xBtn.onclick=(function(cid){return function(){dalDeleteComment(cid);};})(c.id);
+        row.appendChild(xBtn);
+      }
+      frag.appendChild(row);
+    });
+    list.innerHTML='';
+    list.appendChild(frag);
+  }catch(e){ console.warn('[Comments] 로드 실패:',e); }
+}
+
+async function dalSubmitComment(){
+  var text=(document.getElementById('dalCommentText')||{}).value;
+  if(!text||!text.trim()){ alert('댓글을 입력해주세요'); return; }
+  if(!_currentToken||!_currentUserId){ alert('로그인이 필요해요'); return; }
+  var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+  try{
+    var r=await fetch(SUPA_URL+'/rest/v1/comments',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({post_id:_detailPostId,user_id:_currentUserId,nickname:myNick,content:text.trim()})
+    });
+    if(r.ok){
+      document.getElementById('dalCommentText').value='';
+      dalLoadComments(_detailPostId);
+    } else { alert('댓글 등록에 실패했어요'); }
+  }catch(e){ alert('오류: '+e.message); }
+}
+
+async function dalDeleteComment(commentId){
+  if(!confirm('댓글을 삭제할까요?')) return;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/comments?id=eq.'+commentId,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken}
+    });
+    dalLoadComments(_detailPostId);
+  }catch(e){ console.warn('[Comments] 삭제 실패:',e); }
+}
+
+function dalCloseDetail(){
+  var popup=document.getElementById('dalDetailPopup');
+  if(popup) popup.style.display='none';
+  _detailPostId=null;
+}
+
 async function likeFeedPost(btn, postId){
+  if(!_currentToken){ alert('로그인이 필요해요'); return; }
+  var liked=btn.dataset.liked==='true';
   var cur=parseInt((btn.textContent||'').replace('❤️ ',''))||0;
-  btn.textContent='❤️ '+(cur+1);
-  btn.style.color='var(--red)';
-  if(_currentToken&&postId){
-    try{
-      await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
-        method:'PATCH',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({likes:cur+1})
-      });
-    }catch(e){ console.warn('[Feed] 좋아요 실패:',e.message); }
+
+  if(liked){
+    // 좋아요 취소
+    var newCnt=Math.max(0,cur-1);
+    btn.dataset.liked='false';
+    btn.textContent='❤️ '+newCnt;
+    btn.style.color='var(--m)';
+    btn.style.borderColor='var(--b2)';
+    var likedArr=JSON.parse(localStorage.getItem('dal_liked')||'[]');
+    likedArr=likedArr.filter(function(id){return id!==postId;});
+    localStorage.setItem('dal_liked',JSON.stringify(likedArr));
+    if(_currentToken){
+      try{
+        await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
+          method:'PATCH',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body:JSON.stringify({likes:newCnt})
+        });
+      }catch(e){ console.warn('[Feed] 좋아요 취소 실패:',e.message); }
+    }
+  } else {
+    // 좋아요
+    var newCnt2=cur+1;
+    btn.dataset.liked='true';
+    btn.textContent='❤️ '+newCnt2;
+    btn.style.color='var(--red)';
+    btn.style.borderColor='rgba(240,96,96,.5)';
+    var likedArr2=JSON.parse(localStorage.getItem('dal_liked')||'[]');
+    if(!likedArr2.includes(postId)){ likedArr2.push(postId); }
+    localStorage.setItem('dal_liked',JSON.stringify(likedArr2));
+    if(_currentToken){
+      try{
+        await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
+          method:'PATCH',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body:JSON.stringify({likes:newCnt2})
+        });
+      }catch(e){ console.warn('[Feed] 좋아요 실패:',e.message); }
+    }
   }
 }
 // ══ 피드 새로고침 ══
@@ -3175,7 +3394,7 @@ function openNewPost(){
   if(!requireLogin(function(){ openNewPost(); })) return;
   // 하루 5개 제한 체크
   var today=new Date().toDateString();
-  var postKey='dal_post_count_'+today;
+  var postKey='dal_post_count_'+(_currentUserId||'guest')+'_'+today;
   var postCount=parseInt(localStorage.getItem(postKey)||'0');
   if(postCount>=5){ alert('하루 최대 5개까지 공유할 수 있어요 🌙'); return; }
   // 글쓰기 팝업 열기
@@ -3240,13 +3459,14 @@ function dalSubmitPost(){
   if(!_currentToken||!_currentUserId){ alert('로그인이 필요해요'); return; }
   var btn=document.querySelector('#dalPostPopup button[onclick="dalSubmitPost()"]');
   if(btn){ btn.disabled=true; btn.textContent='공유 중...'; }
+  var place=(document.getElementById('dalPostPlace')||{}).value||'';
   var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
-  var fullText=(country?'['+country+'] ':'')+text;
+  var fullText=(country?'['+country+'] ':'')+(place?'📍'+place+' ':'')+text;
   savePostToServer(fullText, myNick, _dalPostPhotos.slice()).then(function(ok){
     if(btn){ btn.disabled=false; btn.textContent='공유하기'; }
     if(ok){
       var today=new Date().toDateString();
-      var postKey='dal_post_count_'+today;
+      var postKey='dal_post_count_'+(_currentUserId||'guest')+'_'+today;
       localStorage.setItem(postKey, (parseInt(localStorage.getItem(postKey)||'0')+1).toString());
       dalClosePostPopup();
       loadPostsFromServer();
@@ -3263,6 +3483,7 @@ function dalClosePostPopup(){
   _dalPostPhotos=[];
   var box=document.getElementById('dalPostPhotoPreview');
   if(box) box.innerHTML='';
+  var pl=document.getElementById('dalPostPlace'); if(pl) pl.value='';
 }
 
 function reportPost(postId){
@@ -3466,12 +3687,30 @@ async function saveUnlockedToServer(tripId, optKey, content){
 }
 
 // ══ 소셜 피드 서버 연동 ══
+var _feedFilter='all'; // 'all' | 'mine'
+
+function setFeedFilter(f){
+  _feedFilter=f;
+  document.querySelectorAll('.feed-filter-btn').forEach(function(b){ b.style.borderColor=b.dataset.f===f?'var(--gold)':'var(--b2)'; b.style.color=b.dataset.f===f?'var(--gold)':'var(--m)'; });
+  loadPostsFromServer();
+}
+
+function _timeLeft(createdAt){
+  var diff=48*60*60*1000-(Date.now()-new Date(createdAt).getTime());
+  if(diff<=0) return null;
+  var h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000);
+  return h>0?h+'시간 '+m+'분 남음':m+'분 남음';
+}
+
 async function loadPostsFromServer(){
   var feedEl=document.getElementById('socialFeed');
   if(!feedEl) return;
   try{
-    // 로그인 여부 무관하게 피드는 누구나 볼 수 있음
-    var r=await fetch(SUPA_URL+'/rest/v1/posts?order=created_at.desc&limit=50&reported=neq.true&select=*',{
+    // 48시간 이내 데이터만 가져옴
+    var cutoff=new Date(Date.now()-48*60*60*1000).toISOString();
+    var url=SUPA_URL+'/rest/v1/posts?order=created_at.desc&limit=50&reported=neq.true&created_at=gt.'+cutoff+'&select=*';
+    if(_feedFilter==='mine'&&_currentUserId) url+='&user_id=eq.'+_currentUserId;
+    var r=await fetch(url,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
     }).then(function(res){return res.json();});
 
@@ -3479,41 +3718,61 @@ async function loadPostsFromServer(){
       feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙</div>';
       return;
     }
+
+    // 좋아요한 게시물 목록 (localStorage)
+    var likedSet=new Set(JSON.parse(localStorage.getItem('dal_liked')||'[]'));
+
     feedEl.innerHTML='';
     r.forEach(function(p){
       var isMe=(_currentUserId&&p.user_id===_currentUserId);
       var date=new Date(p.created_at);
       var dateStr=date.getFullYear()+'.'+(date.getMonth()+1)+'.'+date.getDate();
-      // 나라 태그 파싱 ([싱가포르] 형태)
-      var countryTag='', contentText=p.content||'';
+      var timeLeft=_timeLeft(p.created_at);
+      var liked=likedSet.has(p.id);
+
+      // 나라 태그 파싱
+      var countryTag='', placeTag='', contentText=p.content||'';
       var tagMatch=contentText.match(/^\[([^\]]+)\]\s*/);
       if(tagMatch){ countryTag=tagMatch[1]; contentText=contentText.replace(tagMatch[0],''); }
+      var placeMatch=contentText.match(/^📍([^\s].*?)\s/);
+      if(placeMatch){ placeTag=placeMatch[1]; contentText=contentText.replace(placeMatch[0],''); }
 
       var card=document.createElement('div');
       card.className='feed-card';
-      card.style.cssText='background:var(--s1);border:1px solid var(--b1);border-radius:6px;padding:11px 12px;margin-bottom:8px;';
+      card.style.cssText='background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;';
       card.innerHTML=
+        // 헤더
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
         +'<div style="display:flex;align-items:center;gap:7px;">'
-        +'<div style="width:28px;height:28px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div>'
+        +'<div style="width:30px;height:30px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:14px;">👤</div>'
         +'<div><div style="font-size:11px;color:var(--w);font-weight:500;">'+(p.nickname||'DAL User')+'</div>'
-        +'<div style="font-size:9px;color:var(--m);">'+dateStr+'</div></div>'
+        +'<div style="font-size:9px;color:var(--m);">'+dateStr+(timeLeft?'  ⏳ '+timeLeft:'')+'</div></div>'
         +'</div>'
+        +'<div style="display:flex;gap:4px;align-items:center;">'
         +(countryTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);">'+countryTag+'</span>':'')
-        +'</div>'
-        +'<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:8px;">'+contentText+'</div>'
-        +(p.images&&p.images.length>0?'<div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;">'+p.images.map(function(img){return '<img src="'+img+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;">';}).join('')+'</div>':'')
+        +(placeTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.2);border-radius:10px;color:#7bb8f0;">📍'+placeTag+'</span>':'')
+        +'</div></div>'
+        // 본문
+        +'<div style="font-size:11px;color:rgba(240,236,228,.8);line-height:1.8;margin-bottom:8px;">'+contentText+'</div>'
+        // 사진
+        +(p.images&&p.images.length>0?'<div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;">'+p.images.map(function(img){return '<img src="'+img+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;" onclick="event.stopPropagation()">';}).join('')+'</div>':'')
+        // 하단 액션바
         +'<div style="display:flex;gap:6px;align-items:center;">'
-        +'<button class="dal-like-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;">❤️ '+(p.likes||0)+'</button>'
+        +'<button class="dal-like-btn" data-pid="'+p.id+'" data-liked="'+liked+'" style="background:transparent;border:1px solid '+(liked?'rgba(240,96,96,.5)':'var(--b2)')+';border-radius:10px;padding:4px 12px;font-size:10px;color:'+(liked?'var(--red)':'var(--m)')+';cursor:pointer;" onclick="event.stopPropagation()">❤️ '+(p.likes||0)+'</button>'
+        +'<button class="dal-comment-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;" onclick="event.stopPropagation();dalOpenDetail(''+p.id+'')">💬 댓글</button>'
         +(isMe
-          ?'<button data-pid="'+p.id+'" onclick="dalDeletePost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;">삭제</button>'
-          :'<button data-pid="'+p.id+'" onclick="reportPost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;font-size:9px;color:var(--m);cursor:pointer;">신고</button>'
+          ?'<button data-pid="'+p.id+'" onclick="event.stopPropagation();dalDeletePost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;">삭제</button>'
+          :'<button data-pid="'+p.id+'" onclick="event.stopPropagation();reportPost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;font-size:9px;color:var(--m);cursor:pointer;">신고</button>'
         )
         +'</div>';
+
+      // 카드 클릭 → 상세 팝업
+      card.onclick=function(){ dalOpenDetail(p.id); };
+
       // 좋아요 버튼 이벤트
       var likeBtn=card.querySelector('.dal-like-btn');
       var pid=p.id;
-      likeBtn.onclick=function(){ likeFeedPost(likeBtn,pid); };
+      likeBtn.onclick=function(e){ e.stopPropagation(); likeFeedPost(likeBtn,pid); };
       feedEl.appendChild(card);
     });
     console.log('[Posts] 로드:', r.length+'개');
@@ -3540,9 +3799,11 @@ async function cleanupExpiredData(){
   if(!_currentToken||!_currentUserId) return;
   try{
     var now=new Date();
-    // trips: 2일(48시간) 이전 삭제
-    var trips2d=new Date(now.getTime()-2*24*60*60*1000).toISOString();
-    await _sfDel('/rest/v1/trips?user_id=eq.'+_currentUserId+'&created_at=lt.'+trips2d);
+    var cut48h=new Date(now.getTime()-48*60*60*1000).toISOString();
+    // trips: 48시간 이전 삭제
+    await _sfDel('/rest/v1/trips?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut48h);
+    // posts: 48시간 이전 내 글 삭제
+    await _sfDel('/rest/v1/posts?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut48h);
     // unlocked: 7일 이전 삭제
     var unlock7d=new Date(now.getTime()-7*24*60*60*1000).toISOString();
     await _sfDel('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&created_at=lt.'+unlock7d);
@@ -4753,6 +5014,7 @@ window.searchUsers=searchUsers; window.openNewPost=openNewPost; function dalDele
   }).then(function(){ loadPostsFromServer(); });
 }
 window.dalSubmitPost=dalSubmitPost; window.dalClosePostPopup=dalClosePostPopup; window.dalLoadPostPhotos=dalLoadPostPhotos; window.dalRemovePhoto=dalRemovePhoto; window.dalDeletePost=dalDeletePost; window.reportPost=reportPost;
+window.dalOpenDetail=dalOpenDetail; window.dalCloseDetail=dalCloseDetail; window.dalSubmitComment=dalSubmitComment; window.dalDeleteComment=dalDeleteComment; window.setFeedFilter=setFeedFilter;
 window.openShareFeed=openShareFeed; window.collapseHero=collapseHero;
 window.expandHero=expandHero; window.selectOption=selectOption;
 window.doBookTrip=doBookTrip; window.openShareModal=openShareModal;
