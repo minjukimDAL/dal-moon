@@ -3371,11 +3371,18 @@ async function likeFeedPost(btn, postId){
     btn.textContent='❤️ '+newCnt;
     btn.style.color='var(--m)';
     btn.style.borderColor='var(--b2)';
+    // localStorage 업데이트
     var likedArr=JSON.parse(localStorage.getItem('dal_liked')||'[]');
     likedArr=likedArr.filter(function(id){return id!==postId;});
     localStorage.setItem('dal_liked',JSON.stringify(likedArr));
     if(_currentToken){
       try{
+        // post_likes 테이블에서 삭제
+        await fetch(SUPA_URL+'/rest/v1/post_likes?post_id=eq.'+postId+'&user_id=eq.'+_currentUserId,{
+          method:'DELETE',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken}
+        });
+        // posts.likes 숫자 업데이트
         await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
           method:'PATCH',
           headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -3390,11 +3397,19 @@ async function likeFeedPost(btn, postId){
     btn.textContent='❤️ '+newCnt2;
     btn.style.color='var(--red)';
     btn.style.borderColor='rgba(240,96,96,.5)';
+    // localStorage 업데이트
     var likedArr2=JSON.parse(localStorage.getItem('dal_liked')||'[]');
     if(!likedArr2.includes(postId)){ likedArr2.push(postId); }
     localStorage.setItem('dal_liked',JSON.stringify(likedArr2));
     if(_currentToken){
       try{
+        // post_likes 테이블에 upsert (중복 방지)
+        await fetch(SUPA_URL+'/rest/v1/post_likes',{
+          method:'POST',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=ignore-duplicates,return=minimal'},
+          body:JSON.stringify({post_id:postId,user_id:_currentUserId})
+        });
+        // posts.likes 숫자 업데이트
         await fetch(SUPA_URL+'/rest/v1/posts?id=eq.'+postId,{
           method:'PATCH',
           headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -3738,8 +3753,20 @@ async function loadPostsFromServer(){
       return;
     }
 
-    // 좋아요한 게시물 목록 (localStorage)
+    // 좋아요한 게시물 목록 — 서버에서 가져옴 (로그인 시), localStorage는 fallback
     var likedSet=new Set(JSON.parse(localStorage.getItem('dal_liked')||'[]'));
+    if(_currentToken&&_currentUserId){
+      try{
+        var lr=await fetch(SUPA_URL+'/rest/v1/post_likes?user_id=eq.'+_currentUserId+'&select=post_id',{
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken}
+        }).then(function(res){return res.json();});
+        if(Array.isArray(lr)){
+          likedSet=new Set(lr.map(function(x){return x.post_id;}));
+          // localStorage도 동기화
+          localStorage.setItem('dal_liked',JSON.stringify(Array.from(likedSet)));
+        }
+      }catch(e){ console.warn('[Likes] 로드 실패:', e.message); }
+    }
 
     feedEl.innerHTML='';
     r.forEach(function(p){
