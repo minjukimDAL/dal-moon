@@ -3237,17 +3237,23 @@ function dalSubmitPost(){
   var text=document.getElementById('dalPostContent').value.trim();
   var country=document.getElementById('dalPostCountry').value;
   if(!text){ alert('내용을 입력해주세요'); return; }
+  if(!_currentToken||!_currentUserId){ alert('로그인이 필요해요'); return; }
+  var btn=document.querySelector('#dalPostPopup button[onclick="dalSubmitPost()"]');
+  if(btn){ btn.disabled=true; btn.textContent='공유 중...'; }
   var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
   var fullText=(country?'['+country+'] ':'')+text;
   savePostToServer(fullText, myNick, _dalPostPhotos.slice()).then(function(ok){
+    if(btn){ btn.disabled=false; btn.textContent='공유하기'; }
     if(ok){
-      // 하루 게시 횟수 증가
       var today=new Date().toDateString();
       var postKey='dal_post_count_'+today;
       localStorage.setItem(postKey, (parseInt(localStorage.getItem(postKey)||'0')+1).toString());
       dalClosePostPopup();
       loadPostsFromServer();
-    } else { alert('게시 중 오류가 발생했습니다.'); }
+    } else { alert('게시 중 오류가 발생했습니다.\nF12 콘솔에서 [Posts] 로그를 확인해주세요.'); }
+  }).catch(function(e){
+    if(btn){ btn.disabled=false; btn.textContent='공유하기'; }
+    alert('오류: '+e.message);
   });
 }
 
