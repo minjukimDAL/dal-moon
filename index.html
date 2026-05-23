@@ -419,6 +419,20 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
 </div>
 
+<!-- ══ 닉네임 변경 팝업 ══ -->
+<div id="nicknamePopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:3000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;">
+  <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:380px;padding:24px 20px;box-sizing:border-box;">
+    <div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:6px;">닉네임 변경</div>
+    <div style="font-size:10px;color:var(--m);margin-bottom:16px;" id="nicknameChangeInfo">닉네임은 30일에 1번 변경할 수 있어요</div>
+    <input id="nicknameInput" type="text" maxlength="20" placeholder="닉네임 입력 (최대 20자)" style="width:100%;padding:10px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:12px;color:var(--w);font-family:'DM Sans',sans-serif;box-sizing:border-box;margin-bottom:6px;">
+    <div style="font-size:9px;color:var(--m);margin-bottom:16px;">영문, 한글, 숫자, _  사용 가능 · 공백 불가</div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="closeNicknameModal()" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--m);cursor:pointer;">취소</button>
+      <button onclick="saveNickname()" id="nicknameSubmitBtn" style="flex:1;padding:10px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:6px;font-size:11px;color:var(--gold);cursor:pointer;font-weight:500;">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ 게시물 상세/댓글 팝업 ══ -->
 <div id="dalDetailPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2001;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="dalCloseDetail()">
   <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
@@ -1368,7 +1382,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div class="profile-header">
         <div class="profile-avatar" id="profileAvatar">👤</div>
         <div>
-          <div style="font-size:14px;color:var(--sb);margin-bottom:2px;" id="profileName">사용자</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="font-size:14px;color:var(--sb);margin-bottom:2px;" id="profileName">사용자</div>
+            <button onclick="openNicknameModal()" style="background:transparent;border:1px solid var(--b2);border-radius:4px;padding:1px 7px;font-size:9px;color:var(--m);cursor:pointer;">✏️ 닉네임</button>
+          </div>
           <div style="font-size:10px;color:var(--m);" id="profileEmail">—</div>
           <div style="font-size:9px;color:var(--ok);margin-top:3px;" id="profileProvider"><span id='t-provider-status'>● 로그인됨</span></div>
         </div>
@@ -3563,7 +3580,9 @@ var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 async function _sf(path, body, token){
   var hdrs={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(token||SUPA_KEY)};
   var r=await fetch(SUPA_URL+path,{method:'POST',headers:hdrs,body:JSON.stringify(body)});
-  return r.json();
+  var data=await r.json();
+  if(!r.ok) console.warn('[Auth] HTTP '+r.status, path, data);
+  return data;
 }
 
 // ══ 서버 연동 전역 변수 ══
@@ -3832,10 +3851,11 @@ function onLoginSuccess(user, token){
   _currentUserId=user.id;
   // 로그인 즉시 현재 코인 UI 표시 (서버 로드 전)
   updateCoinUI();
-  // 코인/여행/잠금해제 즉시 로드 (cleanup과 분리)
+  // 코인/여행/잠금해제/닉네임 즉시 로드
   loadCoinsFromServer();
   loadTripsFromServer();
   loadUnlockedFromServer();
+  loadNicknameFromServer();
   // 유저 핀 로드 (지도에 표시)
   if (typeof loadUserPins === 'function') loadUserPins();
   // 만료 데이터 정리는 백그라운드에서 별도 실행
@@ -3856,12 +3876,95 @@ function onLoginSuccess(user, token){
   var lv=document.getElementById('loginView'); if(lv) lv.style.display='none';
   var pv=document.getElementById('profileView'); if(pv) pv.style.display='block';
   var meta=user.user_metadata||{};
-  var nick=meta.full_name||meta.name||(user.email?user.email.split('@')[0]:'DAL User');
+  var defaultNick=meta.full_name||meta.name||(user.email?user.email.split('@')[0]:'DAL User');
   var el;
-  el=document.getElementById('profileName'); if(el) el.textContent=nick;
+  el=document.getElementById('profileName'); if(el) el.textContent=defaultNick;
   el=document.getElementById('profileEmail'); if(el) el.textContent=user.email||'';
   el=document.getElementById('profileProvider'); if(el) el.innerHTML='<span id="t-provider-status">● email '+(lang==='ko'?'연동':'connected')+'</span>';
   if(user.id){el=document.getElementById('myInviteCode');if(el) el.textContent='DAL-'+user.id.substring(0,8).toUpperCase();}
+}
+
+// ══ 닉네임 관리 ══
+async function loadNicknameFromServer(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=nickname,nickname_changed_at');
+    if(r&&r[0]){
+      var nick=r[0].nickname;
+      if(nick){
+        var el=document.getElementById('profileName');
+        if(el) el.textContent=nick;
+      } else {
+        // profiles에 닉네임 없으면 기본값으로 upsert
+        var defaultNick=(document.getElementById('profileName')||{}).textContent||'DAL User';
+        await _sfPatch('/rest/v1/profiles?id=eq.'+_currentUserId,{nickname:defaultNick});
+      }
+    }
+  }catch(e){ console.warn('[Nickname] 로드 실패:',e.message); }
+}
+
+function openNicknameModal(){
+  if(!_currentToken){ alert('로그인이 필요해요'); return; }
+  var popup=document.getElementById('nicknamePopup');
+  var input=document.getElementById('nicknameInput');
+  var info=document.getElementById('nicknameChangeInfo');
+  var btn=document.getElementById('nicknameSubmitBtn');
+  if(!popup) return;
+  // 현재 닉네임 채우기
+  var curNick=(document.getElementById('profileName')||{}).textContent||'';
+  if(input) input.value=curNick;
+  // 30일 제한 체크 — localStorage에 마지막 변경일 저장
+  var lastChanged=localStorage.getItem('dal_nick_changed_'+_currentUserId);
+  var canChange=true;
+  if(lastChanged){
+    var diff=Date.now()-parseInt(lastChanged);
+    var daysLeft=Math.ceil((30*24*60*60*1000-diff)/(24*60*60*1000));
+    if(daysLeft>0){
+      canChange=false;
+      if(info) info.textContent='닉네임은 30일에 1번 변경 가능해요 ('+daysLeft+'일 후 변경 가능)';
+      if(btn){ btn.disabled=true; btn.style.opacity='0.4'; btn.style.cursor='not-allowed'; }
+      if(input) input.disabled=true;
+    }
+  }
+  if(canChange){
+    if(info) info.textContent='닉네임은 30일에 1번 변경할 수 있어요';
+    if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; }
+    if(input) input.disabled=false;
+  }
+  popup.style.display='flex';
+}
+
+function closeNicknameModal(){
+  var popup=document.getElementById('nicknamePopup');
+  if(popup) popup.style.display='none';
+}
+
+async function saveNickname(){
+  var input=document.getElementById('nicknameInput');
+  var nick=(input||{}).value||'';
+  nick=nick.trim();
+  if(!nick){ alert('닉네임을 입력해주세요'); return; }
+  if(nick.length>20){ alert('닉네임은 20자 이하로 입력해주세요'); return; }
+  if(!/^[a-zA-Z0-9가-힣ힰ-ퟻ_]+$/.test(nick)){ alert('영문, 한글, 숫자, _ 만 사용 가능해요 (공백 불가)'); return; }
+  var btn=document.getElementById('nicknameSubmitBtn');
+  if(btn){ btn.disabled=true; btn.textContent='저장 중...'; }
+  try{
+    var r=await _sfPatch('/rest/v1/profiles?id=eq.'+_currentUserId,{
+      nickname:nick,
+      nickname_changed_at:new Date().toISOString()
+    });
+    // UI 업데이트
+    var el=document.getElementById('profileName');
+    if(el) el.textContent=nick;
+    // 변경 시각 저장
+    localStorage.setItem('dal_nick_changed_'+_currentUserId, Date.now().toString());
+    closeNicknameModal();
+    alert('닉네임이 변경됐어요 🌙');
+  }catch(e){
+    alert('저장 실패: '+e.message);
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='저장'; }
+  }
 }
 
 function onLogoutSuccess(){
@@ -5027,6 +5130,7 @@ window.toggleDiscount=toggleDiscount; window.removeCard=removeCard;
 window.removeAirline=removeAirline; window.editPassport=editPassport;
 window.calcBudget=calcBudget;
 window.doEmailLogin=doEmailLogin; window.doEmailSignup=doEmailSignup;
+window.openNicknameModal=openNicknameModal; window.closeNicknameModal=closeNicknameModal; window.saveNickname=saveNickname;
 window.setHomeTab=setHomeTab; window.selectStyleChip=selectStyleChip;
 window.toggleFullChip=toggleFullChip; window.toggleFullBudget=toggleFullBudget;
 window.startFullAnalysis=startFullAnalysis; window.saveFullTrip=saveFullTrip; window.backToFullInput=backToFullInput;
