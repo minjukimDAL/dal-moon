@@ -3514,16 +3514,19 @@ async function loadPostsFromServer(){
   }catch(e){ console.warn('[Posts] 로드 실패:', e.message); }
 }
 async function savePostToServer(text, nickname, photos){
-  if(!_currentToken||!_currentUserId) return false;
+  if(!_currentToken||!_currentUserId){ console.warn('[Posts] 저장 실패: 토큰 없음'); return false; }
   try{
+    var payload=Object.assign({user_id:_currentUserId,nickname:nickname||'DAL User',content:text}, (photos&&photos.length?{images:photos}:{}));
+    console.log('[Posts] 저장 시도 — 사진수:'+(photos?photos.length:0)+', payload:'+((JSON.stringify(payload).length)/1024).toFixed(1)+'KB');
     var r=await fetch(SUPA_URL+'/rest/v1/posts',{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify(Object.assign({user_id:_currentUserId,nickname:nickname||'DAL User',content:text}, (photos&&photos.length?{images:photos}:{})))
+      body:JSON.stringify(payload)
     });
-    console.log('[Posts] 서버 저장 완료');
+    if(!r.ok){ var eb=await r.text(); console.warn('[Posts] 저장 실패 HTTP'+r.status+':',eb); }
+    else{ console.log('[Posts] 서버 저장 완료'); }
     return r.ok;
-  }catch(e){ console.warn('[Posts] 저장 실패:', e.message); return false; }
+  }catch(e){ console.warn('[Posts] 저장 실패(예외):', e.message); return false; }
 }
 
 // ══ 데이터 만료 정리 (trips: 2일, unlocked: 7일) ══
