@@ -1,92 +1,144 @@
-// DAL Service Worker v1.0
-const CACHE_NAME = 'dal-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,200;0,300;0,400;1,200&family=DM+Sans:wght@200;300;400;500&display=swap',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-];
+const https = require('https');
 
-// 설치 — 핵심 파일 캐싱
-self.addEventListener('install', function(e) {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(STATIC_ASSETS).catch(function(err) {
-        console.warn('[SW] 캐시 설치 일부 실패:', err);
-      });
-    })
-  );
-  self.skipWaiting();
-});
-
-// 활성화 — 이전 캐시 삭제
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE_NAME; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-// fetch — 네트워크 우선, 실패 시 캐시
-self.addEventListener('fetch', function(e) {
-  var url = e.request.url;
-
-  // Supabase, Gemini API 요청은 캐시 안 함
-  if (url.includes('supabase.co') ||
-      url.includes('netlify/functions') ||
-      url.includes('googleapis.com/v1') ||
-      url.includes('formspree.io')) {
-    return;
-  }
-
-  // GET 요청만 캐싱
-  if (e.request.method !== 'GET') return;
-
-  e.respondWith(
-    fetch(e.request)
-      .then(function(response) {
-        // 정상 응답이면 캐시에도 저장
-        if (response && response.status === 200 && response.type !== 'opaque') {
-          var copy = response.clone();
-          caches.open(CACHE_NAME).then(function(cache) {
-            cache.put(e.request, copy);
-          });
-        }
-        return response;
-      })
-      .catch(function() {
-        // 네트워크 실패 시 캐시에서
-        return caches.match(e.request).then(function(cached) {
-          if (cached) return cached;
-          // 캐시도 없으면 오프라인 페이지 (index.html 반환)
-          if (e.request.destination === 'document') {
-            return caches.match('/');
-          }
-        });
-      })
-  );
-});
-
-// 푸시 알림 (향후 확장용)
-self.addEventListener('push', function(e) {
-  if (!e.data) return;
-  var data = e.data.json();
-  self.registration.showNotification(data.title || 'DAL', {
-    body: data.body || '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-72.png',
-    data: { url: data.url || '/' }
+// Gemini 호출 (타임아웃 7초)
+function callGemini(body, apiKey) {
+  const model = body.model || 'gemini-2.5-flash';
+  const payload = JSON.stringify({
+    contents: body.contents,
+    generationConfig: body.generationConfig || { maxOutputTokens: 8000, temperature: 0.7 }
   });
-});
+  return new Promise((resolve, reject) => {
+    const urlPath = `/v1/models/${model}:generateContent?key=${apiKey}`;
+    const options = {
+      hostname: 'generativelanguage.googleapis.com',
+      path: urlPath,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    // 7초 타임아웃 — 초과 시 GPT 폴백으로
+    req.setTimeout(7000, () => {
+      req.destroy();
+      resolve({ status: 503, body: JSON.stringify({ error: { message: 'Gemini timeout' } }) });
+    });
+    req.on('error', (e) => {
+      resolve({ status: 503, body: JSON.stringify({ error: { message: e.message } }) });
+    });
+    req.write(payload);
+    req.end();
+  });
+}
 
-self.addEventListener('notificationclick', function(e) {
-  e.notification.close();
-  e.waitUntil(
-    clients.openWindow(e.notification.data.url || '/')
-  );
-});
+// GPT 폴백 호출
+function callGPT(body, apiKey) {
+  const messages = (body.contents || []).map(c => ({
+    role: c.role === 'user' ? 'user' : 'assistant',
+    content: (c.parts || []).map(p => p.text || '').join('')
+  }));
+
+  const payload = JSON.stringify({
+    model: 'gpt-4o-mini',
+    messages: messages,
+    max_tokens: (body.generationConfig && body.generationConfig.maxOutputTokens) || 8000,
+    temperature: (body.generationConfig && body.generationConfig.temperature) || 0.7
+  });
+
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'api.openai.com',
+      path: '/v1/chat/completions',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Length': Buffer.byteLength(payload)
+      }
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve({ status: res.statusCode, body: data }));
+    });
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
+  });
+}
+
+// GPT 응답 → Gemini 형식 변환
+function convertGPTToGeminiFormat(gptBody) {
+  try {
+    const gpt = JSON.parse(gptBody);
+    const text = gpt.choices && gpt.choices[0] && gpt.choices[0].message
+      ? gpt.choices[0].message.content : '';
+    return JSON.stringify({
+      candidates: [{
+        content: { parts: [{ text }], role: 'model' },
+        finishReason: 'STOP'
+      }]
+    });
+  } catch(e) {
+    return gptBody;
+  }
+}
+
+exports.handler = async function(event) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+  try {
+    const body = JSON.parse(event.body);
+    const geminiKey = process.env.GEMINI_API_KEY;
+    const openaiKey = process.env.openai_api_key;
+
+    if (!geminiKey) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'GEMINI_API_KEY not set' }) };
+    }
+
+    // 1차: Gemini 시도
+    const geminiResult = await callGemini(body, geminiKey);
+    console.log('[Gemini] status:', geminiResult.status);
+
+    // Gemini 성공
+    if (geminiResult.status === 200) {
+      return { statusCode: 200, headers, body: geminiResult.body };
+    }
+
+    // Gemini 실패 → GPT 폴백 (503/429/타임아웃 모두 포함)
+    if (openaiKey) {
+      console.log('[Fallback] Gemini', geminiResult.status, '→ GPT-4o-mini');
+      try {
+        const gptResult = await callGPT(body, openaiKey);
+        console.log('[GPT] status:', gptResult.status);
+        if (gptResult.status === 200) {
+          const converted = convertGPTToGeminiFormat(gptResult.body);
+          return { statusCode: 200, headers, body: converted };
+        }
+      } catch(gptErr) {
+        console.log('[GPT] 오류:', gptErr.message);
+      }
+    }
+
+    // 둘 다 실패
+    return { statusCode: geminiResult.status, headers, body: geminiResult.body };
+
+  } catch (error) {
+    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
+  }
+};
