@@ -814,43 +814,37 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- PAGE: LUGGAGE -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-luggage" class="page">
-  <div class="page-wrap">
-    <div class="page-title" id="t-lug-title">수화물 서비스</div>
-    <div class="page-sub" id="t-lug-sub">DAL 로봇이 공항 수화물을 처리합니다.</div>
-    <div class="legal-box">
-      <div class="legal-title">⚠️ 법적 고지사항</div>
-      <div class="legal-items">· 위험물·액체류·배터리류 반입 금지<br>· 허용되지 않은 물품 운반 시 법적 책임은 이용자에게 있습니다<br>· 픽업 후 이용자 요청 전까지 수화물 개봉 불가</div>
+  <div class="page-wrap" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;padding:40px 24px;">
+    <!-- 아이콘 -->
+    <div style="font-size:56px;margin-bottom:20px;line-height:1;">🤖</div>
+    <!-- 타이틀 -->
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--sb);letter-spacing:1px;margin-bottom:8px;" id="t-lug-title">수화물 로봇 서비스</div>
+    <div style="font-size:11px;color:var(--m);line-height:1.9;margin-bottom:28px;max-width:280px;" id="t-lug-sub">공항에서 로봇이 직접 수화물을 픽업·보관·이동하는 서비스를 준비하고 있어요.<br>앱 출시 이후 파트너십 체결을 거쳐 오픈할 예정입니다.</div>
+    <!-- 예정 서비스 카드들 -->
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
+        <div style="font-size:22px;flex-shrink:0;">🛄</div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">공항 수화물 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;">로봇이 공항 내에서 직접 픽업</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);white-space:nowrap;flex-shrink:0;">준비중</div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
+        <div style="font-size:22px;flex-shrink:0;">🗄️</div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;">위탁 전 안전 보관 서비스</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);white-space:nowrap;flex-shrink:0;">준비중</div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
+        <div style="font-size:22px;flex-shrink:0;">🏨</div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">호텔 → 공항 배송</div><div style="font-size:10px;color:var(--m);line-height:1.6;">호텔에서 공항까지 자동 배송</div></div>
+        <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:10px;color:#7bb8f0;white-space:nowrap;flex-shrink:0;">2027+</div>
+      </div>
     </div>
-    <div class="weight-check">
-      <div class="sec-label" id="t-weight">✈️ 중량 사전 확인</div>
-      <div class="wc-row"><div class="wc-label" id="t-allow">항공사 허용</div><input class="wc-input" type="number" id="allowKg" placeholder="23"><div style="font-size:10px;color:var(--m)">kg</div></div>
-      <div class="wc-row"><div class="wc-label" id="t-actual">실제 무게</div><input class="wc-input" type="number" id="actualKg" placeholder="0" oninput="checkWeight()"><div style="font-size:10px;color:var(--m)">kg</div></div>
-      <div id="weightResult" style="display:none;margin-top:6px;padding:8px 10px;border-radius:2px;font-size:11px;"></div>
-    </div>
-    <div class="sec-label" id="t-robot-loc">📍 근처 로봇 위치</div>
-    <div class="robot-map">
-      <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,14,26,.8),rgba(18,19,30,.6));"></div>
-      <div class="map-zone" style="top:12px;left:12px">T1 입국장 A</div>
-      <div class="map-zone" style="bottom:20px;right:12px">수화물 벨트 3</div>
-      <div class="map-pulse" style="top:50px;left:58px;"></div>
-      <div class="map-robot" style="top:46px;left:54px;">🤖</div>
-      <div style="position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:9px;color:var(--m);" id="t-robot-eta">로봇까지 약 120m · 도착 예정 2분</div>
-    </div>
-    <div class="sec-label" id="t-svc-select">서비스 선택</div>
-    <div class="lug-cards">
-      <div class="lug-card" onclick="bookLuggage('공항 수화물 픽업',30)"><div style="font-size:20px;margin-bottom:6px;">🤖</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l1">공항 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l1s">로봇이 직접 픽업. 인천 T1.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin1'>🪙 30코인</span></div><span class="badge b-ok">Beta</span></div>
-      <div class="lug-card" onclick="bookLuggage('수화물 보관',20)"><div style="font-size:20px;margin-bottom:6px;">🗄️</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l2s">위탁 전 안전 보관.</div><div style="font-size:11px;color:var(--gold);"><span id='t-lug-coin2'>🪙 20코인/6h</span></div><span class="badge b-ok">Beta</span></div>
-      <div class="lug-card disabled"><div class="coming-badge">2027+</div><div style="font-size:20px;margin-bottom:6px;">🏨</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l3">호텔→공항</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l3s">호텔에서 자동 배송.</div><div style="font-size:11px;color:var(--m);">Coming Soon</div></div>
-      <div class="lug-card" onclick="bookLuggage('안마의자 라운지',50)"><div style="font-size:20px;margin-bottom:6px;">💺</div><div style="font-size:12px;color:var(--sb);margin-bottom:3px;" id="t-l4">안마의자 라운지</div><div style="font-size:10px;color:var(--m);line-height:1.6;margin-bottom:6px;" id="t-l4s">짐 없이 편안한 휴식.</div><div style="font-size:11px;color:var(--gold);">🪙 50코인/1h</div><span class="badge b-warn">준비중</span></div>
-    </div>
-    <div class="sec-label" id="t-robot-rent">🤖 로봇 대여</div>
-    <div class="card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-      <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;" id="t-robot-hr">시간제 대여</div><div style="font-size:10px;color:var(--m);" id="t-robot-hrs">공항 내 이동 지원</div></div>
-      <div style="text-align:right;"><div style="font-size:12px;color:var(--gold);margin-bottom:6px;">🪙 100코인/h</div><button style="padding:7px 14px;background:var(--gold);border:none;border-radius:2px;font-size:10px;color:#060710;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="bookLuggage('로봇 시간제 대여',100)" id="t-rent-btn">대여</button></div>
-    </div>
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-      <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;" id="t-robot-mo">월정액 구독</div><div style="font-size:10px;color:var(--m);" id="t-robot-mos">매월 자동 차감</div></div>
-      <div style="text-align:right;"><div style="font-size:12px;color:var(--gold);margin-bottom:6px;">🪙 500코인/월</div><button style="padding:7px 14px;background:var(--s2);border:1px solid var(--b2);border-radius:2px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="bookLuggage('로봇 월정액',500)" id="t-sub-btn">구독</button></div>
+    <!-- 출시 알림 신청 -->
+    <div style="width:100%;max-width:320px;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 18px;">
+      <div style="font-size:12px;color:var(--w);font-weight:500;margin-bottom:4px;">출시 알림 받기</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:14px;">서비스 오픈 시 이메일로 알려드릴게요</div>
+      <input id="lugNotifyEmail" type="email" placeholder="이메일 주소" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;">
+      <button onclick="submitLugNotify()" style="width:100%;padding:11px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:6px;font-size:11px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">알림 신청하기</button>
+      <div id="lugNotifyMsg" style="font-size:10px;text-align:center;margin-top:8px;min-height:16px;"></div>
     </div>
   </div>
 </div>
@@ -3058,6 +3052,42 @@ function editPassport(){
 // 수화물 예약
 // ══════════════════════════════════════════════
 var agreed=false, currentLugCoin=30;
+// ══ 수화물 출시 알림 신청 ══
+async function submitLugNotify(){
+  var email=(document.getElementById('lugNotifyEmail')||{}).value||'';
+  var msg=document.getElementById('lugNotifyMsg');
+  email=email.trim();
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(msg){msg.style.color='#ff6b6b';msg.textContent='올바른 이메일 주소를 입력해주세요';}
+    return;
+  }
+  var btn=document.querySelector('#page-luggage button[onclick="submitLugNotify()"]');
+  if(btn){btn.disabled=true;btn.textContent='신청 중...';}
+  try{
+    var FORMSPREE_ID='YOUR_FORM_ID';
+    var r=await fetch('https://formspree.io/f/'+FORMSPREE_ID,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({email:email,subject:'DAL 수화물 서비스 출시 알림 신청',message:'수화물 서비스 출시 알림을 신청했습니다.'})
+    });
+    if(msg){
+      if(r.ok){
+        msg.style.color='var(--ok)';
+        msg.textContent='✅ 신청됐어요! 출시 시 알려드릴게요 🌙';
+        var input=document.getElementById('lugNotifyEmail');
+        if(input) input.value='';
+      } else {
+        msg.style.color='#ff6b6b';
+        msg.textContent='신청 중 오류가 발생했어요. 다시 시도해주세요.';
+      }
+    }
+  }catch(e){
+    if(msg){msg.style.color='#ff6b6b';msg.textContent='오류: '+e.message;}
+  } finally {
+    if(btn){btn.disabled=false;btn.textContent='알림 신청하기';}
+  }
+}
+
 function bookLuggage(name,cost){
   currentLugCoin=cost;
   document.getElementById('lugModalTitle').textContent=name;
@@ -5149,6 +5179,7 @@ window.removeAirline=removeAirline; window.editPassport=editPassport;
 window.calcBudget=calcBudget;
 window.doEmailLogin=doEmailLogin; window.doEmailSignup=doEmailSignup;
 window.openNicknameModal=openNicknameModal; window.closeNicknameModal=closeNicknameModal; window.saveNickname=saveNickname;
+window.submitLugNotify=submitLugNotify;
 window.setHomeTab=setHomeTab; window.selectStyleChip=selectStyleChip;
 window.toggleFullChip=toggleFullChip; window.toggleFullBudget=toggleFullBudget;
 window.startFullAnalysis=startFullAnalysis; window.saveFullTrip=saveFullTrip; window.backToFullInput=backToFullInput;
