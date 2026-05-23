@@ -1250,8 +1250,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">+ 여행 정보 공유하기</button>
   </div>
   <!-- 글쓰기 팝업 -->
-  <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePostPopup()">
-    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;height:90vh;max-height:90vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+  <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="dalClosePostPopup()">
+    <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
       <!-- 고정 헤더 -->
       <div style="padding:14px 16px 10px;flex-shrink:0;">
         <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
@@ -1298,7 +1298,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
       </div>
       <!-- 고정 하단 버튼 -->
-      <div style="padding:12px 16px calc(20px + env(safe-area-inset-bottom));flex-shrink:0;border-top:1px solid var(--b1);">
+      <div style="padding:14px 16px;flex-shrink:0;border-top:1px solid var(--b1);">
         <button onclick="dalSubmitPost()" style="width:100%;padding:13px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:4px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">공유하기</button>
       </div>
     </div>
@@ -3187,13 +3187,59 @@ function openNewPost(){
   }
 }
 
+// 첨부 사진 데이터 (base64 배열)
+var _dalPostPhotos=[];
+
+function dalLoadPostPhotos(input){
+  var files=Array.prototype.slice.call(input.files||[]);
+  if(!files.length) return;
+  // 최대 3장 제한
+  var remain=3-_dalPostPhotos.length;
+  if(remain<=0){ alert('사진은 최대 3장까지 첨부할 수 있어요'); input.value=''; return; }
+  files.slice(0,remain).forEach(function(file){
+    if(!file.type.startsWith('image/')) return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      // 용량 절감을 위해 캔버스로 리사이즈 (최대 1000px, jpeg 0.7)
+      var img=new Image();
+      img.onload=function(){
+        var max=1000, w=img.width, h=img.height;
+        if(w>max||h>max){ if(w>h){ h=Math.round(h*max/w); w=max; } else { w=Math.round(w*max/h); h=max; } }
+        var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        _dalPostPhotos.push(cv.toDataURL('image/jpeg',0.7));
+        dalRenderPhotoPreview();
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function dalRenderPhotoPreview(){
+  var box=document.getElementById('dalPostPhotoPreview');
+  if(!box) return;
+  box.innerHTML=_dalPostPhotos.map(function(src,i){
+    return '<div style="position:relative;width:70px;height:70px;flex-shrink:0;">'
+      +'<img src="'+src+'" style="width:70px;height:70px;object-fit:cover;border-radius:6px;">'
+      +'<span onclick="dalRemovePhoto('+i+')" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:rgba(6,7,16,.9);border:1px solid var(--b2);border-radius:50%;color:var(--w);font-size:11px;line-height:16px;text-align:center;cursor:pointer;">✕</span>'
+      +'</div>';
+  }).join('');
+}
+
+function dalRemovePhoto(i){
+  _dalPostPhotos.splice(i,1);
+  dalRenderPhotoPreview();
+}
+
 function dalSubmitPost(){
   var text=document.getElementById('dalPostContent').value.trim();
   var country=document.getElementById('dalPostCountry').value;
   if(!text){ alert('내용을 입력해주세요'); return; }
   var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
   var fullText=(country?'['+country+'] ':'')+text;
-  savePostToServer(fullText, myNick).then(function(ok){
+  savePostToServer(fullText, myNick, _dalPostPhotos.slice()).then(function(ok){
     if(ok){
       // 하루 게시 횟수 증가
       var today=new Date().toDateString();
@@ -3208,6 +3254,9 @@ function dalSubmitPost(){
 function dalClosePostPopup(){
   var p=document.getElementById('dalPostPopup');
   if(p) p.style.display='none';
+  _dalPostPhotos=[];
+  var box=document.getElementById('dalPostPhotoPreview');
+  if(box) box.innerHTML='';
 }
 
 function reportPost(postId){
@@ -3464,7 +3513,7 @@ async function loadPostsFromServer(){
     console.log('[Posts] 로드:', r.length+'개');
   }catch(e){ console.warn('[Posts] 로드 실패:', e.message); }
 }
-async function savePostToServer(text, nickname){
+async function savePostToServer(text, nickname, photos){
   if(!_currentToken||!_currentUserId) return false;
   try{
     var r=await fetch(SUPA_URL+'/rest/v1/posts',{
