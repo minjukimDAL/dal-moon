@@ -1251,7 +1251,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 글쓰기 팝업 -->
   <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePostPopup()">
-    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:480px;height:90vh;max-height:90vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
       <!-- 고정 헤더 -->
       <div style="padding:14px 16px 10px;flex-shrink:0;">
         <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
@@ -1261,7 +1261,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
       </div>
       <!-- 스크롤 영역 -->
-      <div style="flex:1;overflow-y:auto;padding:0 16px;">
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:0 16px;">
         <!-- 나라 선택 -->
         <div style="margin-bottom:10px;">
           <div style="font-size:8px;color:var(--m);margin-bottom:4px;">여행지 (선택)</div>
@@ -1298,7 +1298,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
       </div>
       <!-- 고정 하단 버튼 -->
-      <div style="padding:12px 16px 24px;flex-shrink:0;border-top:1px solid var(--b1);">
+      <div style="padding:12px 16px calc(20px + env(safe-area-inset-bottom));flex-shrink:0;border-top:1px solid var(--b1);">
         <button onclick="dalSubmitPost()" style="width:100%;padding:13px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:4px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">공유하기</button>
       </div>
     </div>
