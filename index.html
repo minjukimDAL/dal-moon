@@ -3778,7 +3778,7 @@ async function loadPostsFromServer(){
         // 하단 액션바
         +'<div style="display:flex;gap:6px;align-items:center;">'
         +'<button class="dal-like-btn" data-pid="'+p.id+'" data-liked="'+liked+'" style="background:transparent;border:1px solid '+(liked?'rgba(240,96,96,.5)':'var(--b2)')+';border-radius:10px;padding:4px 12px;font-size:10px;color:'+(liked?'var(--red)':'var(--m)')+';cursor:pointer;" onclick="event.stopPropagation()">❤️ '+(p.likes||0)+'</button>'
-        +'<button class="dal-comment-btn" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;" onclick="event.stopPropagation();dalOpenDetail(''+p.id+'')">💬 댓글</button>'
+        +'<button class="dal-comment-btn" data-pid="'+p.id+'" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;" onclick="event.stopPropagation();dalOpenDetail(this.dataset.pid)">💬 댓글</button>'
         +(isMe
           ?'<button data-pid="'+p.id+'" onclick="event.stopPropagation();dalDeletePost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;">삭제</button>'
           :'<button data-pid="'+p.id+'" onclick="event.stopPropagation();reportPost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;font-size:9px;color:var(--m);cursor:pointer;">신고</button>'
