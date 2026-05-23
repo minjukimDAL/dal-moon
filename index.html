@@ -1362,19 +1362,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div class="login-sub" id="t-login-sub">로그인하고 여행 기록과<br>코인을 관리하세요.</div>
     <div class="social-btns">
       <button class="social-btn" onclick="doLogin('google')"><span style="font-size:18px;width:22px;text-align:center;">🟡</span><span id="t-google">Google로 계속하기</span></button>
-      <button class="social-btn" onclick="doLogin('kakao')"><span style="font-size:18px;width:22px;text-align:center;">💬</span><span id="t-kakao">카카오로 계속하기</span></button>
       <button class="social-btn" onclick="doLogin('apple')"><span style="font-size:18px;width:22px;text-align:center;">🍎</span><span id="t-apple">Apple로 계속하기</span></button>
-      <div style="font-size:10px;color:var(--m);text-align:center;padding:4px 0" id="t-or-email">— 또는 이메일로 —</div>
-      <input id="loginEmailInput" type="email" id="loginEmailPlaceholder" placeholder="이메일" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
-      <input id="loginPwInput" type="password" id="loginPwPlaceholder" placeholder="비밀번호 (6자 이상)" style="width:100%;box-sizing:border-box;padding:11px 14px;background:var(--s1);border:1px solid var(--b2);border-radius:2px;color:var(--w);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:6px;">
-      <div id="loginErrMsg" style="font-size:10px;color:#ff6b6b;text-align:center;min-height:16px;margin-bottom:4px;"></div>
-      <div style="display:flex;gap:6px;">
-        <button class="social-btn" onclick="doEmailLogin()" style="flex:1;" id="t-email-login-btn">✉️ 로그인</button>
-        <button class="social-btn" onclick="doEmailSignup()" style="flex:1;" id="t-email-signup-btn">✨ 회원가입</button>
-      </div>
     </div>
     <div style="font-size:9px;color:var(--m);text-align:center;line-height:1.9;max-width:280px;" id="t-terms">계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.</div>
-    <div style="margin-top:16px;font-size:9px;color:rgba(200,205,216,0.25);text-align:center;line-height:1.8;" id="t-mock-note">* Beta: 실제 인증 없이 UI 테스트용<br>실제 OAuth는 앱스토어 등록 후 활성화</div>
+
   </div>
   <!-- 로그인 후 -->
   <div id="profileView" style="display:none;">
