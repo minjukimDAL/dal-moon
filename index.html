@@ -489,10 +489,11 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button class="dal-country-btn" onclick="selectCountry(this,'th')" data-val="th">🇹🇭 태국</button>
           <button class="dal-country-btn" onclick="selectCountry(this,'bali')" data-val="bali">🇮🇩 발리</button>
           <button class="dal-country-btn" onclick="selectCountry(this,'vn')" data-val="vn">🇻🇳 베트남</button>
-          <button class="dal-country-btn" style="border-color:rgba(91,143,255,.3);color:var(--ac);">+ 더 보기</button>
+          <button class="dal-country-btn" onclick="dalShowWorldMap()" style="border-color:rgba(91,143,255,.3);color:var(--ac);">+ 더 보기</button>
         </div>
-        <div id="dalMapArea" style="height:350px;border-radius:4px;overflow:hidden;margin-bottom:8px;border:1px solid var(--b1);">
+        <div id="dalMapArea" style="height:350px;border-radius:4px;overflow:hidden;margin-bottom:8px;border:1px solid var(--b1);position:relative;">
           <div id="dalLeafletMap" style="height:100%;width:100%;"></div>
+          <button onclick="dalRefreshMap()" style="position:absolute;top:8px;right:8px;z-index:500;background:rgba(6,7,16,.85);border:1px solid var(--b2);border-radius:6px;padding:5px 10px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔄</button>
         </div>
         <!-- 핀 저장 팝업 -->
         <div id="dalPinPopup" style="display:none;position:fixed;inset:0;background:rgba(6,7,16,.88);z-index:2000;align-items:flex-end;justify-content:center;" onclick="dalClosePinPopup()">
@@ -736,6 +737,16 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <button onclick="openInClaude()" style="padding:11px 6px;border-radius:4px;font-size:10px;border:1px solid rgba(196,175,135,.3);background:rgba(196,175,135,.08);color:var(--gold);font-family:'DM Sans',sans-serif;cursor:pointer;">🌙 Claude에서 열기</button>
           <button onclick="openInGPT()" style="padding:11px 6px;border-radius:4px;font-size:10px;border:1px solid rgba(91,143,255,.3);background:rgba(91,143,255,.06);color:var(--ac);font-family:'DM Sans',sans-serif;cursor:pointer;">⚡ GPT에서 열기</button>
         </div>
+        <!-- 제휴 링크 (투명 광고: 수수료 전액 코인 적립) -->
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--b1);">
+          <div style="font-size:9px;color:var(--m);margin-bottom:8px;letter-spacing:.5px;">✈️ 예약하고 코인 적립받기 <span style="color:var(--gold);">· 수수료 전액 코인 환원</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+            <a href="YOUR_SKYSCANNER_LINK" target="_blank" rel="noopener" style="text-decoration:none;padding:10px 6px;border-radius:4px;font-size:10px;border:1px solid var(--b2);background:var(--s1);color:var(--sb);text-align:center;display:block;">🔍 항공권 검색</a>
+            <a href="YOUR_BOOKING_LINK" target="_blank" rel="noopener" style="text-decoration:none;padding:10px 6px;border-radius:4px;font-size:10px;border:1px solid var(--b2);background:var(--s1);color:var(--sb);text-align:center;display:block;">🏨 호텔 예약</a>
+          </div>
+          <a href="YOUR_AGODA_LINK" target="_blank" rel="noopener" style="text-decoration:none;padding:10px 6px;border-radius:4px;font-size:10px;border:1px solid var(--b2);background:var(--s1);color:var(--sb);text-align:center;display:block;">🌏 아고다 숙소 예약</a>
+          <div style="font-size:8px;color:var(--m);margin-top:8px;line-height:1.6;text-align:center;">위 링크로 예약 시 DAL이 받는 제휴 수수료를 전액 코인으로 돌려드려요 🌙</div>
+        </div>
       </div>
 
     </div>
@@ -816,7 +827,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
         <div class="chat-area" id="fullChatArea" style="max-height:55vh;overflow-y:auto;margin-bottom:10px;"></div>
         <div id="fullSaveBtnArea" style="display:none;">
-          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-full-save-btn">✓ 내 여행에 저장 · 🪙 5코인 적립</button>
+          <button onclick="saveFullTrip()" style="width:100%;padding:12px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.3);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" id="t-full-save-btn">✓ 내 여행에 저장</button>
         </div>
       </div>
     </div>
@@ -829,7 +840,18 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <div id="page-luggage" class="page">
   <div class="page-wrap" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;text-align:center;padding:40px 24px;">
     <!-- 아이콘 -->
-    <div style="font-size:56px;margin-bottom:20px;line-height:1;">🤖</div>
+    <div style="margin-bottom:20px;line-height:1;">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="16" y="20" width="32" height="26" rx="6" fill="#161722" stroke="#c4af87" stroke-width="1.5"/>
+        <circle cx="25" cy="32" r="3.5" fill="#c4af87"/>
+        <circle cx="39" cy="32" r="3.5" fill="#c4af87"/>
+        <rect x="26" y="39" width="12" height="2.5" rx="1.25" fill="#5b6680"/>
+        <line x1="32" y1="20" x2="32" y2="13" stroke="#c4af87" stroke-width="1.5"/>
+        <circle cx="32" cy="11" r="2.5" fill="#c4af87"/>
+        <rect x="12" y="27" width="3" height="10" rx="1.5" fill="#5b6680"/>
+        <rect x="49" y="27" width="3" height="10" rx="1.5" fill="#5b6680"/>
+      </svg>
+    </div>
     <!-- 타이틀 -->
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--sb);letter-spacing:1px;margin-bottom:8px;" id="t-lug-title">수화물 로봇 서비스</div>
     <div style="font-size:11px;color:var(--m);line-height:1.9;margin-bottom:28px;max-width:280px;" id="t-lug-sub">공항에서 로봇이 직접 수화물을 픽업·보관·이동하는 서비스를 준비하고 있어요.<br>앱 출시 이후 파트너십 체결을 거쳐 오픈할 예정입니다.</div>
@@ -837,28 +859,85 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
         <div style="font-size:22px;flex-shrink:0;">🛄</div>
-        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">공항 수화물 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;">로봇이 공항 내에서 직접 픽업</div></div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;" id="t-lugc1">공항 수화물 픽업</div><div style="font-size:10px;color:var(--m);line-height:1.6;" id="t-lugc1s">로봇이 공항 내에서 직접 픽업</div></div>
         <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);white-space:nowrap;flex-shrink:0;">준비중</div>
       </div>
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
         <div style="font-size:22px;flex-shrink:0;">🗄️</div>
-        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;">위탁 전 안전 보관 서비스</div></div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;" id="t-lugc2">수화물 보관</div><div style="font-size:10px;color:var(--m);line-height:1.6;" id="t-lugc2s">위탁 전 안전 보관 서비스</div></div>
         <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:10px;color:var(--gold);white-space:nowrap;flex-shrink:0;">준비중</div>
       </div>
       <div style="background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;">
         <div style="font-size:22px;flex-shrink:0;">🏨</div>
-        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;">호텔 → 공항 배송</div><div style="font-size:10px;color:var(--m);line-height:1.6;">호텔에서 공항까지 자동 배송</div></div>
+        <div><div style="font-size:12px;color:var(--sb);margin-bottom:2px;" id="t-lugc3">호텔 → 공항 배송</div><div style="font-size:10px;color:var(--m);line-height:1.6;" id="t-lugc3s">호텔에서 공항까지 자동 배송</div></div>
         <div style="margin-left:auto;font-size:9px;padding:2px 8px;background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:10px;color:#7bb8f0;white-space:nowrap;flex-shrink:0;">2027+</div>
       </div>
     </div>
     <!-- 출시 알림 신청 -->
     <div style="width:100%;max-width:320px;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:20px 18px;">
-      <div style="font-size:12px;color:var(--w);font-weight:500;margin-bottom:4px;">출시 알림 받기</div>
-      <div style="font-size:10px;color:var(--m);margin-bottom:14px;">서비스 오픈 시 이메일로 알려드릴게요</div>
+      <div style="font-size:12px;color:var(--w);font-weight:500;margin-bottom:4px;" id="t-lugnotify">출시 알림 받기</div>
+      <div style="font-size:10px;color:var(--m);margin-bottom:14px;" id="t-lugnotifys">서비스 오픈 시 이메일로 알려드릴게요</div>
       <input id="lugNotifyEmail" type="email" placeholder="이메일 주소" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--w);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:8px;">
       <button onclick="submitLugNotify()" style="width:100%;padding:11px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:6px;font-size:11px;font-weight:500;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">알림 신청하기</button>
       <div id="lugNotifyMsg" style="font-size:10px;text-align:center;margin-top:8px;min-height:16px;"></div>
     </div>
+    <!-- 미니게임 -->
+    <div style="width:100%;max-width:320px;margin-top:24px;">
+      <div style="font-size:11px;color:var(--m);text-align:center;margin-bottom:12px;" id="t-gamehint">준비하는 동안 즐겨보세요 🎮</div>
+      <div style="display:flex;gap:10px;">
+        <div onclick="dalOpenGame('blocks')" style="flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:18px 10px;text-align:center;cursor:pointer;">
+          <div style="font-size:30px;margin-bottom:8px;">🧱</div>
+          <div style="font-size:11px;color:var(--w);font-weight:500;">DAL Blocks</div>
+          <div style="font-size:8px;color:var(--m);margin-top:2px;">블록 쌓기</div>
+        </div>
+        <div onclick="dalOpenGame('galaxy')" style="flex:1;background:var(--s1);border:1px solid var(--b2);border-radius:12px;padding:18px 10px;text-align:center;cursor:pointer;">
+          <div style="font-size:30px;margin-bottom:8px;">🚀</div>
+          <div style="font-size:11px;color:var(--w);font-weight:500;">DAL Galaxy</div>
+          <div style="font-size:8px;color:var(--m);margin-top:2px;">우주 슈팅</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 게임 모달 ══ -->
+<div id="dalGamePopup" style="display:none;position:fixed;inset:0;background:#060710;z-index:4000;flex-direction:column;">
+  <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b1);flex-shrink:0;">
+    <div id="dalGameTitle" style="font-size:13px;color:var(--w);font-weight:500;">게임</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:11px;color:var(--gold);">SCORE <span id="dalGameScore">0</span></div>
+      <div style="font-size:10px;color:var(--m);">BEST <span id="dalGameBest">0</span></div>
+      <button onclick="dalCloseGame()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;">✕</button>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+    <canvas id="dalGameCanvas" style="background:#0a0b16;border:1px solid var(--b1);border-radius:8px;touch-action:none;"></canvas>
+    <!-- 광고 오버레이 -->
+    <div id="dalGameAd" style="display:none;position:absolute;inset:0;background:rgba(6,7,16,.97);flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;">광고</div>
+      <div style="width:100%;max-width:300px;height:250px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <!-- AdSense 광고 자리 — 실제 광고 코드로 교체 -->
+        <div style="text-align:center;color:var(--m);font-size:11px;line-height:1.8;">📺<br>광고 영역<br><span style="font-size:9px;">(AdSense 연동 예정)</span></div>
+      </div>
+      <div id="dalAdTimer" style="font-size:12px;color:var(--gold);margin-bottom:12px;">15초 후 계속하기</div>
+      <button id="dalAdSkipBtn" onclick="dalAdComplete()" disabled style="padding:10px 24px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:var(--m);cursor:not-allowed;font-family:'DM Sans',sans-serif;">건너뛰기</button>
+      <div style="font-size:9px;color:var(--m);margin-top:10px;">시청 완료 시 🪙 1코인 적립</div>
+    </div>
+    <!-- 게임 오버 오버레이 -->
+    <div id="dalGameOver" style="display:none;position:absolute;inset:0;background:rgba(6,7,16,.92);flex-direction:column;align-items:center;justify-content:center;">
+      <div style="font-size:18px;color:var(--w);font-weight:500;margin-bottom:8px;">GAME OVER</div>
+      <div style="font-size:13px;color:var(--gold);margin-bottom:4px;">SCORE <span id="dalGameOverScore">0</span></div>
+      <div id="dalGameNewBest" style="display:none;font-size:11px;color:var(--ok);margin-bottom:16px;">🎉 최고 점수 갱신!</div>
+      <button onclick="dalRestartGame()" style="padding:11px 28px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:8px;font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:8px;">다시 하기</button>
+      <button onclick="dalCloseGame()" style="padding:9px 24px;background:transparent;border:1px solid var(--b2);border-radius:8px;font-size:11px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;">나가기</button>
+    </div>
+  </div>
+  <!-- 모바일 컨트롤 -->
+  <div id="dalGameControls" style="padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;gap:8px;flex-shrink:0;">
+    <button class="dal-game-btn" data-act="left" style="flex:1;max-width:80px;padding:14px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;font-size:18px;color:var(--w);cursor:pointer;">←</button>
+    <button class="dal-game-btn" data-act="rotate" style="flex:1;max-width:80px;padding:14px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;font-size:16px;color:var(--w);cursor:pointer;">↻</button>
+    <button class="dal-game-btn" data-act="right" style="flex:1;max-width:80px;padding:14px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;font-size:18px;color:var(--w);cursor:pointer;">→</button>
+    <button class="dal-game-btn" data-act="down" style="flex:1;max-width:80px;padding:14px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;font-size:16px;color:var(--w);cursor:pointer;">↓</button>
   </div>
 </div>
 
@@ -985,8 +1064,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <div id="myt-detail-title" style="font-size:13px;color:var(--w);font-weight:500;"></div>
           <div id="myt-detail-dates" style="font-size:9px;color:var(--m);"></div>
         </div>
+        <button onclick="mytSetCover()" style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">📷 사진</button>
         <button onclick="mytShowRecord()" style="font-size:9px;color:var(--ac);background:rgba(91,143,255,.08);border:1px solid rgba(91,143,255,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">기록</button>
-        <button id="myt-blog-btn" onclick="mytOpenBlog()" style="display:none;font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">블로그</button>
+        <button id="myt-blog-btn" onclick="mytExportReport()" style="display:none;font-size:9px;color:var(--gold);background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:4px;padding:4px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">📋 리포트</button>
+        <input type="file" id="mytCoverInput" accept="image/*" style="display:none;" onchange="mytUploadCover(this)">
       </div>
       <div style="flex:1;overflow-y:auto;">
         <!-- 예산 요약 -->
@@ -1483,14 +1564,12 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <div class="menu-list">
           <div class="toggle-row"><div><div class="toggle-label" id="t-prv-profile">프로필 공개</div><div class="toggle-sub" id="t-prv-profiles">다른 유저가 내 프로필 볼 수 있음</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
           <div class="toggle-row"><div><div class="toggle-label" id="t-prv-feed">피드 공개</div><div class="toggle-sub" id="t-prv-feeds">내 여행 포스트 공개 여부</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="toggle-row"><div><div class="toggle-label" id="t-prv-follow">팔로우 허용</div><div class="toggle-sub" id="t-prv-follows">누구나 팔로우 가능</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-          <div class="toggle-row"><div><div class="toggle-label" id="t-prv-msg">메시지 수신</div><div class="toggle-sub" id="t-prv-msgs">팔로워에게만 · 전체</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div><div class="toggle-label" id="t-prv-affiliate">제휴 적립 동의</div><div class="toggle-sub" id="t-prv-affiliates">제휴 예약 시 수수료를 코인으로 적립</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
           <div class="toggle-row"><div><div class="toggle-label" id="t-prv-data">데이터 분석 동의</div><div class="toggle-sub" id="t-prv-datas">서비스 개선을 위한 익명 데이터 활용</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
           <div class="toggle-row"><div><div class="toggle-label" id="t-prv-marketing">마케팅 수신 동의</div><div class="toggle-sub" id="t-prv-marketings">이메일·문자 마케팅</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
         </div>
         <div class="page-wrap" style="padding-top:12px;">
           <button class="action-btn btn-red" style="margin-top:0;" onclick="alert('개인 데이터 삭제 요청이 접수되었습니다. 30일 내 처리됩니다.')" id="t-del-data">내 데이터 삭제 요청</button>
-          <button class="action-btn btn-dim" onclick="alert('개인정보 처리방침 이메일 발송 완료')" id="t-export-data">내 데이터 내보내기</button>
         </div>
       </div>
     </div>
@@ -1664,7 +1743,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
 <div class="bottom-nav">
   <button class="bn-tab active" id="bn-home" onclick="goPage('home')">
-    <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">
+    <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.3" width="22" height="22">
       <circle cx="12" cy="12" r="9.5" stroke="currentColor"/>
       <circle cx="12" cy="12" r="6" stroke="currentColor" opacity=".4"/>
       <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>
@@ -1672,7 +1751,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <span class="bn-label" id="t-nav-home">홈</span>
   </button>
   <button class="bn-tab" id="bn-luggage" onclick="goPage('luggage')">
-    <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+    <div class="bn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" width="22" height="22">
       <path d="M12 3.5 A8.5 8.5 0 0 1 12 20.5 A8.5 8.5 0 0 0 12 3.5Z" fill="currentColor" opacity=".15"/>
       <path d="M12 3.5 A8.5 8.5 0 0 1 12 20.5" stroke="currentColor" stroke-linecap="round"/>
       <path d="M12 3.5 A8.5 8.5 0 0 0 12 20.5" stroke="currentColor" opacity=".3" stroke-linecap="round"/>
@@ -1847,7 +1926,7 @@ var TR = {
 ko:{
   'home-title':'어디로 떠나시나요?','step1':'1단계 · 여행 스타일','step2':'2단계 · 세부 옵션',
   'nav-home':'홈','nav-lug':'수화물','nav-trips':'내 여행','nav-social':'소셜','nav-my':'마이','coin-label':'코인',
-  'lug-title':'수화물 서비스','lug-sub':'DAL 로봇이 공항 수화물을 처리합니다.',
+  'lug-title':'수화물 로봇 서비스','lug-sub':'공항에서 로봇이 직접 수화물을 픽업·보관·이동하는 서비스를 준비하고 있어요.<br>앱 출시 이후 파트너십 체결을 거쳐 오픈할 예정입니다.',
   'weight':'✈️ 중량 사전 확인','allow':'항공사 허용','actual':'실제 무게',
   'robot-loc':'📍 근처 로봇 위치','robot-eta':'로봇까지 약 120m · 도착 예정 2분',
   'svc-select':'서비스 선택','robot-rent':'🤖 로봇 대여',
@@ -1864,7 +1943,7 @@ ko:{
   'optA-name':'풀 프리미엄','optB-name':'스마트 프리미엄','optC-name':'가성비 프리미엄',
   'tab-msg':'메신저','tab-feed':'피드','tab-follow':'팔로잉',
   'follow-sub':'팔로우하면 피드에서 여행 정보를 받아볼 수 있습니다.',
-  'suggested':'추천 여행자','new-msg':'+ 새 메시지','new-post':'+ 여행 정보 공유하기 · 🪙 5코인 적립',
+  'suggested':'추천 여행자','new-msg':'+ 새 메시지','new-post':'+ 여행 정보 공유하기',
   'login-sub':'로그인하고 여행 기록과<br>코인을 관리하세요.',
   'google':'Google로 계속하기','kakao':'카카오로 계속하기','apple':'Apple로 계속하기','email-login':'이메일로 계속하기',
   'terms':'계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.',
@@ -1885,8 +1964,7 @@ ko:{
   'quiet':'방해 금지 시간',
   'prv-profile':'프로필 공개','prv-profiles':'다른 유저가 내 프로필 볼 수 있음',
   'prv-feed':'피드 공개','prv-feeds':'내 여행 포스트 공개 여부',
-  'prv-follow':'팔로우 허용','prv-follows':'누구나 팔로우 가능',
-  'prv-msg':'메시지 수신','prv-msgs':'팔로워에게만 · 전체',
+  'prv-affiliate':'제휴 적립 동의','prv-affiliates':'제휴 예약 시 수수료를 코인으로 적립',
   'prv-data':'데이터 분석 동의','prv-datas':'서비스 개선을 위한 익명 데이터 활용',
   'prv-marketing':'마케팅 수신 동의','prv-marketings':'이메일·문자 마케팅',
   'del-data':'내 데이터 삭제 요청','export-data':'내 데이터 내보내기',
@@ -1921,7 +1999,7 @@ ko:{
 en:{
   'home-title':'Where are you going?','step1':'Step 1 · Travel Style','step2':'Step 2 · Sub Option',
   'nav-home':'Home','nav-lug':'Luggage','nav-trips':'My Trip','nav-social':'Social','nav-my':'My','coin-label':'coins',
-  'lug-title':'Luggage Service','lug-sub':'DAL robots handle your airport luggage.',
+  'lug-title':'Luggage Robot Service','lug-sub':'We are preparing a service where robots pick up, store, and move your luggage at the airport.<br>Launching after partnership agreements following the app release.',
   'weight':'✈️ Weight Check','allow':'Airline limit','actual':'Actual weight',
   'robot-loc':'📍 Nearby Robot','robot-eta':'Robot ~120m away · ETA 2 min',
   'svc-select':'Select Service','robot-rent':'🤖 Robot Rental',
@@ -1938,7 +2016,7 @@ en:{
   'optA-name':'Full Premium','optB-name':'Smart Premium','optC-name':'Value Premium',
   'tab-msg':'Messages','tab-feed':'Feed','tab-follow':'Following',
   'follow-sub':'Follow travelers to see their updates in your feed.',
-  'suggested':'Suggested Travelers','new-msg':'+ New Message','new-post':'+ Share Travel Tips · Earn 🪙 5 coins',
+  'suggested':'Suggested Travelers','new-msg':'+ New Message','new-post':'+ Share Travel Tips',
   'login-sub':'Sign in to manage your<br>trips and coins.',
   'google':'Continue with Google','kakao':'Continue with Kakao','apple':'Continue with Apple','email-login':'Continue with Email',
   'terms':'By continuing you agree to DAL\'s <span style="color:var(--ac)">Terms</span> and <span style="color:var(--ac)">Privacy Policy</span>.',
@@ -1959,8 +2037,7 @@ en:{
   'quiet':'Do Not Disturb',
   'prv-profile':'Public Profile','prv-profiles':'Allow others to view your profile',
   'prv-feed':'Public Feed','prv-feeds':'Show your posts publicly',
-  'prv-follow':'Allow Follows','prv-follows':'Anyone can follow you',
-  'prv-msg':'Receive Messages','prv-msgs':'Followers only · everyone',
+  'prv-affiliate':'Affiliate Rewards','prv-affiliates':'Earn coins from affiliate bookings',
   'prv-data':'Data Analytics Consent','prv-datas':'Anonymous usage data for service improvement',
   'prv-marketing':'Marketing Consent','prv-marketings':'Email & SMS marketing',
   'del-data':'Request Data Deletion','export-data':'Export My Data',
@@ -2016,6 +2093,16 @@ function applyLang(){
   el=document.getElementById('t-beta-msg'); if(el) el.innerHTML=isEn?'Beta · messaging feature in test':'Beta · 실제 메시지 전송 기능 테스트 중';
   el=document.getElementById('t-lug-coin1'); if(el) el.innerHTML=isEn?'🪙 30 coins':'🪙 30코인';
   el=document.getElementById('t-lug-coin2'); if(el) el.innerHTML=isEn?'🪙 20 coins/6h':'🪙 20코인/6h';
+  el=document.getElementById('t-lugc1'); if(el) el.innerHTML=isEn?'Airport Luggage Pickup':'공항 수화물 픽업';
+  el=document.getElementById('t-lugc1s'); if(el) el.innerHTML=isEn?'Robot picks up inside the airport':'로봇이 공항 내에서 직접 픽업';
+  el=document.getElementById('t-lugc2'); if(el) el.innerHTML=isEn?'Luggage Storage':'수화물 보관';
+  el=document.getElementById('t-lugc2s'); if(el) el.innerHTML=isEn?'Safe storage before check-in':'위탁 전 안전 보관 서비스';
+  el=document.getElementById('t-lugc3'); if(el) el.innerHTML=isEn?'Hotel → Airport Delivery':'호텔 → 공항 배송';
+  el=document.getElementById('t-lugc3s'); if(el) el.innerHTML=isEn?'Auto delivery from hotel to airport':'호텔에서 공항까지 자동 배송';
+  el=document.getElementById('t-lugnotify'); if(el) el.innerHTML=isEn?'Get Launch Alert':'출시 알림 받기';
+  el=document.getElementById('t-lugnotifys'); if(el) el.innerHTML=isEn?'We will email you when the service opens':'서비스 오픈 시 이메일로 알려드릴게요';
+  el=document.getElementById('t-gamehint'); if(el) el.innerHTML=isEn?'Enjoy while you wait 🎮':'준비하는 동안 즐겨보세요 🎮';
+  el=document.getElementById('lugNotifyEmail'); if(el) el.placeholder=isEn?'Email address':'이메일 주소';
   el=document.getElementById('t-coin-type1'); if(el) el.innerHTML=isEn?'Sign-up<br>Bonus':'가입<br>보너스';
   el=document.getElementById('t-coin-type2'); if(el) el.innerHTML=isEn?'App<br>Earned':'앱사용<br>적립';
   el=document.getElementById('t-coin-type3'); if(el) el.innerHTML=isEn?'Personal<br>Charged':'개인<br>충전';
@@ -2906,7 +2993,12 @@ function updateCoinUI(){
   setMode(currentMode);
   var fcb=document.getElementById('fullCoinBalance');if(fcb)fcb.textContent=coins;
 }
-function openCoinModal(){document.getElementById('coinModal').classList.add('open');}
+function openCoinModal(){
+  // 충전 기능 준비중 — 적립 중심으로 운영
+  alert(lang==='ko'
+    ? '코인 충전은 준비 중이에요 🌙\n\n지금은 제휴 예약·광고 시청으로 코인을 적립할 수 있어요. 적립한 코인은 추후 상품권으로 교환 가능합니다.'
+    : 'Coin charging is coming soon 🌙\n\nFor now, earn coins through affiliate bookings and ads. Earned coins will be redeemable for gift cards.');
+}
 function closeModalBg(id,e){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
 var selectedPackPrice='30000';
 function selectPack(el,price){document.querySelectorAll('.coin-pack').forEach(function(p){p.classList.remove('sel');});el.classList.add('sel');selectedPackPrice=price;}
@@ -3088,11 +3180,10 @@ async function submitLugNotify(){
   var btn=document.querySelector('#page-luggage button[onclick="submitLugNotify()"]');
   if(btn){btn.disabled=true;btn.textContent='신청 중...';}
   try{
-    var FORMSPREE_ID='YOUR_FORM_ID';
-    var r=await fetch('https://formspree.io/f/'+FORMSPREE_ID,{
+    var r=await fetch(SUPA_URL+'/rest/v1/waitlist',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({email:email,subject:'DAL 수화물 서비스 출시 알림 신청',message:'수화물 서비스 출시 알림을 신청했습니다.'})
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+(_currentToken||SUPA_KEY),'Content-Type':'application/json','Prefer':'return=minimal,resolution=ignore-duplicates'},
+      body:JSON.stringify({email:email})
     });
     if(msg){
       if(r.ok){
@@ -3101,6 +3192,8 @@ async function submitLugNotify(){
         var input=document.getElementById('lugNotifyEmail');
         if(input) input.value='';
       } else {
+        var eb=await r.text();
+        console.warn('[Waitlist] 저장 실패 HTTP'+r.status+':', eb);
         msg.style.color='#ff6b6b';
         msg.textContent='신청 중 오류가 발생했어요. 다시 시도해주세요.';
       }
@@ -5410,6 +5503,32 @@ function initDalMap(center) {
   loadUserPins();
 }
 
+// ── 지도 새로고침 (먹통 대비) ──
+function dalRefreshMap() {
+  if (_dalMap) {
+    _dalMap.invalidateSize();
+    setTimeout(function(){ if(_dalMap) _dalMap.invalidateSize(); }, 100);
+  } else {
+    renderDalMap();
+  }
+}
+
+// ── 전세계 지도 보기 (더 보기) ──
+function dalShowWorldMap() {
+  function doView(){
+    if (!_dalMap) return;
+    _dalMap.setView([20, 30], 2);
+    setTimeout(function(){ if(_dalMap) _dalMap.invalidateSize(); }, 200);
+  }
+  if (!_dalMap) {
+    // 지도가 아직 없으면 먼저 렌더 후 줌아웃
+    renderDalMap();
+    setTimeout(doView, 600);
+  } else {
+    doView();
+  }
+}
+
 function dalMakePinIcon(emoji) {
   return L.divIcon({
     html: '<div style="background:#060710;border:2px solid #c4af87;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:15px;">'+emoji+'</div>',
@@ -5903,7 +6022,401 @@ document.addEventListener('DOMContentLoaded',function(){
   }
 });
 
-window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderAllPlaces=renderAllPlaces; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;
+window.selectCountry=selectCountry; window.dalOpenPinPopup=dalOpenPinPopup; window.dalClosePinPopup=dalClosePinPopup; window.dalSelPinStatus=dalSelPinStatus; window.dalSelPinCat=dalSelPinCat; window.dalSelPinIcon=dalSelPinIcon; window.dalSetStar=dalSetStar; window.dalSavePin=dalSavePin; window.dalDeletePin=dalDeletePin; window.loadUserPins=loadUserPins; window.renderAllPlaces=renderAllPlaces; window.renderUserPinsInGrid=renderUserPinsInGrid; window.openUserPinPopup=openUserPinPopup; window.dalTogglePinSelect=dalTogglePinSelect; window.dalFocusPin=dalFocusPin; window.dalDeletePinFromGrid=dalDeletePinFromGrid; window.loadDalPlaces=loadDalPlaces; window.loadAllDalPlaces=loadAllDalPlaces;window.toggleHotelStars=toggleHotelStars;window.toggleTheme=toggleTheme;window.dalShowWorldMap=dalShowWorldMap;window.dalRefreshMap=dalRefreshMap;
+
+// ══════════════════════════════════════════════
+// 미니게임 (DAL Blocks / DAL Galaxy)
+// ══════════════════════════════════════════════
+var _dalGame = { type:null, score:0, best:0, level:1, raf:null, running:false, ctx:null, canvas:null, lastLevel:1 };
+var _dalAdTimer = null, _dalAdCount = 0, _dalAdCallback = null;
+
+function dalGetBestKey(type){ return 'dal_game_best_'+type+'_'+(_currentUserId||'guest'); }
+
+function dalOpenGame(type){
+  _dalGame.type = type;
+  var popup = document.getElementById('dalGamePopup');
+  popup.style.display = 'flex';
+  document.getElementById('dalGameTitle').textContent = type==='blocks' ? '🧱 DAL Blocks' : '🚀 DAL Galaxy';
+  document.getElementById('dalGameOver').style.display = 'none';
+  document.getElementById('dalGameAd').style.display = 'none';
+  // 컨트롤 표시: blocks는 회전 필요, galaxy는 좌우+발사
+  var rotateBtn = document.querySelector('.dal-game-btn[data-act="rotate"]');
+  var downBtn = document.querySelector('.dal-game-btn[data-act="down"]');
+  if(type==='galaxy'){
+    if(rotateBtn){ rotateBtn.textContent='🔥'; rotateBtn.dataset.act='fire'; }
+    if(downBtn) downBtn.style.display='none';
+  } else {
+    if(rotateBtn){ rotateBtn.textContent='↻'; rotateBtn.dataset.act='rotate'; }
+    if(downBtn) downBtn.style.display='';
+  }
+  // best 로드
+  _dalGame.best = parseInt(localStorage.getItem(dalGetBestKey(type))||'0');
+  if(_currentToken && _currentUserId){
+    _sfGet('/rest/v1/game_scores?user_id=eq.'+_currentUserId+'&game=eq.'+type+'&select=score').then(function(r){
+      if(r && r[0] && r[0].score > _dalGame.best){ _dalGame.best = r[0].score; }
+      document.getElementById('dalGameBest').textContent = _dalGame.best;
+    }).catch(function(){});
+  }
+  document.getElementById('dalGameBest').textContent = _dalGame.best;
+  dalStartGame();
+}
+
+function dalCloseGame(){
+  dalStopGame();
+  var popup = document.getElementById('dalGamePopup');
+  if(popup) popup.style.display = 'none';
+  if(_dalAdTimer){ clearInterval(_dalAdTimer); _dalAdTimer=null; }
+}
+
+function dalStopGame(){
+  _dalGame.running = false;
+  if(_dalGame.raf){ cancelAnimationFrame(_dalGame.raf); _dalGame.raf=null; }
+}
+
+function dalRestartGame(){
+  document.getElementById('dalGameOver').style.display='none';
+  dalStartGame();
+}
+
+function dalUpdateScore(s){
+  _dalGame.score = s;
+  document.getElementById('dalGameScore').textContent = s;
+}
+
+function dalGameEnd(){
+  dalStopGame();
+  var newBest = false;
+  if(_dalGame.score > _dalGame.best){
+    _dalGame.best = _dalGame.score;
+    newBest = true;
+    localStorage.setItem(dalGetBestKey(_dalGame.type), String(_dalGame.best));
+    // 서버 저장 (upsert)
+    if(_currentToken && _currentUserId){
+      fetch(SUPA_URL+'/rest/v1/game_scores',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify({user_id:_currentUserId,game:_dalGame.type,score:_dalGame.best,level:_dalGame.level,updated_at:new Date().toISOString()})
+      }).catch(function(e){ console.warn('[Game] 점수 저장 실패:',e.message); });
+    }
+  }
+  document.getElementById('dalGameOverScore').textContent = _dalGame.score;
+  document.getElementById('dalGameNewBest').style.display = newBest ? 'block' : 'none';
+  document.getElementById('dalGameBest').textContent = _dalGame.best;
+  document.getElementById('dalGameOver').style.display = 'flex';
+}
+
+// ── 레벨업 시 광고 ──
+function dalShowAd(callback){
+  _dalAdCallback = callback;
+  dalStopGame();
+  var ad = document.getElementById('dalGameAd');
+  ad.style.display = 'flex';
+  var sec = 15;
+  var timerEl = document.getElementById('dalAdTimer');
+  var skipBtn = document.getElementById('dalAdSkipBtn');
+  skipBtn.disabled = true;
+  skipBtn.style.cursor = 'not-allowed';
+  skipBtn.style.color = 'var(--m)';
+  skipBtn.textContent = '잠시만요...';
+  timerEl.textContent = sec+'초 후 계속하기';
+  if(_dalAdTimer) clearInterval(_dalAdTimer);
+  _dalAdTimer = setInterval(function(){
+    sec--;
+    if(sec<=0){
+      clearInterval(_dalAdTimer); _dalAdTimer=null;
+      timerEl.textContent = '시청 완료!';
+      skipBtn.disabled = false;
+      skipBtn.style.cursor = 'pointer';
+      skipBtn.style.color = 'var(--gold)';
+      skipBtn.textContent = '계속하기';
+    } else {
+      timerEl.textContent = sec+'초 후 계속하기';
+    }
+  }, 1000);
+}
+
+function dalAdComplete(){
+  var skipBtn = document.getElementById('dalAdSkipBtn');
+  if(skipBtn.disabled) return;
+  document.getElementById('dalGameAd').style.display='none';
+  // 광고 시청 코인 적립 (하루 10개 한도)
+  dalEarnAdCoin();
+  // 게임 재개
+  if(_dalAdCallback){ var cb=_dalAdCallback; _dalAdCallback=null; cb(); }
+}
+
+function dalEarnAdCoin(){
+  if(!_currentToken || !_currentUserId) return;
+  var today = new Date().toDateString();
+  var key = 'dal_ad_coin_'+_currentUserId+'_'+today;
+  var cnt = parseInt(localStorage.getItem(key)||'0');
+  if(cnt >= 10) return; // 하루 10개 한도
+  localStorage.setItem(key, String(cnt+1));
+  // 코인 +1 (서버)
+  fetch(SUPA_URL+'/rest/v1/coin_history',{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({user_id:_currentUserId,amount:1,type:'earn_ad',description:'광고 시청 적립'})
+  }).then(function(){
+    if(typeof _currentCoins!=='undefined'){ _currentCoins+=1; }
+    if(typeof addCoins==='function'){ addCoins(1); }
+    else if(typeof saveCoinsToServer==='function'){ /* 별도 처리 */ }
+  }).catch(function(e){ console.warn('[Game] 광고코인 적립 실패:',e.message); });
+}
+
+// ── 게임 시작 라우터 ──
+function dalStartGame(){
+  var canvas = document.getElementById('dalGameCanvas');
+  _dalGame.canvas = canvas;
+  _dalGame.ctx = canvas.getContext('2d');
+  _dalGame.score = 0; _dalGame.level = 1; _dalGame.lastLevel = 1;
+  dalUpdateScore(0);
+  if(_dalGame.type==='blocks') dalBlocksStart();
+  else dalGalaxyStart();
+}
+
+// ══════════════════════════════════════════════
+// DAL Blocks (테트리스류)
+// ══════════════════════════════════════════════
+var _blk = {};
+function dalBlocksStart(){
+  var canvas = _dalGame.canvas;
+  var COLS=10, ROWS=20, CELL=Math.floor(Math.min(window.innerWidth*0.85, 300)/COLS);
+  canvas.width = COLS*CELL; canvas.height = ROWS*CELL;
+  var ctx = _dalGame.ctx;
+  var colors = ['#c4af87','#7bb8f0','#e0a8a8','#a8e0b0','#d0a8e0','#e0d0a8','#a8d8e0'];
+  var shapes = [
+    [[1,1,1,1]],            // I
+    [[1,1],[1,1]],          // O
+    [[0,1,0],[1,1,1]],      // T
+    [[1,0,0],[1,1,1]],      // J
+    [[0,0,1],[1,1,1]],      // L
+    [[1,1,0],[0,1,1]],      // S
+    [[0,1,1],[1,1,0]]       // Z
+  ];
+  var grid = [];
+  for(var r=0;r<ROWS;r++){ grid.push(new Array(COLS).fill(0)); }
+  var cur, curX, curY, curColor;
+  var dropTimer = 0, dropInterval = 600, lastTime = 0;
+  var linesCleared = 0;
+
+  function newPiece(){
+    var idx = Math.floor(Math.random()*shapes.length);
+    cur = shapes[idx].map(function(row){return row.slice();});
+    curColor = colors[idx];
+    curX = Math.floor((COLS - cur[0].length)/2);
+    curY = 0;
+    if(collide(cur, curX, curY)){ dalGameEnd(); _blk.over=true; }
+  }
+  function collide(piece, px, py){
+    for(var y=0;y<piece.length;y++){
+      for(var x=0;x<piece[y].length;x++){
+        if(piece[y][x]){
+          var nx=px+x, ny=py+y;
+          if(nx<0||nx>=COLS||ny>=ROWS) return true;
+          if(ny>=0 && grid[ny][nx]) return true;
+        }
+      }
+    }
+    return false;
+  }
+  function merge(){
+    for(var y=0;y<cur.length;y++){
+      for(var x=0;x<cur[y].length;x++){
+        if(cur[y][x] && curY+y>=0){ grid[curY+y][curX+x]=curColor; }
+      }
+    }
+  }
+  function clearLines(){
+    var cleared=0;
+    for(var y=ROWS-1;y>=0;y--){
+      if(grid[y].every(function(c){return c;})){
+        grid.splice(y,1);
+        grid.unshift(new Array(COLS).fill(0));
+        cleared++; y++;
+      }
+    }
+    if(cleared>0){
+      linesCleared += cleared;
+      dalUpdateScore(_dalGame.score + cleared*100*cleared);
+      // 10줄마다 레벨업 + 광고
+      var newLevel = Math.floor(linesCleared/10)+1;
+      if(newLevel > _dalGame.level){
+        _dalGame.level = newLevel;
+        dropInterval = Math.max(150, 600 - (newLevel-1)*60);
+        dalShowAd(function(){ _blk.loop(performance.now()); });
+      }
+    }
+  }
+  function rotate(){
+    var rotated = cur[0].map(function(_,i){ return cur.map(function(row){return row[i];}).reverse(); });
+    if(!collide(rotated, curX, curY)) cur = rotated;
+  }
+  function draw(){
+    ctx.fillStyle='#0a0b16'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(var y=0;y<ROWS;y++){
+      for(var x=0;x<COLS;x++){
+        if(grid[y][x]){ ctx.fillStyle=grid[y][x]; ctx.fillRect(x*CELL+1,y*CELL+1,CELL-2,CELL-2); }
+      }
+    }
+    if(cur){
+      ctx.fillStyle=curColor;
+      for(var yy=0;yy<cur.length;yy++){
+        for(var xx=0;xx<cur[yy].length;xx++){
+          if(cur[yy][xx]){ ctx.fillRect((curX+xx)*CELL+1,(curY+yy)*CELL+1,CELL-2,CELL-2); }
+        }
+      }
+    }
+  }
+  function loop(time){
+    if(!_dalGame.running) return;
+    var delta = time - lastTime; lastTime = time;
+    dropTimer += delta;
+    if(dropTimer > dropInterval){
+      dropTimer = 0;
+      if(!collide(cur, curX, curY+1)){ curY++; }
+      else { merge(); clearLines(); if(!_blk.over) newPiece(); }
+    }
+    draw();
+    if(_dalGame.running && !_blk.over) _dalGame.raf = requestAnimationFrame(loop);
+  }
+  _blk = { over:false, loop:loop,
+    move:function(dir){ if(!collide(cur,curX+dir,curY)){ curX+=dir; draw(); } },
+    rotate:function(){ rotate(); draw(); },
+    drop:function(){ if(!collide(cur,curX,curY+1)){ curY++; draw(); } }
+  };
+  newPiece();
+  _dalGame.running = true;
+  lastTime = performance.now();
+  _dalGame.raf = requestAnimationFrame(loop);
+}
+
+// ══════════════════════════════════════════════
+// DAL Galaxy (슈팅류)
+// ══════════════════════════════════════════════
+var _gxy = {};
+function dalGalaxyStart(){
+  var canvas = _dalGame.canvas;
+  var W = Math.floor(Math.min(window.innerWidth*0.85, 320));
+  var H = Math.floor(Math.min(window.innerHeight*0.5, 440));
+  canvas.width = W; canvas.height = H;
+  var ctx = _dalGame.ctx;
+  var ship = { x:W/2, y:H-30, w:24, h:18 };
+  var bullets = [], enemies = [], stars = [];
+  var enemyTimer = 0, enemyInterval = 1100, lastTime = 0;
+  var killCount = 0;
+  for(var i=0;i<30;i++){ stars.push({x:Math.random()*W,y:Math.random()*H,s:Math.random()*2}); }
+
+  function spawnEnemy(){
+    var cols = 4, gap = W/cols;
+    enemies.push({ x:Math.random()*(W-24)+12, y:-20, w:22, h:18, vy:1+_dalGame.level*0.3 });
+  }
+  function fire(){
+    if(_gxy.over) return;
+    bullets.push({ x:ship.x, y:ship.y-12, vy:-6 });
+  }
+  function draw(){
+    ctx.fillStyle='#0a0b16'; ctx.fillRect(0,0,W,H);
+    // 별
+    ctx.fillStyle='rgba(255,255,255,.4)';
+    stars.forEach(function(s){ s.y+=0.4; if(s.y>H)s.y=0; ctx.fillRect(s.x,s.y,s.s,s.s); });
+    // 함선
+    ctx.fillStyle='#c4af87';
+    ctx.beginPath();
+    ctx.moveTo(ship.x, ship.y-ship.h/2);
+    ctx.lineTo(ship.x-ship.w/2, ship.y+ship.h/2);
+    ctx.lineTo(ship.x+ship.w/2, ship.y+ship.h/2);
+    ctx.closePath(); ctx.fill();
+    // 총알
+    ctx.fillStyle='#7bb8f0';
+    bullets.forEach(function(b){ ctx.fillRect(b.x-1.5,b.y,3,8); });
+    // 적
+    ctx.fillStyle='#e0a8a8';
+    enemies.forEach(function(e){ ctx.fillRect(e.x-e.w/2,e.y-e.h/2,e.w,e.h); });
+  }
+  function loop(time){
+    if(!_dalGame.running) return;
+    var delta = time - lastTime; lastTime = time;
+    enemyTimer += delta;
+    if(enemyTimer > enemyInterval){ enemyTimer=0; spawnEnemy(); }
+    // 총알 이동
+    bullets.forEach(function(b){ b.y+=b.vy; });
+    bullets = bullets.filter(function(b){ return b.y>-10; });
+    // 적 이동
+    enemies.forEach(function(e){ e.y+=e.vy; });
+    // 충돌 체크
+    for(var i=enemies.length-1;i>=0;i--){
+      var e=enemies[i];
+      // 함선 충돌
+      if(e.y+e.h/2 >= ship.y-ship.h/2 && Math.abs(e.x-ship.x)<(e.w+ship.w)/2){
+        dalGameEnd(); _gxy.over=true; return;
+      }
+      if(e.y > H+20){ dalGameEnd(); _gxy.over=true; return; }
+      // 총알 충돌
+      for(var j=bullets.length-1;j>=0;j--){
+        var b=bullets[j];
+        if(b.x>e.x-e.w/2 && b.x<e.x+e.w/2 && b.y>e.y-e.h/2 && b.y<e.y+e.h/2){
+          enemies.splice(i,1); bullets.splice(j,1);
+          killCount++;
+          dalUpdateScore(_dalGame.score+50);
+          // 20킬마다 레벨업 + 광고
+          var newLevel = Math.floor(killCount/20)+1;
+          if(newLevel > _dalGame.level){
+            _dalGame.level = newLevel;
+            enemyInterval = Math.max(400, 1100-(newLevel-1)*120);
+            dalShowAd(function(){ lastTime=performance.now(); _gxy.loop(lastTime); });
+            return;
+          }
+          break;
+        }
+      }
+    }
+    draw();
+    if(_dalGame.running && !_gxy.over) _dalGame.raf = requestAnimationFrame(loop);
+  }
+  _gxy = { over:false, loop:loop, ship:ship, W:W,
+    move:function(dir){ ship.x = Math.max(ship.w/2, Math.min(W-ship.w/2, ship.x + dir*22)); },
+    fire:fire
+  };
+  _dalGame.running = true;
+  lastTime = performance.now();
+  _dalGame.raf = requestAnimationFrame(loop);
+}
+
+// ── 게임 컨트롤 입력 ──
+function dalGameControl(act){
+  if(_dalGame.type==='blocks' && _blk && !_blk.over){
+    if(act==='left') _blk.move(-1);
+    else if(act==='right') _blk.move(1);
+    else if(act==='rotate') _blk.rotate();
+    else if(act==='down') _blk.drop();
+  } else if(_dalGame.type==='galaxy' && _gxy && !_gxy.over){
+    if(act==='left') _gxy.move(-1);
+    else if(act==='right') _gxy.move(1);
+    else if(act==='fire') _gxy.fire();
+  }
+}
+
+// 버튼/키보드 바인딩
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.dal-game-btn').forEach(function(btn){
+    var handler = function(e){ e.preventDefault(); dalGameControl(btn.dataset.act); };
+    btn.addEventListener('click', handler);
+    btn.addEventListener('touchstart', handler, {passive:false});
+  });
+});
+document.addEventListener('keydown', function(e){
+  var popup = document.getElementById('dalGamePopup');
+  if(!popup || popup.style.display==='none') return;
+  if(e.key==='ArrowLeft') dalGameControl('left');
+  else if(e.key==='ArrowRight') dalGameControl('right');
+  else if(e.key==='ArrowUp') dalGameControl(_dalGame.type==='blocks'?'rotate':'fire');
+  else if(e.key==='ArrowDown') dalGameControl('down');
+  else if(e.key===' ') { e.preventDefault(); dalGameControl(_dalGame.type==='blocks'?'rotate':'fire'); }
+});
+
+window.dalOpenGame=dalOpenGame; window.dalCloseGame=dalCloseGame; window.dalRestartGame=dalRestartGame; window.dalAdComplete=dalAdComplete; window.dalGameControl=dalGameControl;
+
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
 
@@ -5968,6 +6481,73 @@ window.addEventListener('appinstalled', function(){
   var banner = document.getElementById('pwaInstallBanner');
   if(banner) banner.style.display = 'none';
 });
+
+// ── 뒤로 가기 앱 탈출 방지 + 새로고침 ──
+(function(){
+  // history에 더미 상태를 쌓아서 뒤로 가기를 가로챔
+  history.pushState({dal:true}, '');
+  var _lastBack = 0;
+
+  function showExitToast(){
+    var toast = document.getElementById('dalExitToast');
+    if(!toast){
+      toast = document.createElement('div');
+      toast.id = 'dalExitToast';
+      toast.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(20,21,32,.95);border:1px solid rgba(196,175,135,.3);color:#f0ece4;font-size:12px;padding:10px 18px;border-radius:20px;z-index:5000;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = '뒤로 가기를 한 번 더 누르면 종료돼요';
+    toast.style.display = 'block';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function(){ toast.style.display='none'; }, 2000);
+  }
+
+  window.addEventListener('popstate', function(e){
+    // 1) 열려있는 모달이 있으면 닫기
+    var modals = [
+      'dalPostPopup','dalDetailPopup','nicknamePopup','mytReportPopup','coinModal'
+    ];
+    for(var i=0;i<modals.length;i++){
+      var m = document.getElementById(modals[i]);
+      if(m && m.style.display && m.style.display!=='none'){
+        m.style.display='none';
+        history.pushState({dal:true}, '');
+        return;
+      }
+    }
+    // 2) 마이 서브페이지가 열려있으면 뒤로
+    var anyMySub = false;
+    ['notify','privacy','more-menu','cs','about','terms'].forEach(function(p){
+      var el=document.getElementById('mypage-'+p);
+      if(el && el.style.display && el.style.display!=='none') anyMySub=true;
+    });
+    if(anyMySub && typeof hideMyPage==='function'){
+      hideMyPage();
+      history.pushState({dal:true}, '');
+      return;
+    }
+    // 3) 내여행 상세/기록 화면이면 목록으로
+    var mytDetail = document.getElementById('myt-detail');
+    var mytRecord = document.getElementById('myt-record');
+    if((mytDetail && mytDetail.style.display==='flex') || (mytRecord && mytRecord.style.display==='flex')){
+      if(typeof mytShowScreen==='function'){ mytShowScreen('myt-list'); history.pushState({dal:true}, ''); return; }
+    }
+    // 4) 홈이 아니면 홈으로
+    var homePage = document.getElementById('page-home');
+    if(homePage && !homePage.classList.contains('active')){
+      if(typeof goPage==='function'){ goPage('home'); history.pushState({dal:true}, ''); return; }
+    }
+    // 5) 홈에서 뒤로 → 2초 내 두 번이면 종료 허용, 아니면 토스트
+    var now = Date.now();
+    if(now - _lastBack < 2000){
+      // 종료 허용 (더 이상 pushState 안 함)
+      return;
+    }
+    _lastBack = now;
+    showExitToast();
+    history.pushState({dal:true}, '');
+  });
+})();
 </script>
 </body>
 </html>
@@ -6022,15 +6602,28 @@ function mytLoadList() {
       var status = end < today ? 'past' : (start <= today && end >= today ? 'ongoing' : 'upcoming');
       var badgeMap = {past:'완료된 여행',ongoing:'진행중',upcoming:'다가올 여행'};
       var borderMap = {past:'',ongoing:'ongoing',upcoming:'upcoming'};
-      html += '<div class="mytrip-card '+borderMap[status]+'" onclick="mytOpenTrip(\''+t.id+'\')">';
-      html += '<div class="mytrip-badge '+status+'">'+badgeMap[status]+'</div>';
-      html += '<div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:2px;">'+t.title+'</div>';
-      html += '<div style="font-size:10px;color:var(--m);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
+      html += '<div class="mytrip-card '+borderMap[status]+'" onclick="mytOpenTrip(\''+t.id+'\')" style="padding:0;overflow:hidden;">';
       if (t.cover_image) {
-        html += '<div style="height:60px;background:var(--s2);border-radius:4px;margin-bottom:8px;overflow:hidden;"><img src="'+t.cover_image+'" style="width:100%;height:100%;object-fit:cover;"></div>';
-      }
-      if (t.total_budget > 0) {
-        html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b1);font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
+        html += '<div style="position:relative;height:120px;overflow:hidden;">';
+        html += '<img src="'+t.cover_image+'" style="width:100%;height:100%;object-fit:cover;">';
+        html += '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(6,7,16,.85),rgba(6,7,16,.1));"></div>';
+        html += '<div class="mytrip-badge '+status+'" style="position:absolute;top:10px;left:10px;">'+badgeMap[status]+'</div>';
+        html += '<div style="position:absolute;bottom:10px;left:12px;right:12px;">';
+        html += '<div style="font-size:14px;color:#fff;font-weight:500;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.6);">'+t.title+'</div>';
+        html += '<div style="font-size:10px;color:rgba(255,255,255,.85);text-shadow:0 1px 3px rgba(0,0,0,.6);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
+        html += '</div></div>';
+        if (t.total_budget > 0) {
+          html += '<div style="padding:10px 14px;font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
+        }
+      } else {
+        html += '<div style="padding:12px;">';
+        html += '<div class="mytrip-badge '+status+'">'+badgeMap[status]+'</div>';
+        html += '<div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:2px;">'+t.title+'</div>';
+        html += '<div style="font-size:10px;color:var(--m);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
+        if (t.total_budget > 0) {
+          html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b1);font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
+        }
+        html += '</div>';
       }
       html += '</div>';
     });
@@ -6076,6 +6669,18 @@ function mytRenderCal() {
   if (title) title.textContent = _mytCalYear+'년 '+(_mytCalMonth+1)+'월';
   var grid = document.getElementById('myt-cal-grid');
   if (!grid) return;
+  // 일정 있는 날짜 집합 로드 후 렌더링
+  _sfGet('/rest/v1/trip_schedules?trip_id=eq.'+t.id+'&select=schedule_date').then(function(scheds){
+    var schedDates = {};
+    (scheds||[]).forEach(function(s){ if(s.schedule_date) schedDates[s.schedule_date]=true; });
+    _mytRenderCalGrid(schedDates);
+  }).catch(function(){ _mytRenderCalGrid({}); });
+}
+
+function _mytRenderCalGrid(schedDates) {
+  var t = _mytCurrentTrip;
+  var grid = document.getElementById('myt-cal-grid');
+  if (!grid) return;
   var firstDay = new Date(_mytCalYear, _mytCalMonth, 1).getDay();
   var daysInMonth = new Date(_mytCalYear, _mytCalMonth+1, 0).getDate();
   var tripStart = new Date(t.start_date); tripStart.setHours(0,0,0,0);
@@ -6090,7 +6695,8 @@ function mytRenderCal() {
     if (cur >= tripStart && cur <= tripEnd) cls += ' trip';
     if (dateStr === _mytSelectedDate) cls = 'mytrip-cal-day sel';
     if (cur.getTime()===today.getTime() && dateStr!==_mytSelectedDate) cls += ' today';
-    html += '<div class="'+cls+'" onclick="mytSelDate(\''+dateStr+'\')">'+d+'</div>';
+    var dot = schedDates[dateStr] ? '<span style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold);"></span>' : '';
+    html += '<div class="'+cls+'" onclick="mytSelDate(\''+dateStr+'\')" style="position:relative;">'+d+dot+'</div>';
   }
   grid.innerHTML = html;
 }
@@ -6269,6 +6875,7 @@ function mytSaveSched() {
   }).then(function() {
     mytBack('myt-detail');
     mytLoadSchedules();
+    mytRenderCal();
     mytUpdateBudget();
   });
 }
@@ -6442,6 +7049,131 @@ function mytCopyBlog() {
   navigator.clipboard.writeText(text).then(function() { alert('블로그 텍스트가 복사됐어요! 붙여넣기 하세요 📋'); });
 }
 function mytShareFeed() { alert('DAL 소셜 피드 공유 기능은 준비 중이에요 🌙'); }
+
+// ── 대표 사진 설정 ──
+function mytSetCover() {
+  var input = document.getElementById('mytCoverInput');
+  if (input) input.click();
+}
+
+function mytUploadCover(input) {
+  var file = (input.files||[])[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  if (!_mytCurrentTrip) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      // 리사이즈 (최대 800px, jpeg 0.7)
+      var max=800, w=img.width, h=img.height;
+      if (w>max||h>max) { if(w>h){h=Math.round(h*max/w);w=max;} else {w=Math.round(w*max/h);h=max;} }
+      var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      var dataUrl = cv.toDataURL('image/jpeg',0.7);
+      // 서버 저장
+      _sfPatch('/rest/v1/my_trips?id=eq.'+_mytCurrentTrip.id, {cover_image:dataUrl}).then(function(){
+        _mytCurrentTrip.cover_image = dataUrl;
+        alert('대표 사진이 설정됐어요 🌙');
+      }).catch(function(err){ alert('사진 저장 실패: '+err.message); });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+// ── 여행 리포트 내보내기 (마크다운) ──
+function mytExportReport() {
+  var t = _mytCurrentTrip;
+  if (!t) return;
+  Promise.all([
+    _sfGet('/rest/v1/trip_schedules?trip_id=eq.'+t.id),
+    _sfGet('/rest/v1/trip_records?trip_id=eq.'+t.id+'&order=record_date.asc,created_at.asc')
+  ]).then(function(results) {
+    var scheds = results[0]||[], recs = results[1]||[];
+    var totalPlanned=0, totalActual=0;
+    scheds.forEach(function(s){ totalPlanned+=(s.planned_amount||0); totalActual+=(s.actual_amount||s.planned_amount||0); });
+    var saved = totalPlanned - totalActual;
+    var start = new Date(t.start_date), end = new Date(t.end_date);
+    var nights = Math.round((end-start)/(1000*60*60*24));
+    var cur = t.currency||'KRW';
+
+    var md = '# '+t.title+'\n';
+    md += t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일\n\n';
+    md += '## 예산\n';
+    md += '- 총 예산: '+(t.total_budget||totalPlanned).toLocaleString()+' '+cur+'\n';
+    md += '- 실제 지출: '+totalActual.toLocaleString()+' '+cur+'\n';
+    md += '- '+(saved>=0?'절약':'초과')+': '+Math.abs(saved).toLocaleString()+' '+cur+'\n\n';
+
+    md += '## 일정\n';
+    var days = nights+1;
+    var dayNames=['일','월','화','수','목','금','토'];
+    for (var i=0;i<days;i++) {
+      var d = new Date(start); d.setDate(d.getDate()+i);
+      var dateStr = d.toISOString().split('T')[0];
+      var daySched = scheds.filter(function(s){ return s.schedule_date===dateStr; });
+      var dayRecs = recs.filter(function(r){ return r.record_date===dateStr; });
+      if (daySched.length===0 && dayRecs.length===0) continue;
+      md += '\n### Day'+(i+1)+' — '+(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+dayNames[d.getDay()]+')\n';
+      daySched.forEach(function(s){
+        md += '- '+(s.start_time||'')+' '+(s.title||'')+(s.planned_amount?' ('+s.planned_amount.toLocaleString()+cur+')':'')+'\n';
+      });
+      dayRecs.forEach(function(r){
+        md += '- 📝 '+(r.content||'')+(r.tip?' / TIP: '+r.tip:'')+'\n';
+      });
+    }
+
+    var photoRecs = recs.filter(function(r){ return r.image_url; });
+    if (photoRecs.length>0) {
+      md += '\n## 사진 ('+photoRecs.length+'장)\n';
+      md += '여행 중 '+photoRecs.length+'장의 사진을 기록했습니다.\n';
+    }
+
+    md += '\n---\n*DAL · Design AI Life 에서 내보냄*\n';
+
+    // 팝업 표시
+    mytShowReportPopup(md);
+  });
+}
+
+function mytShowReportPopup(md) {
+  var popup = document.getElementById('mytReportPopup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'mytReportPopup';
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(6,7,16,.9);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;';
+    popup.onclick = function(e){ if(e.target===popup) mytCloseReport(); };
+    document.body.appendChild(popup);
+  }
+  popup.innerHTML = '<div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;">'
+    +'<div style="padding:14px 16px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">'
+    +'<div style="font-size:13px;color:var(--w);font-weight:500;">📋 여행 리포트</div>'
+    +'<button onclick="mytCloseReport()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;">✕</button></div>'
+    +'<div style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;">'
+    +'<div style="font-size:10px;color:var(--m);margin-bottom:10px;line-height:1.7;">아래 내용을 복사해서 Claude·GPT에 붙여넣으면 멋진 여행기로 정리해줘요 🌙</div>'
+    +'<textarea id="mytReportText" readonly style="width:100%;height:300px;box-sizing:border-box;padding:12px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:rgba(240,236,228,.85);font-family:monospace;line-height:1.6;resize:none;"></textarea>'
+    +'</div>'
+    +'<div style="padding:12px 16px;border-top:1px solid var(--b1);flex-shrink:0;">'
+    +'<button onclick="mytCopyReport()" style="width:100%;padding:12px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:8px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;">📋 복사하기</button>'
+    +'</div></div>';
+  document.getElementById('mytReportText').value = md;
+  popup.style.display = 'flex';
+}
+
+function mytCopyReport() {
+  var ta = document.getElementById('mytReportText');
+  if (!ta) return;
+  navigator.clipboard.writeText(ta.value).then(function(){
+    alert('복사됐어요! Claude·GPT에 붙여넣어 보세요 📋');
+  }).catch(function(){
+    ta.select(); document.execCommand('copy'); alert('복사됐어요 📋');
+  });
+}
+
+function mytCloseReport() {
+  var popup = document.getElementById('mytReportPopup');
+  if (popup) popup.style.display = 'none';
+}
 
 // ── 새 여행 ──
 function mytShowNewTrip() {
@@ -6739,5 +7471,6 @@ window.mytSelCat=mytSelCat; window.mytSelBooking=mytSelBooking; window.mytSelAla
 window.mytShowRecord=mytShowRecord; window.mytShowAddRecord=mytShowAddRecord; window.mytSaveRecord=mytSaveRecord;
 window.mytSelRecordDay=mytSelRecordDay; window.mytSelRecCat=mytSelRecCat;
 window.mytOpenBlog=mytOpenBlog; window.mytCopyBlog=mytCopyBlog; window.mytShareFeed=mytShareFeed;
+window.mytSetCover=mytSetCover; window.mytUploadCover=mytUploadCover; window.mytExportReport=mytExportReport; window.mytCopyReport=mytCopyReport; window.mytCloseReport=mytCloseReport;
 window.mytBack=mytBack;
 </script>
