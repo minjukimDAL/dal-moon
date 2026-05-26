@@ -3722,29 +3722,22 @@ async function submitCS(){
   var subject=document.getElementById('csSubject').value.trim();
   var body=document.getElementById('csBody').value.trim();
   if(!name||!body){alert(lang==='ko'?'이름과 문의 내용을 입력해주세요.':'Please fill in name and message.');return;}
-  var btn=document.getElementById('t-cs-submit');
-  if(btn){btn.disabled=true;btn.textContent=lang==='ko'?'전송 중...':'Sending...';}
+  // support 메일로 바로 연동 (mailto)
+  var mailSubject=encodeURIComponent('[DAL 문의] '+(subject||name));
+  var mailBody=encodeURIComponent(
+    body+'\n\n'
+    +'─────────────\n'
+    +'보낸이: '+name+'\n'
+    +'회신 이메일: '+(email||'(미입력)')+'\n'
+    +'접수 시각: '+new Date().toLocaleString('ko-KR')
+  );
+  alert(lang==='ko'
+    ? '메일 앱이 열리면 그대로 전송해주세요.\n24시간 내 답변드릴게요 🌙'
+    : 'Please send the email that opens.\nWe\'ll reply within 24h 🌙');
   try{
-    // Formspree 연동 — Form ID를 받으면 YOUR_FORM_ID 교체
-    var FORMSPREE_ID='YOUR_FORM_ID';
-    var r=await fetch('https://formspree.io/f/'+FORMSPREE_ID,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({name:name,email:email||'(미입력)',subject:subject||'문의',message:body})
-    });
-    if(r.ok){
-      alert(lang==='ko'?'문의가 접수됐어요! 24시간 내 support.dal@gmail.com으로 답변드립니다 🌙':'Submitted! We\'ll reply within 24h to support.dal@gmail.com 🌙');
-      ['csName','csEmail','csSubject','csBody'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    } else {
-      // Formspree ID 미설정 시 mailto 폴백
-      var mailBody=encodeURIComponent('['+subject+']\n\n'+body+'\n\n보낸이: '+name+' ('+email+')');
-      window.open('mailto:support.dal@gmail.com?subject='+encodeURIComponent('[DAL문의] '+(subject||name))+'&body='+mailBody);
-    }
-  }catch(e){
-    var mailBody2=encodeURIComponent(body+'\n\n보낸이: '+name);
-    window.open('mailto:support.dal@gmail.com?subject='+encodeURIComponent('[DAL문의] '+(subject||name))+'&body='+mailBody2);
-  }
-  if(btn){btn.disabled=false;btn.textContent=lang==='ko'?'문의 접수':'Submit';}
+    window.location.href='mailto:support.dal@gmail.com?subject='+mailSubject+'&body='+mailBody;
+    ['csName','csEmail','csSubject','csBody'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  }catch(e){ console.warn('[CS] mailto 실패:', e.message); }
 }
 function shareInvite(method){
   var code=document.getElementById('myInviteCode').textContent;
@@ -6543,9 +6536,26 @@ async function redeemGift(giftName, giftCode, cost){
     });
   }catch(e){ console.warn('[Gift] 교환 내역 기록 실패:', e.message); }
 
+  // support 메일로 교환 신청 연동 (mailto)
+  var userEmail = '';
+  try{ var pe=document.getElementById('profileEmail'); if(pe) userEmail=pe.textContent.trim(); }catch(e){}
+  var subject = encodeURIComponent('[DAL] 상품권 교환 신청 — '+giftName);
+  var bodyText = '상품권 교환을 신청합니다.\n\n'
+    + '■ 상품: '+giftName+'\n'
+    + '■ 사용 코인: '+cost+'코인\n'
+    + '■ 신청자 이메일: '+(userEmail||'(앱 프로필 메일)')+'\n'
+    + '■ 유저 ID: '+_currentUserId+'\n'
+    + '■ 신청 시각: '+new Date().toLocaleString('ko-KR')+'\n\n'
+    + '위 내용으로 기프티콘 발송 부탁드립니다.';
+  var body = encodeURIComponent(bodyText);
+  var mailto = 'mailto:support.dal@gmail.com?subject='+subject+'&body='+body;
+
   alert(lang==='ko'
-    ? '✅ '+giftName+' 교환 신청 완료!\n\n영업일 기준 1~2일 내 등록된 이메일로 기프티콘을 보내드릴게요 🌙'
-    : '✅ '+giftName+' redeemed!\n\nGift card will be emailed within 1-2 business days 🌙');
+    ? '✅ '+giftName+' 교환 신청 완료!\n\n'+cost+'코인이 차감됐어요.\n잠시 후 메일 앱이 열리면 그대로 전송해주세요.\n영업일 1~2일 내 기프티콘을 보내드릴게요 🌙'
+    : '✅ '+giftName+' redeemed!\n\n'+cost+' coins deducted.\nPlease send the email that opens. Gift card in 1-2 business days 🌙');
+
+  // 메일 앱 열기
+  try{ window.location.href = mailto; }catch(e){ console.warn('[Gift] mailto 실패:', e.message); }
 }
 window.redeemGift=redeemGift;
 
