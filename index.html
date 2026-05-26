@@ -1478,13 +1478,36 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <div class="coin-display">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:4px;" id="t-mycoins">내 코인</div><div style="font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);" id="profileCoins">0 🪙</div></div>
-          <button style="padding:8px 14px;background:rgba(196,175,135,.1);border:1px solid rgba(196,175,135,.2);border-radius:2px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openCoinModal()" id="t-charge">충전하기</button>
+          <button style="padding:8px 14px;background:var(--s2);border:1px solid var(--b2);border-radius:2px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="openCoinModal()" id="t-charge">충전 준비중</button>
         </div>
         <div class="coin-types">
           <div class="coin-type"><div class="ct-amount" id="earnCoin">0</div><div class="ct-label"><span id='t-coin-type2'>앱사용<br>적립</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund2'>환불불가</span></div></div>
           <div class="coin-type"><div class="ct-amount" id="bonusCoin">0</div><div class="ct-label"><span id='t-coin-type1'>가입<br>보너스</span></div><div style="font-size:7px;color:var(--red);margin-top:3px;"><span id='t-coin-no-refund1'>환불불가</span></div></div>
           <div class="coin-type"><div class="ct-amount" id="paidCoin">0</div><div class="ct-label"><span id='t-coin-type3'>개인<br>충전</span></div><div style="font-size:7px;color:var(--ok);margin-top:3px;"><span id='t-coin-refund'>환불가능</span></div></div>
         </div>
+      </div>
+      <!-- 코인 사용처: 상품권 교환 -->
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--w);font-weight:500;margin-bottom:3px;" id="t-coin-shop-title">🎁 코인으로 상품권 교환</div>
+        <div style="font-size:9px;color:var(--m);margin-bottom:14px;" id="t-coin-shop-sub">적립한 코인을 실물 상품권으로 바꿔보세요</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+          <div onclick="redeemGift('스타벅스 아메리카노','starbucks',50)" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;">
+            <div style="font-size:24px;margin-bottom:6px;">☕</div>
+            <div style="font-size:9px;color:var(--sb);line-height:1.4;">스타벅스<br>아메리카노</div>
+            <div style="font-size:10px;color:var(--gold);margin-top:4px;font-weight:500;">50🪙</div>
+          </div>
+          <div onclick="redeemGift('올리브영 5천원권','oliveyoung',50)" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;">
+            <div style="font-size:24px;margin-bottom:6px;">🛍️</div>
+            <div style="font-size:9px;color:var(--sb);line-height:1.4;">올리브영<br>5천원권</div>
+            <div style="font-size:10px;color:var(--gold);margin-top:4px;font-weight:500;">50🪙</div>
+          </div>
+          <div onclick="redeemGift('다이소 5천원권','daiso',50)" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:12px 6px;text-align:center;cursor:pointer;">
+            <div style="font-size:24px;margin-bottom:6px;">🏪</div>
+            <div style="font-size:9px;color:var(--sb);line-height:1.4;">다이소<br>5천원권</div>
+            <div style="font-size:10px;color:var(--gold);margin-top:4px;font-weight:500;">50🪙</div>
+          </div>
+        </div>
+        <div style="font-size:8px;color:var(--m);margin-top:10px;text-align:center;line-height:1.6;" id="t-coin-shop-note">교환 신청 시 등록된 이메일로 기프티콘을 보내드려요 🌙</div>
       </div>
       <div class="menu-list">
         <div class="menu-item" onclick="showMyPage('notify')"><span>🔔 <span id="t-notify">알림 설정</span></span><span style="color:var(--m)">›</span></div>
@@ -1953,7 +1976,7 @@ ko:{
   'google':'Google로 계속하기','kakao':'카카오로 계속하기','apple':'Apple로 계속하기','email-login':'이메일로 계속하기',
   'terms':'계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.',
   'mock-note':'* Beta: 실제 인증 없이 UI 테스트용<br>실제 OAuth는 앱스토어 등록 후 활성화',
-  'mycoins':'내 코인','charge':'충전하기','cards':'💳 내 카드 & 할인혜택','add-card':'+ 카드 / 혜택 추가',
+  'mycoins':'내 코인','charge':'충전 준비중','cards':'💳 내 카드 & 할인혜택','add-card':'+ 카드 / 혜택 추가',
   'mileage':'항공 마일리지','passport':'여권 정보','notify':'알림 설정','privacy':'개인정보 설정','more-menu':'더보기','logout':'로그아웃','withdraw':'회원탈퇴 (충전 코인 환불)',
   'miles-title':'항공 마일리지','miles-sub':'항공사 계정을 연동하면 마일리지를 한눈에 확인할 수 있습니다.<br>실제 연동은 앱스토어 출시 후 활성화됩니다.',
   'add-airline':'+ 항공사 계정 연동',
@@ -2026,7 +2049,7 @@ en:{
   'google':'Continue with Google','kakao':'Continue with Kakao','apple':'Continue with Apple','email-login':'Continue with Email',
   'terms':'By continuing you agree to DAL\'s <span style="color:var(--ac)">Terms</span> and <span style="color:var(--ac)">Privacy Policy</span>.',
   'mock-note':'* Beta: UI test only, no real authentication<br>Real OAuth activates after App Store launch',
-  'mycoins':'My Coins','charge':'Charge','cards':'💳 Cards & Benefits','add-card':'+ Add Card / Benefit',
+  'mycoins':'My Coins','charge':'Coming soon','cards':'💳 Cards & Benefits','add-card':'+ Add Card / Benefit',
   'mileage':'Airline Miles','passport':'Passport Info','notify':'Notifications','privacy':'Privacy Settings','more-menu':'More','logout':'Sign Out','withdraw':'Withdraw (Refund Charged Coins)',
   'miles-title':'Airline Miles','miles-sub':'Link your airline accounts to view all miles in one place.<br>Real API integration activates after app launch.',
   'add-airline':'+ Link Airline Account',
@@ -2114,6 +2137,9 @@ function applyLang(){
   el=document.getElementById('t-coin-no-refund1'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
   el=document.getElementById('t-coin-no-refund2'); if(el) el.innerHTML=isEn?'Non-refund':'환불불가';
   el=document.getElementById('t-coin-refund'); if(el) el.innerHTML=isEn?'Refundable':'환불가능';
+  el=document.getElementById('t-coin-shop-title'); if(el) el.innerHTML=isEn?'🎁 Redeem Coins for Gift Cards':'🎁 코인으로 상품권 교환';
+  el=document.getElementById('t-coin-shop-sub'); if(el) el.innerHTML=isEn?'Exchange earned coins for real gift cards':'적립한 코인을 실물 상품권으로 바꿔보세요';
+  el=document.getElementById('t-coin-shop-note'); if(el) el.innerHTML=isEn?'Gift card sent to your email on request 🌙':'교환 신청 시 등록된 이메일로 기프티콘을 보내드려요 🌙';
   el=document.getElementById('t-provider-status'); if(el && el.textContent) el.innerHTML=el.innerHTML.replace('● 로그인됨','● Connected').replace('● email 연동','● email connected');
   // data-ko/data-en 속성 가진 모든 요소 일괄 번역
   document.querySelectorAll('[data-ko][data-en]').forEach(function(el){
@@ -6478,6 +6504,50 @@ document.addEventListener('keydown', function(e){
 });
 
 window.dalOpenGame=dalOpenGame; window.dalCloseGame=dalCloseGame; window.dalRestartGame=dalRestartGame; window.dalAdComplete=dalAdComplete; window.dalGameControl=dalGameControl;
+
+// ── 코인 → 상품권 교환 ──
+async function redeemGift(giftName, giftCode, cost){
+  if(!_currentToken || !_currentUserId){
+    alert(lang==='ko'?'로그인 후 이용할 수 있어요 🌙':'Please log in first 🌙');
+    return;
+  }
+  if(coins < cost){
+    alert(lang==='ko'
+      ? '코인이 부족해요.\n\n현재 '+coins+'🪙 / 필요 '+cost+'🪙\n\n게임·제휴 예약으로 코인을 적립해보세요!'
+      : 'Not enough coins.\n\nCurrent '+coins+' / Need '+cost);
+    return;
+  }
+  var ok = confirm(lang==='ko'
+    ? giftName+' 교환\n\n'+cost+'🪙를 사용해 교환을 신청할까요?\n등록된 이메일로 기프티콘을 보내드려요.'
+    : 'Redeem '+giftName+'?\n\nUse '+cost+' coins. Gift card will be emailed.');
+  if(!ok) return;
+
+  // 코인 차감 (앱사용 적립 → 가입보너스 → 충전 순)
+  if(earnCoinAmt>=cost){
+    earnCoinAmt-=cost;
+  } else if(bonusCoinAmt>=(cost-earnCoinAmt)){
+    var need=cost-earnCoinAmt; earnCoinAmt=0; bonusCoinAmt=Math.max(0,bonusCoinAmt-need);
+  } else {
+    var need2=cost-earnCoinAmt-bonusCoinAmt; earnCoinAmt=0; bonusCoinAmt=0; paidCoinAmt=Math.max(0,paidCoinAmt-need2);
+  }
+  updateCoinUI();
+  if(_coinSaveTimer){ clearTimeout(_coinSaveTimer); _coinSaveTimer=null; }
+  await saveCoinsToServer();
+
+  // 교환 내역 기록 (coin_history) — 음수 amount로 사용 기록
+  try{
+    await fetch(SUPA_URL+'/rest/v1/coin_history',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({user_id:_currentUserId,amount:-cost,type:'use_reward',description:giftName+' 교환'})
+    });
+  }catch(e){ console.warn('[Gift] 교환 내역 기록 실패:', e.message); }
+
+  alert(lang==='ko'
+    ? '✅ '+giftName+' 교환 신청 완료!\n\n영업일 기준 1~2일 내 등록된 이메일로 기프티콘을 보내드릴게요 🌙'
+    : '✅ '+giftName+' redeemed!\n\nGift card will be emailed within 1-2 business days 🌙');
+}
+window.redeemGift=redeemGift;
 
 window.openInClaude=openInClaude;window.openInGPT=openInGPT;
 window.closeDalPlacePopup=closeDalPlacePopup;window.toggleDalPlace=toggleDalPlace;
