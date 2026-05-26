@@ -914,14 +914,19 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <canvas id="dalGameCanvas" style="background:#0a0b16;border:1px solid var(--b1);border-radius:8px;touch-action:none;"></canvas>
     <!-- 광고 오버레이 -->
     <div id="dalGameAd" style="display:none;position:absolute;inset:0;background:rgba(253,251,247,.97);flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
-      <div style="font-size:10px;color:var(--m);margin-bottom:8px;">광고</div>
-      <div style="width:100%;max-width:300px;height:250px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-        <!-- AdSense 광고 자리 — 실제 광고 코드로 교체 -->
+      <div style="font-size:10px;color:var(--m);margin-bottom:8px;letter-spacing:1px;">AD · 광고</div>
+      <div id="dalAdSlot" style="width:100%;max-width:300px;height:250px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;overflow:hidden;">
+        <!-- ▼▼▼ AdSense 광고 코드 삽입 위치 ▼▼▼
+             승인 후 아래 placeholder div를 지우고 ins 태그로 교체:
+             <ins class="adsbygoogle" style="display:block;width:300px;height:250px"
+                  data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+             그리고 dalShowAd() 안에서 (adsbygoogle=window.adsbygoogle||[]).push({}); 호출
+             ▲▲▲ -->
         <div style="text-align:center;color:var(--m);font-size:11px;line-height:1.8;">📺<br>광고 영역<br><span style="font-size:9px;">(AdSense 연동 예정)</span></div>
       </div>
       <div id="dalAdTimer" style="font-size:12px;color:var(--gold);margin-bottom:12px;">15초 후 계속하기</div>
       <button id="dalAdSkipBtn" onclick="dalAdComplete()" disabled style="padding:10px 24px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:var(--m);cursor:not-allowed;font-family:'DM Sans',sans-serif;">건너뛰기</button>
-      <div style="font-size:9px;color:var(--m);margin-top:10px;">시청 완료 시 🪙 1코인 적립</div>
+      <div id="dalAdReward" style="font-size:9px;color:var(--m);margin-top:10px;">시청 완료 시 🪙 1코인 적립</div>
     </div>
     <!-- 게임 오버 오버레이 -->
     <div id="dalGameOver" style="display:none;position:absolute;inset:0;background:rgba(58,52,43,.55);flex-direction:column;align-items:center;justify-content:center;">
@@ -3760,20 +3765,26 @@ async function loadCoinsFromServer(){
   if(!_currentToken||!_currentUserId) return;
   try{
     var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=coins,bonus_coins');
-    if(r&&r[0]&&r[0].coins!==null&&r[0].coins!==undefined){
-      // 서버에 코인 데이터 있음 → 로드
-      // coins = 총 적립/유료 코인, bonus_coins = 보너스 코인
-      earnCoinAmt=typeof r[0].coins==='number'?r[0].coins:0;
-      bonusCoinAmt=typeof r[0].bonus_coins==='number'?r[0].bonus_coins:0;
-      paidCoinAmt=0;
+    var hasRow = Array.isArray(r) && r.length > 0;
+    if(hasRow && r[0].coins!==null && r[0].coins!==undefined){
+      // 기존 유저 + coins 값 존재 → 정상 로드
+      earnCoinAmt = typeof r[0].coins==='number' ? r[0].coins : 0;
+      bonusCoinAmt = typeof r[0].bonus_coins==='number' ? r[0].bonus_coins : 0;
+      paidCoinAmt = 0;
       updateCoinUI();
-      console.log('[Coin] 서버에서 로드 완료:', earnCoinAmt+bonusCoinAmt, '코인');
+      console.log('[Coin] 서버 로드 완료:', earnCoinAmt+bonusCoinAmt, '코인');
+    } else if(hasRow){
+      // 프로필 row는 있으나 coins가 null → 기존 유저인데 컬럼만 비어있음 (30코인 신규지급 금지)
+      earnCoinAmt = 0; bonusCoinAmt = 0; paidCoinAmt = 0;
+      updateCoinUI();
+      await saveCoinsToServer();  // coins=0으로 초기화 저장
+      console.log('[Coin] 기존 프로필, coins 비어있음 → 0으로 초기화');
     } else {
-      // 서버에 프로필 row 없음 → 신규 유저: 30코인 지급 후 저장
-      console.log('[Coin] 신규 유저 — 30코인 지급');
-      earnCoinAmt=30; bonusCoinAmt=0; paidCoinAmt=0;
+      // 프로필 row 자체가 없음 → 진짜 신규 유저: 가입 보너스 30코인
+      bonusCoinAmt = 30; earnCoinAmt = 0; paidCoinAmt = 0;
       updateCoinUI();
       await saveCoinsToServer();
+      console.log('[Coin] 신규 유저 — 가입 보너스 30코인 지급');
     }
   }catch(e){ console.warn('[Coin] 로드 실패:', e.message); }
 }
@@ -3789,6 +3800,20 @@ async function saveCoinsToServer(){
     console.log('[Coin] 서버 저장 완료 — 잔액:', earnCoinAmt+bonusCoinAmt, '코인');
   }catch(e){ console.warn('[Coin] 저장 실패:', e.message); }
 }
+
+// 페이지 이탈 시 대기 중인 코인 저장 flush (keepalive로 보장)
+window.addEventListener('beforeunload', function(){
+  if(_coinSaveTimer && _currentToken && _currentUserId){
+    clearTimeout(_coinSaveTimer); _coinSaveTimer=null;
+    try{
+      fetch(SUPA_URL+'/rest/v1/profiles',{
+        method:'POST', keepalive:true,
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+        body:JSON.stringify({id:_currentUserId,coins:earnCoinAmt+paidCoinAmt,bonus_coins:bonusCoinAmt})
+      });
+    }catch(e){}
+  }
+});
 
 // ══ 여행 서버 연동 ══
 var _isLoadingTrips=false;
@@ -4133,6 +4158,11 @@ async function saveNickname(){
 }
 
 function onLogoutSuccess(){
+  // 로그아웃 전, 대기 중인 코인 저장이 있으면 즉시 flush (유실 방지)
+  if(_coinSaveTimer){ clearTimeout(_coinSaveTimer); _coinSaveTimer=null; }
+  if(_currentToken && _currentUserId && typeof saveCoinsToServer==='function'){
+    try{ saveCoinsToServer(); }catch(e){}
+  }
   isLoggedIn=false; _clearSession();
   _currentToken=null; _currentUserId=null;
   halfTrips=[]; _unlockedOptions={};
@@ -6114,6 +6144,17 @@ function dalShowAd(callback){
   var sec = 15;
   var timerEl = document.getElementById('dalAdTimer');
   var skipBtn = document.getElementById('dalAdSkipBtn');
+  // 적립 안내 문구 (로그인 여부에 따라)
+  var rewardEl = document.getElementById('dalAdReward');
+  if(rewardEl){
+    if(_currentToken && _currentUserId){
+      var today = new Date().toDateString();
+      var cnt = parseInt(localStorage.getItem('dal_ad_coin_'+_currentUserId+'_'+today)||'0');
+      rewardEl.textContent = cnt>=10 ? '오늘 적립 한도 도달 (10/10)' : '시청 완료 시 🪙 1코인 적립 ('+cnt+'/10)';
+    } else {
+      rewardEl.textContent = '로그인하면 시청 시 코인을 적립할 수 있어요';
+    }
+  }
   skipBtn.disabled = true;
   skipBtn.style.cursor = 'not-allowed';
   skipBtn.style.color = 'var(--m)';
@@ -6146,22 +6187,43 @@ function dalAdComplete(){
 }
 
 function dalEarnAdCoin(){
-  if(!_currentToken || !_currentUserId) return;
+  if(!_currentToken || !_currentUserId) return false;
   var today = new Date().toDateString();
   var key = 'dal_ad_coin_'+_currentUserId+'_'+today;
   var cnt = parseInt(localStorage.getItem(key)||'0');
-  if(cnt >= 10) return; // 하루 10개 한도
+  if(cnt >= 10){
+    // 하루 한도 초과 — 적립 없이 안내
+    dalShowCoinToast('오늘 광고 적립 한도(10코인)에 도달했어요');
+    return false;
+  }
   localStorage.setItem(key, String(cnt+1));
-  // 코인 +1 (서버)
+  // 실제 코인 잔액 반영 (앱사용 적립분)
+  earnCoinAmt += 1;
+  updateCoinUI();          // 화면 갱신 + 1초 후 profiles 저장(디바운스)
+  if(typeof saveCoinsToServer==='function'){ saveCoinsToServer(); }  // 즉시 저장(유실 방지)
+  // 적립 내역 기록 (coin_history)
   fetch(SUPA_URL+'/rest/v1/coin_history',{
     method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({user_id:_currentUserId,amount:1,type:'earn_ad',description:'광고 시청 적립'})
-  }).then(function(){
-    if(typeof _currentCoins!=='undefined'){ _currentCoins+=1; }
-    if(typeof addCoins==='function'){ addCoins(1); }
-    else if(typeof saveCoinsToServer==='function'){ /* 별도 처리 */ }
-  }).catch(function(e){ console.warn('[Game] 광고코인 적립 실패:',e.message); });
+  }).catch(function(e){ console.warn('[Game] 광고 적립 내역 기록 실패:',e.message); });
+  dalShowCoinToast('🪙 +1 코인 적립! (오늘 '+(cnt+1)+'/10)');
+  return true;
+}
+
+// 코인 적립 토스트
+function dalShowCoinToast(text){
+  var t = document.getElementById('dalCoinToast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'dalCoinToast';
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:12px;font-weight:500;padding:10px 20px;border-radius:20px;z-index:6000;white-space:nowrap;box-shadow:0 4px 16px rgba(168,136,78,.4);opacity:0;transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = text;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity='0'; }, 2200);
 }
 
 // ── 게임 시작 라우터 ──
