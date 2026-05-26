@@ -68,7 +68,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 .bn-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:transparent;font-family:'DM Sans',sans-serif;padding:0;transition:all .2s;position:relative;}
 .bn-icon svg{width:22px;height:22px;transition:all .2s;}
 /* R2-1: 비활성 탭도 잘 보이게 — opacity 제거, 색상으로만 구분 */
-.bn-tab .bn-label{font-size:9px;letter-spacing:.3px;color:rgba(200,205,216,0.5);transition:all .2s;}
+.bn-tab .bn-label{font-size:9px;letter-spacing:.3px;color:var(--m);transition:all .2s;}
 .bn-tab .bn-icon svg{stroke:rgba(200,205,216,0.45);}
 .bn-tab.active .bn-label{color:var(--gold);}
 .bn-tab.active .bn-icon svg{stroke:var(--gold);}
@@ -731,7 +731,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
         <div style="background:rgba(91,143,255,.04);border:1px solid rgba(91,143,255,.18);border-radius:4px;padding:10px 12px;margin-bottom:8px;">
           <div style="font-size:8px;color:var(--ac);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Claude / GPT에 붙여넣기</div>
-          <div id="dalPromptText" style="font-size:9px;color:rgba(240,236,228,.65);line-height:1.8;">나라와 조건을 선택하면 자동 생성됩니다.</div>
+          <div id="dalPromptText" style="font-size:9px;color:rgba(46,40,32,.72);line-height:1.8;">나라와 조건을 선택하면 자동 생성됩니다.</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <button onclick="openInClaude()" style="padding:11px 6px;border-radius:4px;font-size:10px;border:1px solid rgba(196,175,135,.3);background:rgba(196,175,135,.08);color:var(--gold);font-family:'DM Sans',sans-serif;cursor:pointer;">🌙 Claude에서 열기</button>
@@ -3427,7 +3427,7 @@ async function dalOpenDetail(postId){
         +'<div style="font-size:9px;color:var(--m);">'+dateStr+(timeLeft?' · ⏳ '+timeLeft:'')+'</div></div>'
       +'</div>'
       +tagsHtml
-      +'<div style="font-size:12px;color:rgba(240,236,228,.85);line-height:1.9;margin-bottom:12px;">'+contentText+'</div>'
+      +'<div style="font-size:12px;color:rgba(46,40,32,.92);line-height:1.9;margin-bottom:12px;">'+contentText+'</div>'
       +imagesHtml
       +'<div style="display:flex;gap:6px;" id="dalDetailActionBar"></div>';
     // 좋아요 버튼 — DOM으로 추가해서 따옴표 충돌 방지
@@ -3477,7 +3477,7 @@ async function dalLoadComments(postId){
       var left=document.createElement('div');
       left.style.flex='1';
       left.innerHTML='<div style="font-size:10px;color:var(--w);font-weight:500;margin-bottom:2px;">'+(c.nickname||'DAL User')+'<span style="font-weight:400;color:var(--m);margin-left:6px;">'+cDateStr+'</span></div>'
-        +'<div style="font-size:11px;color:rgba(240,236,228,.8);line-height:1.6;">'+c.content+'</div>';
+        +'<div style="font-size:11px;color:rgba(46,40,32,.85);line-height:1.6;">'+c.content+'</div>';
       row.appendChild(left);
       if(isMe){
         var xBtn=document.createElement('button');
@@ -3988,7 +3988,7 @@ async function loadPostsFromServer(){
         +(placeTag?'<span style="font-size:9px;padding:2px 8px;background:rgba(100,180,255,.08);border:1px solid rgba(100,180,255,.2);border-radius:10px;color:#7bb8f0;">📍'+placeTag+'</span>':'')
         +'</div></div>'
         // 본문
-        +'<div style="font-size:11px;color:rgba(240,236,228,.8);line-height:1.8;margin-bottom:8px;">'+contentText+'</div>'
+        +'<div style="font-size:11px;color:rgba(46,40,32,.85);line-height:1.8;margin-bottom:8px;">'+contentText+'</div>'
         // 사진
         +(p.images&&p.images.length>0?'<div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;">'+p.images.map(function(img){return '<img src="'+img+'" style="width:80px;height:80px;object-fit:cover;border-radius:6px;flex-shrink:0;" onclick="event.stopPropagation()">';}).join('')+'</div>':'')
         // 하단 액션바
@@ -5819,7 +5819,7 @@ function openUserPinPopup(p){
     +'<div style="font-size:9px;color:'+color+';">'+p.category+'</div>'
     +(p.rating?'<div style="font-size:11px;margin-top:2px;">'+'⭐'.repeat(p.rating)+'</div>':'')
     +'</div></div>'
-    +(p.memo?'<div style="background:var(--s2);border-radius:4px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:rgba(240,236,228,.7);line-height:1.7;">'+p.memo+'</div>':'')
+    +(p.memo?'<div style="background:var(--s2);border-radius:4px;padding:8px 10px;margin-bottom:10px;font-size:10px;color:rgba(46,40,32,.78);line-height:1.7;">'+p.memo+'</div>':'')
     +'<div style="background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:10px;">'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:9px;"><span style="color:var(--m);">위도/경도</span><span style="color:var(--m);">'+p.lat.toFixed(4)+', '+p.lng.toFixed(4)+'</span></div>'
     +'</div>'
@@ -5854,7 +5854,7 @@ function openDalPlacePopup(p){
   var nearbyHtml=(p.nearby||[]).map(function(n){return '<span style="display:inline-block;padding:3px 8px;border-radius:10px;border:1px solid var(--b2);font-size:9px;color:var(--m);background:var(--s2);margin:2px;">'+n+'</span>';}).join('');
   content.innerHTML='<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;"><div style="font-size:28px;">'+p.icon+'</div><div><div style="font-size:14px;color:var(--w);font-weight:500;">'+p.name+'</div><div style="font-size:9px;color:var(--m);">'+p.tag+'</div></div></div>'
     +'<div style="width:100%;height:70px;background:var(--s2);border-radius:4px;border:1px solid var(--b1);margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--m);">📸 사진 (관광청 API 연동 예정)</div>'
-    +'<div style="font-size:10px;color:rgba(240,236,228,.65);line-height:1.8;margin-bottom:10px;">'+p.desc+'</div>'
+    +'<div style="font-size:10px;color:rgba(46,40,32,.72);line-height:1.8;margin-bottom:10px;">'+p.desc+'</div>'
     +'<div style="background:var(--s2);border:1px solid var(--b1);border-radius:4px;padding:8px 10px;margin-bottom:10px;">'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:9px;"><span style="color:var(--m);">운영시간</span><span style="color:var(--w);">'+(p.hours||'-')+'</span></div>'
     +'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:9px;"><span style="color:var(--m);">가격</span><span style="color:var(--w);">'+(p.price||'-')+'</span></div>'
@@ -7070,7 +7070,7 @@ function mytLoadRecords(dateStr) {
         +'<span style="font-size:8px;color:var(--m);">'+(r.record_time||'')+'</span>'
         +'<span style="font-size:8px;padding:1px 6px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>'
         +'</div>'
-        +'<div style="font-size:10px;color:rgba(240,236,228,.7);line-height:1.7;margin-bottom:'+(r.tip?'6px':'0px')+';">'+(r.content||'')+'</div>'
+        +'<div style="font-size:10px;color:rgba(46,40,32,.78);line-height:1.7;margin-bottom:'+(r.tip?'6px':'0px')+';">'+(r.content||'')+'</div>'
         +(r.tip?'<div style="font-size:9px;color:var(--ac);padding:4px 8px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);">TIP: '+r.tip+'</div>':'')
         +'</div></div>';
     }).join('');
@@ -7162,7 +7162,7 @@ function mytOpenBlog() {
           daysHtml += '<div data-recid="'+r.id+'" onclick="mytOpenRecById(this)" style="cursor:pointer;background:var(--s2);border-radius:4px;margin-bottom:6px;overflow:hidden;">';
           if (r.image_url) daysHtml += '<div style="height:100px;overflow:hidden;"><img src="'+r.image_url+'" style="width:100%;height:100%;object-fit:contain;background:#000;"></div>';
           daysHtml += '<div style="padding:6px 8px;">';
-          daysHtml += '<div style="font-size:10px;color:rgba(240,236,228,.65);line-height:1.7;margin-bottom:'+(r.tip?'5px':'0')+';">'+r.content+'</div>';
+          daysHtml += '<div style="font-size:10px;color:rgba(46,40,32,.72);line-height:1.7;margin-bottom:'+(r.tip?'5px':'0')+';">'+r.content+'</div>';
           if (r.tip) daysHtml += '<div style="font-size:9px;color:var(--ac);padding:4px 8px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);">TIP: '+r.tip+'</div>';
           daysHtml += '</div></div>';
         });
@@ -7293,7 +7293,7 @@ function mytShowReportPopup(md) {
     +'<button onclick="mytCloseReport()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;">✕</button></div>'
     +'<div style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;">'
     +'<div style="font-size:10px;color:var(--m);margin-bottom:10px;line-height:1.7;">아래 내용을 복사해서 Claude·GPT에 붙여넣으면 멋진 여행기로 정리해줘요 🌙</div>'
-    +'<textarea id="mytReportText" readonly style="width:100%;height:300px;box-sizing:border-box;padding:12px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:rgba(240,236,228,.85);font-family:monospace;line-height:1.6;resize:none;"></textarea>'
+    +'<textarea id="mytReportText" readonly style="width:100%;height:300px;box-sizing:border-box;padding:12px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:rgba(46,40,32,.92);font-family:monospace;line-height:1.6;resize:none;"></textarea>'
     +'</div>'
     +'<div style="padding:12px 16px;border-top:1px solid var(--b1);flex-shrink:0;">'
     +'<button onclick="mytCopyReport()" style="width:100%;padding:12px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:8px;font-size:12px;font-weight:500;color:var(--gold);cursor:pointer;font-family:\'DM Sans\',sans-serif;">📋 복사하기</button>'
@@ -7440,7 +7440,7 @@ function mytOpenSchedPopup(schedData) {
   if (s.memo) {
     html += '<div style="background:var(--s2);border-radius:4px;padding:10px;margin-bottom:10px;">';
     html += '<div style="font-size:9px;color:var(--m);margin-bottom:4px;">메모</div>';
-    html += '<div style="font-size:10px;color:rgba(240,236,228,.7);line-height:1.6;">'+s.memo+'</div>';
+    html += '<div style="font-size:10px;color:rgba(46,40,32,.78);line-height:1.6;">'+s.memo+'</div>';
     html += '</div>';
   }
   // 실제 금액 빠른 입력
@@ -7512,7 +7512,7 @@ function mytOpenRecPopup(e, recData) {
   html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
   html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
   html += '</div>';
-  html += '<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
+  html += '<div style="font-size:11px;color:rgba(46,40,32,.82);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
   if (r.tip) html += '<div style="font-size:10px;color:var(--ac);padding:6px 10px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);">TIP: '+r.tip+'</div>';
 
   var contentEl = document.getElementById('myt-rec-popup-content');
@@ -7591,7 +7591,7 @@ function mytOpenRecPopupData(r) {
   html += '<span style="font-size:9px;color:var(--m);">'+(r.record_time||'')+'</span>';
   html += '<span style="font-size:9px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.05);color:var(--m);">'+(r.category||'기타')+'</span>';
   html += '</div>';
-  html += '<div style="font-size:11px;color:rgba(240,236,228,.75);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
+  html += '<div style="font-size:11px;color:rgba(46,40,32,.82);line-height:1.8;margin-bottom:'+(r.tip?'10px':'0')+'">'+(r.content||'')+'</div>';
   if (r.tip) html += '<div style="font-size:10px;color:var(--ac);padding:6px 10px;background:rgba(91,143,255,.06);border-radius:4px;border-left:2px solid var(--ac);margin-top:8px;">TIP: '+r.tip+'</div>';
   var contentEl = document.getElementById('myt-rec-popup-content');
   if (contentEl) contentEl.innerHTML = html;
