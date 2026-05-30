@@ -1281,12 +1281,21 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 <!-- PAGE: SOCIAL — R2-2 별도 탭 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div id="page-social" class="page">
+  <!-- 메인 서브탭: 친구 피드 / 발견 -->
+  <div style="display:flex;border-bottom:1px solid var(--b1);flex-shrink:0;">
+    <button id="socialMainTab-feed" onclick="switchSocialMain('feed')" style="flex:1;padding:12px;background:transparent;border:none;border-bottom:2px solid var(--gold);font-size:12px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="👥 친구 피드" data-en="👥 Friends">👥 친구 피드</button>
+    <button id="socialMainTab-discover" onclick="switchSocialMain('discover')" style="flex:1;padding:12px;background:transparent;border:none;border-bottom:2px solid transparent;font-size:12px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🌍 발견" data-en="🌍 Discover">🌍 발견</button>
+  </div>
+
+  <!-- 친구 피드 영역 -->
+  <div id="socialPane-feed" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
   <div style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b1);flex-shrink:0;">
     <div style="display:flex;gap:6px;">
-      <button class="feed-filter-btn" data-f="all" onclick="setFeedFilter('all')" style="background:transparent;border:1px solid var(--gold);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--gold);cursor:pointer;" data-ko="전체" data-en="All">전체</button>
+      <button class="feed-filter-btn" data-f="all" onclick="setFeedFilter('all')" style="background:transparent;border:1px solid var(--gold);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--gold);cursor:pointer;" data-ko="친구" data-en="Friends">친구</button>
       <button class="feed-filter-btn" data-f="mine" onclick="setFeedFilter('mine')" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="내 글" data-en="Mine">내 글</button>
+      <button onclick="openFollowsModal()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🤝 친구 관리" data-en="🤝 Friends">🤝 친구 관리</button>
     </div>
-    <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🔄 새로고침" data-en="🔄 Refresh">🔄 새로고침</button>
+    <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🔄" data-en="🔄">🔄</button>
   </div>
 
   <!-- 피드 목록 -->
@@ -1297,8 +1306,38 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         <span data-ko="아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙" data-en="No travel tips shared yet.<br>Be the first to share 🌙">아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙</span>
       </div>
     </div>
-    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">+ 여행 정보 공유하기</button>
+    <button class="action-btn btn-dim" onclick="openNewPost()" id="t-new-post" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">+ 친구에게 공유하기</button>
   </div>
+  </div><!-- /socialPane-feed -->
+
+  <!-- 발견 영역 -->
+  <div id="socialPane-discover" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+    <!-- 추천/비추천 토글 + 카테고리 필터 -->
+    <div style="padding:10px 14px;border-bottom:1px solid var(--b1);flex-shrink:0;">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button id="discVerdict-recommend" onclick="setDiscoverVerdict('recommend')" style="flex:1;padding:7px;background:rgba(42,157,111,.1);border:1px solid var(--ok);border-radius:6px;font-size:11px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="👍 추천" data-en="👍 Recommend">👍 추천</button>
+        <button id="discVerdict-avoid" onclick="setDiscoverVerdict('avoid')" style="flex:1;padding:7px;background:transparent;border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="👎 비추천" data-en="👎 Avoid">👎 비추천</button>
+      </div>
+      <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;" id="discCategoryFilter">
+        <button class="disc-cat-btn active" data-cat="all" onclick="setDiscoverCategory('all')" style="flex-shrink:0;background:var(--gold);color:#fff;border:none;border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="전체" data-en="All">전체</button>
+        <button class="disc-cat-btn" data-cat="restaurant" onclick="setDiscoverCategory('restaurant')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="🍜 식당" data-en="🍜 Food">🍜 식당</button>
+        <button class="disc-cat-btn" data-cat="cafe" onclick="setDiscoverCategory('cafe')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="☕ 카페" data-en="☕ Cafe">☕ 카페</button>
+        <button class="disc-cat-btn" data-cat="stay" onclick="setDiscoverCategory('stay')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="🏨 숙소" data-en="🏨 Stay">🏨 숙소</button>
+        <button class="disc-cat-btn" data-cat="attraction" onclick="setDiscoverCategory('attraction')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="🗺 관광" data-en="🗺 Sights">🗺 관광</button>
+        <button class="disc-cat-btn" data-cat="shopping" onclick="setDiscoverCategory('shopping')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="🛍 쇼핑" data-en="🛍 Shop">🛍 쇼핑</button>
+        <button class="disc-cat-btn" data-cat="activity" onclick="setDiscoverCategory('activity')" style="flex-shrink:0;background:var(--s2);color:var(--m);border:1px solid var(--b2);border-radius:10px;padding:4px 10px;font-size:9px;cursor:pointer;" data-ko="🎢 액티비티" data-en="🎢 Activity">🎢 액티비티</button>
+      </div>
+    </div>
+    <!-- 발견 글 목록 -->
+    <div style="flex:1;overflow-y:auto;padding:10px 14px;">
+      <div id="discoverList" style="margin-bottom:10px;">
+        <div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">
+          <span data-ko="아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙" data-en="No places shared yet.<br>Share your first recommendation 🌙">아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙</span>
+        </div>
+      </div>
+      <button onclick="openNewDiscovery()" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="+ 추천/비추천 장소 공유" data-en="+ Share a place">+ 추천/비추천 장소 공유</button>
+    </div>
+  </div><!-- /socialPane-discover -->
   <!-- 글쓰기 팝업 -->
   <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="dalClosePostPopup()">
     <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
@@ -3466,6 +3505,70 @@ async function likeFeedPost(btn, postId){
 // ══ 피드 새로고침 ══
 function refreshFeed(){ if(typeof loadPostsFromServer==='function') loadPostsFromServer(); }
 
+// ══ 소셜 서브탭 전환 (친구 피드 / 발견) ══
+var _socialMain='feed';
+var _discoverVerdict='recommend';
+var _discoverCategory='all';
+function switchSocialMain(which){
+  _socialMain=which;
+  var tf=document.getElementById('socialMainTab-feed');
+  var td=document.getElementById('socialMainTab-discover');
+  var pf=document.getElementById('socialPane-feed');
+  var pd=document.getElementById('socialPane-discover');
+  if(which==='feed'){
+    if(tf){ tf.style.borderBottomColor='var(--gold)'; tf.style.color='var(--gold)'; tf.style.fontWeight='500'; }
+    if(td){ td.style.borderBottomColor='transparent'; td.style.color='var(--m)'; td.style.fontWeight='normal'; }
+    if(pf){ pf.style.display='flex'; } if(pd){ pd.style.display='none'; }
+  } else {
+    if(td){ td.style.borderBottomColor='var(--gold)'; td.style.color='var(--gold)'; td.style.fontWeight='500'; }
+    if(tf){ tf.style.borderBottomColor='transparent'; tf.style.color='var(--m)'; tf.style.fontWeight='normal'; }
+    if(pd){ pd.style.display='flex'; } if(pf){ pf.style.display='none'; }
+    if(typeof loadDiscoveriesFromServer==='function') loadDiscoveriesFromServer();
+  }
+}
+
+function setDiscoverVerdict(v){
+  _discoverVerdict=v;
+  var br=document.getElementById('discVerdict-recommend');
+  var ba=document.getElementById('discVerdict-avoid');
+  if(v==='recommend'){
+    if(br){ br.style.background='rgba(42,157,111,.1)'; br.style.borderColor='var(--ok)'; br.style.color='var(--ok)'; }
+    if(ba){ ba.style.background='transparent'; ba.style.borderColor='var(--b2)'; ba.style.color='var(--m)'; }
+  } else {
+    if(ba){ ba.style.background='rgba(208,69,69,.1)'; ba.style.borderColor='var(--red)'; ba.style.color='var(--red)'; }
+    if(br){ br.style.background='transparent'; br.style.borderColor='var(--b2)'; br.style.color='var(--m)'; }
+  }
+  if(typeof loadDiscoveriesFromServer==='function') loadDiscoveriesFromServer();
+}
+
+function setDiscoverCategory(cat){
+  _discoverCategory=cat;
+  document.querySelectorAll('.disc-cat-btn').forEach(function(b){
+    if(b.dataset.cat===cat){ b.style.background='var(--gold)'; b.style.color='#fff'; b.style.border='none'; }
+    else { b.style.background='var(--s2)'; b.style.color='var(--m)'; b.style.border='1px solid var(--b2)'; }
+  });
+  if(typeof loadDiscoveriesFromServer==='function') loadDiscoveriesFromServer();
+}
+
+// (다음 단계에서 구현 — 지금은 placeholder)
+function loadDiscoveriesFromServer(){
+  var el=document.getElementById('discoverList');
+  if(!el) return;
+  // TODO: discoveries 테이블에서 verdict/category 필터로 조회
+  el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;"><span data-ko="아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙" data-en="No places shared yet.<br>Share your first recommendation 🌙">아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙</span></div>';
+}
+function openNewDiscovery(){
+  alert(lang==='en'?'Coming soon 🌙':'곧 추가될 예정이에요 🌙');
+}
+function openFollowsModal(){
+  alert(lang==='en'?'Coming soon 🌙':'곧 추가될 예정이에요 🌙');
+}
+window.switchSocialMain=switchSocialMain;
+window.setDiscoverVerdict=setDiscoverVerdict;
+window.setDiscoverCategory=setDiscoverCategory;
+window.openNewDiscovery=openNewDiscovery;
+window.openFollowsModal=openFollowsModal;
+
 function openNewPost(){
   if(!requireLogin(function(){ openNewPost(); })) return;
   // 하루 5개 제한 체크
@@ -3797,8 +3900,8 @@ async function loadPostsFromServer(){
   var feedEl=document.getElementById('socialFeed');
   if(!feedEl) return;
   try{
-    // 48시간 이내 데이터만 가져옴
-    var cutoff=new Date(Date.now()-48*60*60*1000).toISOString();
+    // 7일 이내 데이터만 가져옴 (팔로우 기반 피드 — 친구 글이 적게 올라오므로)
+    var cutoff=new Date(Date.now()-7*24*60*60*1000).toISOString();
     var url=SUPA_URL+'/rest/v1/posts?order=created_at.desc&limit=50&reported=neq.true&created_at=gt.'+cutoff+'&select=*';
     if(_feedFilter==='mine'&&_currentUserId) url+='&user_id=eq.'+_currentUserId;
     var r=await fetch(url,{
@@ -3897,19 +4000,19 @@ async function savePostToServer(text, nickname, photos){
   }catch(e){ console.warn('[Posts] 저장 실패(예외):', e.message); return false; }
 }
 
-// ══ 데이터 만료 정리 (trips: 2일, unlocked: 7일) ══
+// ══ 데이터 만료 정리 (trips: 2일, posts: 7일, unlocked: 7일) ══
 async function cleanupExpiredData(){
   if(!_currentToken||!_currentUserId) return;
   try{
     var now=new Date();
     var cut48h=new Date(now.getTime()-48*60*60*1000).toISOString();
-    // trips: 48시간 이전 삭제
+    var cut7d=new Date(now.getTime()-7*24*60*60*1000).toISOString();
+    // trips: 48시간 이전 삭제 (검색 기록)
     await _sfDel('/rest/v1/trips?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut48h);
-    // posts: 48시간 이전 내 글 삭제
-    await _sfDel('/rest/v1/posts?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut48h);
+    // posts: 7일 이전 내 글 삭제 (소셜 피드)
+    await _sfDel('/rest/v1/posts?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut7d);
     // unlocked: 7일 이전 삭제
-    var unlock7d=new Date(now.getTime()-7*24*60*60*1000).toISOString();
-    await _sfDel('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&created_at=lt.'+unlock7d);
+    await _sfDel('/rest/v1/unlocked?user_id=eq.'+_currentUserId+'&created_at=lt.'+cut7d);
     console.log('[Cleanup] 만료 데이터 정리 완료');
   }catch(e){ console.warn('[Cleanup] 정리 실패:', e.message); }
 }
