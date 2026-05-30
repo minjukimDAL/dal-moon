@@ -1338,6 +1338,53 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <button onclick="openNewDiscovery()" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="+ 추천/비추천 장소 공유" data-en="+ Share a place">+ 추천/비추천 장소 공유</button>
     </div>
   </div><!-- /socialPane-discover -->
+  <!-- 친구 관리 팝업 -->
+  <div id="followsModal" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="closeFollowsModal()">
+    <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
+      <!-- 헤더 -->
+      <div style="padding:14px 16px 10px;flex-shrink:0;border-bottom:1px solid var(--b1);">
+        <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-size:13px;color:var(--w);font-weight:500;" data-ko="🤝 친구 관리" data-en="🤝 Friends">🤝 친구 관리</div>
+          <button onclick="closeFollowsModal()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+        </div>
+        <!-- 서브탭 -->
+        <div style="display:flex;gap:4px;">
+          <button id="followsTab-friends" onclick="switchFollowsTab('friends')" style="flex:1;padding:8px;background:rgba(196,175,135,.12);border:1px solid var(--gold);border-radius:6px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="내 친구 <span id='followsCntFriends'>0</span>" data-en="Friends <span id='followsCntFriends'>0</span>">내 친구 <span id="followsCntFriends">0</span></button>
+          <button id="followsTab-requests" onclick="switchFollowsTab('requests')" style="flex:1;padding:8px;background:transparent;border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="받은 요청 <span id='followsCntReq'>0</span>" data-en="Requests <span id='followsCntReq'>0</span>">받은 요청 <span id="followsCntReq">0</span></button>
+          <button id="followsTab-add" onclick="switchFollowsTab('add')" style="flex:1;padding:8px;background:transparent;border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="친구 추가" data-en="Add">친구 추가</button>
+        </div>
+      </div>
+      <!-- 본문 -->
+      <div style="flex:1;overflow-y:auto;padding:14px 16px;">
+        <!-- 내 친구 -->
+        <div id="followsPane-friends" style="display:block;">
+          <div id="friendsList"><div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);" data-ko="아직 친구가 없어요.<br>친구 추가 탭에서 초대코드로 시작해보세요 🌙" data-en="No friends yet.<br>Start with the Add tab 🌙">아직 친구가 없어요.<br>친구 추가 탭에서 초대코드로 시작해보세요 🌙</div></div>
+        </div>
+        <!-- 받은 요청 -->
+        <div id="followsPane-requests" style="display:none;">
+          <div id="requestsList"><div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);" data-ko="받은 요청이 없어요" data-en="No pending requests">받은 요청이 없어요</div></div>
+        </div>
+        <!-- 친구 추가 -->
+        <div id="followsPane-add" style="display:none;">
+          <!-- 내 초대코드 -->
+          <div style="background:rgba(196,175,135,.08);border:1px solid var(--b2);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;">
+            <div style="font-size:10px;color:var(--m);margin-bottom:6px;" data-ko="내 초대 코드 (친구에게 공유하세요)" data-en="My invite code (share with friends)">내 초대 코드 (친구에게 공유하세요)</div>
+            <div id="myInviteCode" style="font-size:24px;font-weight:600;color:var(--gold);letter-spacing:4px;font-family:'DM Sans',sans-serif;margin-bottom:10px;">------</div>
+            <button onclick="copyInviteCode()" style="background:var(--gold);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="📋 복사하기" data-en="📋 Copy">📋 복사하기</button>
+          </div>
+          <!-- 코드 입력 -->
+          <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;">
+            <div style="font-size:10px;color:var(--m);margin-bottom:8px;" data-ko="친구의 초대 코드 입력" data-en="Enter friend's code">친구의 초대 코드 입력</div>
+            <input id="inviteInput" type="text" maxlength="6" placeholder="ABC123" style="width:100%;padding:10px;background:var(--s1);border:1px solid var(--b2);border-radius:6px;font-size:16px;color:var(--w);letter-spacing:3px;text-align:center;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:8px;box-sizing:border-box;" oninput="this.value=this.value.toUpperCase();">
+            <button onclick="sendFollowRequest()" style="width:100%;padding:10px;background:rgba(196,175,135,.1);border:1px solid var(--gold);border-radius:6px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="🤝 친구 요청 보내기" data-en="🤝 Send request">🤝 친구 요청 보내기</button>
+          </div>
+          <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;line-height:1.6;" data-ko="상대방이 수락하면 서로의 피드를 볼 수 있어요" data-en="When accepted, you can see each other's feeds">상대방이 수락하면 서로의 피드를 볼 수 있어요</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 글쓰기 팝업 -->
   <div id="dalPostPopup" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="dalClosePostPopup()">
     <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
@@ -3560,9 +3607,226 @@ function loadDiscoveriesFromServer(){
 function openNewDiscovery(){
   alert(lang==='en'?'Coming soon 🌙':'곧 추가될 예정이에요 🌙');
 }
-function openFollowsModal(){
-  alert(lang==='en'?'Coming soon 🌙':'곧 추가될 예정이에요 🌙');
+// ══ 친구 관리 (follows 시스템) ══
+var _followsTab='friends';
+var _myFriendsCache=[]; // accepted된 친구 user_id 목록 (피드 쿼리에 사용)
+
+async function openFollowsModal(){
+  if(!_currentToken||!_currentUserId){
+    alert(lang==='en'?'Please log in first 🌙':'로그인 후 이용할 수 있어요 🌙');
+    return;
+  }
+  document.getElementById('followsModal').style.display='flex';
+  // 내 초대코드 로드
+  try{
+    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=invite_code');
+    if(r&&r[0]&&r[0].invite_code){
+      var el=document.getElementById('myInviteCode');
+      if(el) el.textContent=r[0].invite_code;
+    }
+  }catch(e){ console.warn('[Follows] 초대코드 로드 실패:', e.message); }
+  switchFollowsTab('friends');
+  loadFollowsAll();
 }
+
+function closeFollowsModal(){
+  var m=document.getElementById('followsModal'); if(m) m.style.display='none';
+}
+
+function switchFollowsTab(which){
+  _followsTab=which;
+  ['friends','requests','add'].forEach(function(k){
+    var tab=document.getElementById('followsTab-'+k);
+    var pane=document.getElementById('followsPane-'+k);
+    if(tab){
+      if(k===which){ tab.style.background='rgba(196,175,135,.12)'; tab.style.borderColor='var(--gold)'; tab.style.color='var(--gold)'; }
+      else { tab.style.background='transparent'; tab.style.borderColor='var(--b2)'; tab.style.color='var(--m)'; }
+    }
+    if(pane){ pane.style.display=(k===which?'block':'none'); }
+  });
+}
+
+async function loadFollowsAll(){
+  if(!_currentToken||!_currentUserId) return;
+  try{
+    // 1) 내가 보낸/받은 모든 관계 조회
+    var rows=await _sfGet('/rest/v1/follows?or=(requester.eq.'+_currentUserId+',recipient.eq.'+_currentUserId+')&select=*');
+    if(!Array.isArray(rows)) rows=[];
+    // 2) 분류: accepted = 친구, pending(받은) = 요청
+    var friends=[], requests=[];
+    rows.forEach(function(r){
+      if(r.status==='accepted'){
+        friends.push(r);
+      } else if(r.status==='pending' && r.recipient===_currentUserId){
+        requests.push(r);
+      }
+    });
+    // 3) 친구 user_id 캐시 (피드 쿼리용)
+    _myFriendsCache=friends.map(function(r){
+      return r.requester===_currentUserId ? r.recipient : r.requester;
+    });
+    // 4) 카운트 표시
+    var c1=document.getElementById('followsCntFriends'); if(c1) c1.textContent=friends.length;
+    var c2=document.getElementById('followsCntReq'); if(c2) c2.textContent=requests.length;
+    // 5) 상대 프로필 정보 로드 (닉네임)
+    var otherIds=[];
+    friends.forEach(function(r){ otherIds.push(r.requester===_currentUserId?r.recipient:r.requester); });
+    requests.forEach(function(r){ otherIds.push(r.requester); });
+    var profilesMap={};
+    if(otherIds.length>0){
+      var idsParam=otherIds.map(function(id){return '"'+id+'"';}).join(',');
+      var profs=await _sfGet('/rest/v1/profiles?id=in.('+idsParam+')&select=id,nickname,email');
+      if(Array.isArray(profs)) profs.forEach(function(p){ profilesMap[p.id]=p; });
+    }
+    // 6) 렌더링
+    renderFriendsList(friends, profilesMap);
+    renderRequestsList(requests, profilesMap);
+  }catch(e){ console.warn('[Follows] 로드 실패:', e.message); }
+}
+
+function renderFriendsList(friends, profMap){
+  var el=document.getElementById('friendsList'); if(!el) return;
+  if(friends.length===0){
+    el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);">'+(lang==='en'?'No friends yet.<br>Start with the Add tab 🌙':'아직 친구가 없어요.<br>친구 추가 탭에서 초대코드로 시작해보세요 🌙')+'</div>';
+    return;
+  }
+  var html='';
+  friends.forEach(function(r){
+    var otherId=r.requester===_currentUserId?r.recipient:r.requester;
+    var p=profMap[otherId]||{};
+    var nick=p.nickname||(p.email?p.email.split('@')[0]:'(unknown)');
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;margin-bottom:8px;">'
+      +'<div><div style="font-size:12px;color:var(--w);font-weight:500;">'+nick+'</div><div style="font-size:9px;color:var(--m);margin-top:2px;">'+(lang==='en'?'Friends since ':'친구 등록일 ')+new Date(r.accepted_at||r.created_at).toLocaleDateString()+'</div></div>'
+      +'<button onclick="unfollow(\''+r.id+'\')" style="background:transparent;border:1px solid var(--b2);border-radius:6px;padding:6px 12px;font-size:10px;color:var(--red);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'Unfriend':'끊기')+'</button>'
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+function renderRequestsList(requests, profMap){
+  var el=document.getElementById('requestsList'); if(!el) return;
+  if(requests.length===0){
+    el.innerHTML='<div style="text-align:center;padding:30px 0;font-size:11px;color:var(--m);">'+(lang==='en'?'No pending requests':'받은 요청이 없어요')+'</div>';
+    return;
+  }
+  var html='';
+  requests.forEach(function(r){
+    var p=profMap[r.requester]||{};
+    var nick=p.nickname||(p.email?p.email.split('@')[0]:'(unknown)');
+    html+='<div style="padding:10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;margin-bottom:8px;">'
+      +'<div style="font-size:12px;color:var(--w);font-weight:500;margin-bottom:4px;">'+nick+'</div>'
+      +'<div style="font-size:9px;color:var(--m);margin-bottom:8px;">'+new Date(r.created_at).toLocaleDateString()+'</div>'
+      +'<div style="display:flex;gap:6px;">'
+      +'<button onclick="acceptFollow(\''+r.id+'\')" style="flex:1;background:rgba(42,157,111,.1);border:1px solid var(--ok);border-radius:6px;padding:7px;font-size:10px;color:var(--ok);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'✓ Accept':'✓ 수락')+'</button>'
+      +'<button onclick="rejectFollow(\''+r.id+'\')" style="flex:1;background:transparent;border:1px solid var(--b2);border-radius:6px;padding:7px;font-size:10px;color:var(--m);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'✕ Reject':'✕ 거절')+'</button>'
+      +'</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+async function copyInviteCode(){
+  var el=document.getElementById('myInviteCode');
+  if(!el) return;
+  var code=el.textContent.trim();
+  if(code==='------'){ alert(lang==='en'?'Code loading...':'코드 불러오는 중...'); return; }
+  var shareText=(lang==='en'
+    ?'Add me as a friend on DAL!\nMy invite code: '+code+'\nhttps://dal-moon.com'
+    :'DAL에서 친구 추가해줘!\n내 초대 코드: '+code+'\nhttps://dal-moon.com');
+  try{
+    await navigator.clipboard.writeText(shareText);
+    alert(lang==='en'?'Copied! Share with your friend 🌙':'복사됐어요! 친구에게 공유해주세요 🌙');
+  }catch(e){
+    // 폴백
+    var ta=document.createElement('textarea'); ta.value=shareText; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); alert(lang==='en'?'Copied!':'복사됐어요!'); }catch(_){ alert(shareText); }
+    document.body.removeChild(ta);
+  }
+}
+
+async function sendFollowRequest(){
+  if(!_currentToken||!_currentUserId) return;
+  var inp=document.getElementById('inviteInput');
+  if(!inp) return;
+  var code=inp.value.trim().toUpperCase();
+  if(code.length!==6){ alert(lang==='en'?'Enter a 6-character code':'6자리 코드를 입력해주세요'); return; }
+  try{
+    // 1) 코드로 상대 user_id 찾기
+    var r=await _sfGet('/rest/v1/profiles?invite_code=eq.'+encodeURIComponent(code)+'&select=id,nickname,email');
+    if(!Array.isArray(r)||r.length===0){
+      alert(lang==='en'?'No user found with this code':'해당 코드의 사용자를 찾을 수 없어요');
+      return;
+    }
+    var other=r[0];
+    if(other.id===_currentUserId){
+      alert(lang==='en'?'This is your own code 😅':'본인 코드는 사용할 수 없어요 😅');
+      return;
+    }
+    // 2) 이미 관계가 있는지 확인
+    var existing=await _sfGet('/rest/v1/follows?or=(and(requester.eq.'+_currentUserId+',recipient.eq.'+other.id+'),and(requester.eq.'+other.id+',recipient.eq.'+_currentUserId+'))&select=status');
+    if(Array.isArray(existing)&&existing.length>0){
+      var st=existing[0].status;
+      alert(lang==='en'
+        ?(st==='accepted'?'Already friends 🌙':'Request already pending')
+        :(st==='accepted'?'이미 친구예요 🌙':'이미 요청이 있어요'));
+      return;
+    }
+    // 3) 요청 보내기
+    var resp=await fetch(SUPA_URL+'/rest/v1/follows',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({requester:_currentUserId,recipient:other.id,status:'pending'})
+    });
+    if(resp.ok){
+      var nick=other.nickname||other.email||'(unknown)';
+      alert(lang==='en'?'Request sent to '+nick+' 🌙':nick+'님에게 요청을 보냈어요 🌙');
+      inp.value='';
+      loadFollowsAll();
+    } else {
+      var err=await resp.text();
+      alert(lang==='en'?'Failed: '+err:'요청 실패: '+err);
+    }
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+async function acceptFollow(followId){
+  if(!_currentToken) return;
+  try{
+    var resp=await fetch(SUPA_URL+'/rest/v1/follows?id=eq.'+followId,{
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({status:'accepted',accepted_at:new Date().toISOString()})
+    });
+    if(resp.ok){ loadFollowsAll(); }
+    else { alert(lang==='en'?'Failed to accept':'수락 실패'); }
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+async function rejectFollow(followId){
+  if(!_currentToken) return;
+  if(!confirm(lang==='en'?'Reject this request?':'요청을 거절할까요?')) return;
+  try{
+    await _sfDel('/rest/v1/follows?id=eq.'+followId);
+    loadFollowsAll();
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+async function unfollow(followId){
+  if(!_currentToken) return;
+  if(!confirm(lang==='en'?'Unfriend this person?':'친구를 끊을까요?')) return;
+  try{
+    await _sfDel('/rest/v1/follows?id=eq.'+followId);
+    loadFollowsAll();
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+window.closeFollowsModal=closeFollowsModal;
+window.switchFollowsTab=switchFollowsTab;
+window.copyInviteCode=copyInviteCode;
+window.sendFollowRequest=sendFollowRequest;
+window.acceptFollow=acceptFollow;
+window.rejectFollow=rejectFollow;
+window.unfollow=unfollow;
+// openFollowsModal은 아래에서 placeholder를 덮어쓰므로 export 마지막
 window.switchSocialMain=switchSocialMain;
 window.setDiscoverVerdict=setDiscoverVerdict;
 window.setDiscoverCategory=setDiscoverCategory;
