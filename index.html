@@ -1338,6 +1338,92 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
       <button onclick="openNewDiscovery()" style="width:100%;padding:11px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.25);border-radius:4px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="+ 추천/비추천 장소 공유" data-en="+ Share a place">+ 추천/비추천 장소 공유</button>
     </div>
   </div><!-- /socialPane-discover -->
+  <!-- 발견 글쓰기 팝업 -->
+  <div id="dalDiscoveryPopup" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="closeDiscoveryPopup()">
+    <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
+      <!-- 헤더 -->
+      <div style="padding:14px 16px 10px;flex-shrink:0;border-bottom:1px solid var(--b1);">
+        <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 12px;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;color:var(--w);font-weight:500;" data-ko="🌍 장소 공유" data-en="🌍 Share a Place">🌍 장소 공유</div>
+          <button onclick="closeDiscoveryPopup()" style="background:transparent;border:none;color:var(--m);font-size:18px;cursor:pointer;padding:0 4px;">✕</button>
+        </div>
+      </div>
+      <!-- 본문 -->
+      <div style="flex:1;overflow-y:auto;padding:14px 16px;">
+        <!-- 1. 추천/비추천 -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="① 평가" data-en="① Verdict">① 평가</div>
+          <div style="display:flex;gap:6px;">
+            <button id="discNewVerdict-recommend" onclick="setDiscNewVerdict('recommend')" style="flex:1;padding:10px;background:rgba(42,157,111,.12);border:1px solid var(--ok);border-radius:8px;font-size:12px;color:var(--ok);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="👍 추천" data-en="👍 Recommend">👍 추천</button>
+            <button id="discNewVerdict-avoid" onclick="setDiscNewVerdict('avoid')" style="flex:1;padding:10px;background:transparent;border:1px solid var(--b2);border-radius:8px;font-size:12px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="👎 비추천" data-en="👎 Avoid">👎 비추천</button>
+          </div>
+        </div>
+        <!-- 2. 카테고리 -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="② 카테고리" data-en="② Category">② 카테고리</div>
+          <div id="discNewCategory" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
+            <button class="disc-new-cat-btn" data-cat="restaurant" onclick="setDiscNewCategory('restaurant')" style="padding:8px 4px;background:rgba(196,175,135,.12);border:1px solid var(--gold);border-radius:6px;font-size:10px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🍜 식당" data-en="🍜 Food">🍜 식당</button>
+            <button class="disc-new-cat-btn" data-cat="cafe" onclick="setDiscNewCategory('cafe')" style="padding:8px 4px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="☕ 카페" data-en="☕ Cafe">☕ 카페</button>
+            <button class="disc-new-cat-btn" data-cat="stay" onclick="setDiscNewCategory('stay')" style="padding:8px 4px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🏨 숙소" data-en="🏨 Stay">🏨 숙소</button>
+            <button class="disc-new-cat-btn" data-cat="attraction" onclick="setDiscNewCategory('attraction')" style="padding:8px 4px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🗺 관광" data-en="🗺 Sights">🗺 관광</button>
+            <button class="disc-new-cat-btn" data-cat="shopping" onclick="setDiscNewCategory('shopping')" style="padding:8px 4px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🛍 쇼핑" data-en="🛍 Shop">🛍 쇼핑</button>
+            <button class="disc-new-cat-btn" data-cat="activity" onclick="setDiscNewCategory('activity')" style="padding:8px 4px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:10px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🎢 액티비티" data-en="🎢 Activity">🎢 액티비티</button>
+          </div>
+        </div>
+        <!-- 3. 장소명 -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="③ 장소명 *" data-en="③ Place name *">③ 장소명 *</div>
+          <input id="discNewPlaceName" type="text" maxlength="80" placeholder="예: Jumbo Seafood Clarke Quay" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:13px;color:var(--w);font-family:inherit;box-sizing:border-box;" data-ko-ph="예: 점보씨푸드 클락키" data-en-ph="e.g. Jumbo Seafood Clarke Quay">
+        </div>
+        <!-- 4. 국가 + 지역 -->
+        <div style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1.5fr;gap:8px;">
+          <div>
+            <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="④ 국가 *" data-en="④ Country *">④ 국가 *</div>
+            <select id="discNewCountry" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:12px;color:var(--w);font-family:inherit;box-sizing:border-box;">
+              <option value="" data-ko="선택" data-en="Select">선택</option>
+              <option value="sg" data-ko="🇸🇬 싱가포르" data-en="🇸🇬 Singapore">🇸🇬 싱가포르</option>
+              <option value="jp" data-ko="🇯🇵 일본" data-en="🇯🇵 Japan">🇯🇵 일본</option>
+              <option value="th" data-ko="🇹🇭 태국" data-en="🇹🇭 Thailand">🇹🇭 태국</option>
+              <option value="bali" data-ko="🇮🇩 발리" data-en="🇮🇩 Bali">🇮🇩 발리</option>
+              <option value="vn" data-ko="🇻🇳 베트남" data-en="🇻🇳 Vietnam">🇻🇳 베트남</option>
+              <option value="kr" data-ko="🇰🇷 한국" data-en="🇰🇷 Korea">🇰🇷 한국</option>
+              <option value="tw" data-ko="🇹🇼 대만" data-en="🇹🇼 Taiwan">🇹🇼 대만</option>
+              <option value="hk" data-ko="🇭🇰 홍콩" data-en="🇭🇰 Hong Kong">🇭🇰 홍콩</option>
+              <option value="other" data-ko="🌏 기타" data-en="🌏 Other">🌏 기타</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="⑤ 지역/도시" data-en="⑤ Region/City">⑤ 지역/도시</div>
+            <input id="discNewRegion" type="text" maxlength="40" placeholder="예: Clarke Quay" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:12px;color:var(--w);font-family:inherit;box-sizing:border-box;" data-ko-ph="예: 클락키" data-en-ph="e.g. Clarke Quay">
+          </div>
+        </div>
+        <!-- 6. 한 줄 이유 -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;">
+            <span data-ko="⑥ 한 줄 이유 *" data-en="⑥ One-line reason *">⑥ 한 줄 이유 *</span>
+            <span><span id="discReasonCount">0</span>/100</span>
+          </div>
+          <input id="discNewReason" type="text" maxlength="100" oninput="document.getElementById('discReasonCount').textContent=this.value.length;" placeholder="예: 시그니처 칠리크랩이 정말 좋아요" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:13px;color:var(--w);font-family:inherit;box-sizing:border-box;" data-ko-ph="예: 시그니처 칠리크랩이 정말 좋아요" data-en-ph="e.g. The signature chili crab is amazing">
+        </div>
+        <!-- 7. 상세 메모 (선택) -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="⑦ 상세 메모 (선택)" data-en="⑦ Details (optional)">⑦ 상세 메모 (선택)</div>
+          <textarea id="discNewDetail" rows="3" maxlength="500" placeholder="더 자세한 후기, 팁, 주의사항 등" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:12px;color:var(--w);font-family:inherit;box-sizing:border-box;resize:vertical;line-height:1.6;" data-ko-ph="더 자세한 후기, 팁, 주의사항 등" data-en-ph="Detailed review, tips, warnings, etc."></textarea>
+        </div>
+        <!-- 8. 사진 (준비중) -->
+        <div style="margin-bottom:14px;background:var(--s2);border:1px dashed var(--b2);border-radius:8px;padding:14px;text-align:center;cursor:not-allowed;opacity:.6;">
+          <div style="font-size:10px;color:var(--m);" data-ko="📷 사진 첨부 (준비중)" data-en="📷 Photos (Coming soon)">📷 사진 첨부 (준비중)</div>
+        </div>
+      </div>
+      <!-- 하단 액션 -->
+      <div style="padding:12px 16px;border-top:1px solid var(--b1);display:flex;gap:8px;flex-shrink:0;">
+        <button onclick="closeDiscoveryPopup()" style="flex:1;padding:11px;background:transparent;border:1px solid var(--b2);border-radius:8px;font-size:11px;color:var(--m);cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="취소" data-en="Cancel">취소</button>
+        <button onclick="saveDiscovery()" style="flex:2;padding:11px;background:rgba(196,175,135,.12);border:1px solid var(--gold);border-radius:8px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="🌙 공유하기" data-en="🌙 Share">🌙 공유하기</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 친구 관리 팝업 -->
   <div id="followsModal" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:2000;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;" onclick="closeFollowsModal()">
     <div style="background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:100%;max-width:480px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;" onclick="event.stopPropagation()">
@@ -3597,16 +3683,179 @@ function setDiscoverCategory(cat){
   if(typeof loadDiscoveriesFromServer==='function') loadDiscoveriesFromServer();
 }
 
-// (다음 단계에서 구현 — 지금은 placeholder)
-function loadDiscoveriesFromServer(){
-  var el=document.getElementById('discoverList');
-  if(!el) return;
-  // TODO: discoveries 테이블에서 verdict/category 필터로 조회
-  el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;"><span data-ko="아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙" data-en="No places shared yet.<br>Share your first recommendation 🌙">아직 공유된 장소가 없어요.<br>첫 번째 추천을 남겨주세요 🌙</span></div>';
+// ══ 발견 글 작성 + 조회 ══
+var _discNewVerdict='recommend';
+var _discNewCategory='restaurant';
+var _discoveriesCache=[]; // 닉네임 매핑용
+
+function setDiscNewVerdict(v){
+  _discNewVerdict=v;
+  var br=document.getElementById('discNewVerdict-recommend');
+  var ba=document.getElementById('discNewVerdict-avoid');
+  if(v==='recommend'){
+    if(br){ br.style.background='rgba(42,157,111,.12)'; br.style.borderColor='var(--ok)'; br.style.color='var(--ok)'; }
+    if(ba){ ba.style.background='transparent'; ba.style.borderColor='var(--b2)'; ba.style.color='var(--m)'; }
+  } else {
+    if(ba){ ba.style.background='rgba(208,69,69,.12)'; ba.style.borderColor='var(--red)'; ba.style.color='var(--red)'; }
+    if(br){ br.style.background='transparent'; br.style.borderColor='var(--b2)'; br.style.color='var(--m)'; }
+  }
 }
+
+function setDiscNewCategory(cat){
+  _discNewCategory=cat;
+  document.querySelectorAll('.disc-new-cat-btn').forEach(function(b){
+    if(b.dataset.cat===cat){
+      b.style.background='rgba(196,175,135,.12)'; b.style.border='1px solid var(--gold)'; b.style.color='var(--gold)';
+    } else {
+      b.style.background='var(--s2)'; b.style.border='1px solid var(--b2)'; b.style.color='var(--m)';
+    }
+  });
+}
+
 function openNewDiscovery(){
-  alert(lang==='en'?'Coming soon 🌙':'곧 추가될 예정이에요 🌙');
+  if(!_currentToken||!_currentUserId){
+    alert(lang==='en'?'Please log in first 🌙':'로그인 후 이용할 수 있어요 🌙');
+    return;
+  }
+  // 폼 초기화
+  setDiscNewVerdict('recommend');
+  setDiscNewCategory('restaurant');
+  ['discNewPlaceName','discNewRegion','discNewReason','discNewDetail'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var sel=document.getElementById('discNewCountry'); if(sel) sel.value='';
+  var cnt=document.getElementById('discReasonCount'); if(cnt) cnt.textContent='0';
+  document.getElementById('dalDiscoveryPopup').style.display='flex';
 }
+
+function closeDiscoveryPopup(){
+  var m=document.getElementById('dalDiscoveryPopup'); if(m) m.style.display='none';
+}
+
+async function saveDiscovery(){
+  if(!_currentToken||!_currentUserId) return;
+  var place=(document.getElementById('discNewPlaceName')||{value:''}).value.trim();
+  var country=(document.getElementById('discNewCountry')||{value:''}).value;
+  var region=(document.getElementById('discNewRegion')||{value:''}).value.trim();
+  var reason=(document.getElementById('discNewReason')||{value:''}).value.trim();
+  var detail=(document.getElementById('discNewDetail')||{value:''}).value.trim();
+  // 검증
+  if(!place){ alert(lang==='en'?'Please enter the place name':'장소명을 입력해주세요'); return; }
+  if(!country){ alert(lang==='en'?'Please select a country':'국가를 선택해주세요'); return; }
+  if(!reason){ alert(lang==='en'?'Please write a one-line reason':'한 줄 이유를 입력해주세요'); return; }
+  if(reason.length>100){ alert(lang==='en'?'Reason must be 100 chars or less':'이유는 100자 이내'); return; }
+  var body={
+    user_id:_currentUserId,
+    verdict:_discNewVerdict,
+    category:_discNewCategory,
+    place_name:place,
+    country:country,
+    region:region||null,
+    reason:reason,
+    detail:detail||null
+  };
+  try{
+    var r=await fetch(SUPA_URL+'/rest/v1/discoveries',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(body)
+    });
+    if(r.ok){
+      alert(lang==='en'?'Shared! 🌙':'공유됐어요 🌙');
+      closeDiscoveryPopup();
+      // 발견 탭 갱신 — 작성한 verdict 탭으로 이동
+      setDiscoverVerdict(_discNewVerdict);
+      setDiscoverCategory('all');
+    } else {
+      var err=await r.text();
+      alert((lang==='en'?'Failed: ':'실패: ')+err);
+    }
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+async function loadDiscoveriesFromServer(){
+  var el=document.getElementById('discoverList'); if(!el) return;
+  el.innerHTML='<div style="text-align:center;padding:20px;font-size:11px;color:var(--m);">'+(lang==='en'?'Loading...':'불러오는 중...')+'</div>';
+  try{
+    // verdict 필수 필터, category는 all이면 제외
+    var url='/rest/v1/discoveries?verdict=eq.'+_discoverVerdict+'&order=created_at.desc&limit=50&select=*';
+    if(_discoverCategory && _discoverCategory!=='all'){ url+='&category=eq.'+_discoverCategory; }
+    var rows=await _sfGet(url);
+    if(!Array.isArray(rows)) rows=[];
+    _discoveriesCache=rows;
+    // 작성자 닉네임 조회
+    var userIds=[];
+    rows.forEach(function(r){ if(userIds.indexOf(r.user_id)===-1) userIds.push(r.user_id); });
+    var profMap={};
+    if(userIds.length>0){
+      var idsParam=userIds.map(function(id){return '"'+id+'"';}).join(',');
+      var profs=await _sfGet('/rest/v1/profiles?id=in.('+idsParam+')&select=id,nickname,email');
+      if(Array.isArray(profs)) profs.forEach(function(p){ profMap[p.id]=p; });
+    }
+    renderDiscoveryList(rows, profMap);
+  }catch(e){
+    console.warn('[Discover] 로드 실패:', e.message);
+    el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='en'?'Failed to load. Please try again.':'불러오기 실패. 다시 시도해주세요.')+'</div>';
+  }
+}
+
+var COUNTRY_FLAG={sg:'🇸🇬',jp:'🇯🇵',th:'🇹🇭',bali:'🇮🇩',vn:'🇻🇳',kr:'🇰🇷',tw:'🇹🇼',hk:'🇭🇰',other:'🌏'};
+var CATEGORY_ICON={restaurant:'🍜',cafe:'☕',stay:'🏨',attraction:'🗺',shopping:'🛍',activity:'🎢'};
+
+function escHtml(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+function renderDiscoveryList(rows, profMap){
+  var el=document.getElementById('discoverList'); if(!el) return;
+  if(rows.length===0){
+    var emptyMsg = _discoverVerdict==='recommend'
+      ? (lang==='en'?'No recommendations yet.<br>Be the first to share 🌙':'아직 추천 글이 없어요.<br>첫 번째 추천을 남겨주세요 🌙')
+      : (lang==='en'?'No avoid-warnings yet.<br>Share what to avoid 🌙':'아직 비추천 글이 없어요.<br>피해야 할 곳을 알려주세요 🌙');
+    el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+emptyMsg+'</div>';
+    return;
+  }
+  var isRec=_discoverVerdict==='recommend';
+  var html='';
+  rows.forEach(function(r){
+    var p=profMap[r.user_id]||{};
+    var nick=p.nickname||(p.email?p.email.split('@')[0]:'(unknown)');
+    var flag=COUNTRY_FLAG[r.country]||'🌏';
+    var catIcon=CATEGORY_ICON[r.category]||'📍';
+    var dt=new Date(r.created_at);
+    var dateStr=dt.toLocaleDateString(lang==='en'?'en-US':'ko-KR',{month:'short',day:'numeric'});
+    var isOwner=(r.user_id===_currentUserId);
+    var verdictBadge=isRec
+      ?'<span style="background:rgba(42,157,111,.12);color:var(--ok);border:1px solid var(--ok);padding:2px 7px;border-radius:10px;font-size:9px;font-weight:500;">👍 '+(lang==='en'?'Recommend':'추천')+'</span>'
+      :'<span style="background:rgba(208,69,69,.12);color:var(--red);border:1px solid var(--red);padding:2px 7px;border-radius:10px;font-size:9px;font-weight:500;">👎 '+(lang==='en'?'Avoid':'비추천')+'</span>';
+    html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+      +  verdictBadge
+      +  '<div style="font-size:9px;color:var(--m);">'+escHtml(nick)+' · '+dateStr+'</div>'
+      +'</div>'
+      +'<div style="font-size:14px;color:var(--w);font-weight:500;margin-bottom:4px;">'+catIcon+' '+escHtml(r.place_name)+'</div>'
+      +'<div style="font-size:10px;color:var(--m);margin-bottom:8px;">'+flag+' '+(r.region?escHtml(r.region):'')+'</div>'
+      +'<div style="font-size:12px;color:var(--sb);line-height:1.6;background:var(--s2);padding:8px 10px;border-radius:6px;border-left:3px solid '+(isRec?'var(--ok)':'var(--red)')+';">'+escHtml(r.reason)+'</div>'
+      +(r.detail?'<div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:8px;white-space:pre-wrap;">'+escHtml(r.detail)+'</div>':'')
+      +(isOwner?'<div style="text-align:right;margin-top:8px;"><button onclick="deleteDiscovery(\''+r.id+'\')" style="background:transparent;border:none;font-size:9px;color:var(--red);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'Delete':'삭제')+'</button></div>':'')
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+async function deleteDiscovery(id){
+  if(!_currentToken) return;
+  if(!confirm(lang==='en'?'Delete this post?':'이 글을 삭제할까요?')) return;
+  try{
+    await _sfDel('/rest/v1/discoveries?id=eq.'+id);
+    loadDiscoveriesFromServer();
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+
+window.openNewDiscovery=openNewDiscovery;
+window.closeDiscoveryPopup=closeDiscoveryPopup;
+window.setDiscNewVerdict=setDiscNewVerdict;
+window.setDiscNewCategory=setDiscNewCategory;
+window.saveDiscovery=saveDiscovery;
+window.deleteDiscovery=deleteDiscovery;
 // ══ 친구 관리 (follows 시스템) ══
 var _followsTab='friends';
 var _myFriendsCache=[]; // accepted된 친구 user_id 목록 (피드 쿼리에 사용)
