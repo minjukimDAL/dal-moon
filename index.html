@@ -3792,7 +3792,23 @@ async function loadDiscoveriesFromServer(){
       var profs=await _sfGet('/rest/v1/profiles?id=in.('+idsParam+')&select=id,nickname,email');
       if(Array.isArray(profs)) profs.forEach(function(p){ profMap[p.id]=p; });
     }
-    renderDiscoveryList(rows, profMap);
+    // 동의/반대 카운트 + 내 투표 조회
+    var voteMap={}; // {discovery_id: {agree:N, disagree:N, myVote:'agree'|'disagree'|null}}
+    if(rows.length>0){
+      var discIds=rows.map(function(r){return '"'+r.id+'"';}).join(',');
+      try{
+        var votes=await _sfGet('/rest/v1/discovery_votes?discovery_id=in.('+discIds+')&select=discovery_id,user_id,vote');
+        if(Array.isArray(votes)){
+          rows.forEach(function(r){ voteMap[r.id]={agree:0,disagree:0,myVote:null}; });
+          votes.forEach(function(v){
+            var bucket=voteMap[v.discovery_id]; if(!bucket) return;
+            if(v.vote==='agree') bucket.agree++; else if(v.vote==='disagree') bucket.disagree++;
+            if(v.user_id===_currentUserId) bucket.myVote=v.vote;
+          });
+        }
+      }catch(e){ console.warn('[Discover] votes 로드 실패:', e.message); }
+    }
+    renderDiscoveryList(rows, profMap, voteMap);
   }catch(e){
     console.warn('[Discover] 로드 실패:', e.message);
     el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='en'?'Failed to load. Please try again.':'불러오기 실패. 다시 시도해주세요.')+'</div>';
@@ -3804,7 +3820,7 @@ var CATEGORY_ICON={restaurant:'🍜',cafe:'☕',stay:'🏨',attraction:'🗺',sh
 
 function escHtml(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 
-function renderDiscoveryList(rows, profMap){
+function renderDiscoveryList(rows, profMap, voteMap){
   var el=document.getElementById('discoverList'); if(!el) return;
   if(rows.length===0){
     var emptyMsg = _discoverVerdict==='recommend'
@@ -3813,6 +3829,7 @@ function renderDiscoveryList(rows, profMap){
     el.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+emptyMsg+'</div>';
     return;
   }
+  voteMap = voteMap || {};
   var isRec=_discoverVerdict==='recommend';
   var html='';
   rows.forEach(function(r){
@@ -3826,6 +3843,16 @@ function renderDiscoveryList(rows, profMap){
     var verdictBadge=isRec
       ?'<span style="background:rgba(42,157,111,.12);color:var(--ok);border:1px solid var(--ok);padding:2px 7px;border-radius:10px;font-size:9px;font-weight:500;">👍 '+(lang==='en'?'Recommend':'추천')+'</span>'
       :'<span style="background:rgba(208,69,69,.12);color:var(--red);border:1px solid var(--red);padding:2px 7px;border-radius:10px;font-size:9px;font-weight:500;">👎 '+(lang==='en'?'Avoid':'비추천')+'</span>';
+    // 투표 정보
+    var v=voteMap[r.id]||{agree:0,disagree:0,myVote:null};
+    var canVote=(_currentUserId && !isOwner);
+    var aActive=(v.myVote==='agree');
+    var nActive=(v.myVote==='disagree');
+    var aBtn='<button '+(canVote?'onclick="toggleVote(\''+r.id+'\',\'agree\')"':'disabled')+' style="flex:1;padding:7px;background:'+(aActive?'rgba(42,157,111,.15)':'var(--s2)')+';border:1px solid '+(aActive?'var(--ok)':'var(--b2)')+';border-radius:6px;font-size:11px;color:'+(aActive?'var(--ok)':'var(--m)')+';cursor:'+(canVote?'pointer':'not-allowed')+';font-family:\'DM Sans\',sans-serif;font-weight:'+(aActive?'600':'400')+';">A · '+v.agree+'</button>';
+    var nBtn='<button '+(canVote?'onclick="toggleVote(\''+r.id+'\',\'disagree\')"':'disabled')+' style="flex:1;padding:7px;background:'+(nActive?'rgba(208,69,69,.15)':'var(--s2)')+';border:1px solid '+(nActive?'var(--red)':'var(--b2)')+';border-radius:6px;font-size:11px;color:'+(nActive?'var(--red)':'var(--m)')+';cursor:'+(canVote?'pointer':'not-allowed')+';font-family:\'DM Sans\',sans-serif;font-weight:'+(nActive?'600':'400')+';">N · '+v.disagree+'</button>';
+    var voteSection='<div style="display:flex;gap:6px;margin-top:10px;">'+aBtn+nBtn+'</div>';
+    var voteHint=canVote?'':(isOwner?'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(own post)':'(내 글)')+'</div>':'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(login to vote)':'(로그인 후 투표 가능)')+'</div>');
+
     html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
       +  verdictBadge
@@ -3835,11 +3862,48 @@ function renderDiscoveryList(rows, profMap){
       +'<div style="font-size:10px;color:var(--m);margin-bottom:8px;">'+flag+' '+(r.region?escHtml(r.region):'')+'</div>'
       +'<div style="font-size:12px;color:var(--sb);line-height:1.6;background:var(--s2);padding:8px 10px;border-radius:6px;border-left:3px solid '+(isRec?'var(--ok)':'var(--red)')+';">'+escHtml(r.reason)+'</div>'
       +(r.detail?'<div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:8px;white-space:pre-wrap;">'+escHtml(r.detail)+'</div>':'')
-      +(isOwner?'<div style="text-align:right;margin-top:8px;"><button onclick="deleteDiscovery(\''+r.id+'\')" style="background:transparent;border:none;font-size:9px;color:var(--red);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'Delete':'삭제')+'</button></div>':'')
+      +voteSection
+      +voteHint
+      +(isOwner?'<div style="text-align:right;margin-top:6px;"><button onclick="deleteDiscovery(\''+r.id+'\')" style="background:transparent;border:none;font-size:9px;color:var(--red);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'Delete':'삭제')+'</button></div>':'')
       +'</div>';
   });
   el.innerHTML=html;
 }
+
+// ── 투표 토글 (동의/반대) ──
+async function toggleVote(discoveryId, voteType){
+  if(!_currentToken||!_currentUserId){
+    alert(lang==='en'?'Please log in first 🌙':'로그인 후 이용할 수 있어요 🌙');
+    return;
+  }
+  try{
+    // 기존 내 투표 확인
+    var existing=await _sfGet('/rest/v1/discovery_votes?discovery_id=eq.'+discoveryId+'&user_id=eq.'+_currentUserId+'&select=id,vote');
+    if(Array.isArray(existing)&&existing.length>0){
+      var cur=existing[0];
+      if(cur.vote===voteType){
+        // 같은 버튼 한 번 더 누름 → 취소(삭제)
+        await _sfDel('/rest/v1/discovery_votes?id=eq.'+cur.id);
+      } else {
+        // 다른 버튼 → 변경(UPDATE)
+        await fetch(SUPA_URL+'/rest/v1/discovery_votes?id=eq.'+cur.id,{
+          method:'PATCH',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body:JSON.stringify({vote:voteType})
+        });
+      }
+    } else {
+      // 신규 투표 (INSERT)
+      await fetch(SUPA_URL+'/rest/v1/discovery_votes',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({discovery_id:discoveryId,user_id:_currentUserId,vote:voteType})
+      });
+    }
+    loadDiscoveriesFromServer();
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+}
+window.toggleVote=toggleVote;
 
 async function deleteDiscovery(id){
   if(!_currentToken) return;
