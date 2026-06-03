@@ -4153,8 +4153,8 @@ async function copyInviteCode(){
   var code=el.textContent.trim();
   if(code==='------'){ alert(lang==='en'?'Code loading...':'코드 불러오는 중...'); return; }
   var shareText=(lang==='en'
-    ?'Add me as a friend on DAL!\nMy invite code: '+code+'\nhttps://dal-moon.com'
-    :'DAL에서 친구 추가해줘!\n내 초대 코드: '+code+'\nhttps://dal-moon.com');
+    ?'Let\'s be friends on DAL! 🌙\n\nAlready on DAL? Open the app → [Social → Friends → Add] and enter this code:\n👉 '+code+'\n\n(New to DAL? Start at https://dal-moon.com)'
+    :'DAL에서 친구하자! 🌙\n\n이미 DAL 쓰고 있으면 → 앱 열고 [소셜 → 친구 관리 → 친구 추가]에 코드 입력해줘:\n👉 '+code+'\n\n(DAL이 처음이면 https://dal-moon.com 에서 시작)');
   try{
     await navigator.clipboard.writeText(shareText);
     alert(lang==='en'?'Copied! Share with your friend 🌙':'복사됐어요! 친구에게 공유해주세요 🌙');
@@ -4406,7 +4406,9 @@ async function submitCS(){
 }
 function shareInvite(method){
   var code=document.getElementById('myInviteCode').textContent;
-  var msg=lang==='ko'?'DAL로 여행 계획해봐! AI 여행 플래너 🌙\ndal-moon.com/?invite='+code:'Plan your trip with DAL! AI travel planner 🌙\ndal-moon.com/?invite='+code;
+  var msg=lang==='ko'
+    ?'DAL에서 친구하자! 🌙\n\n앱 열고 [소셜 → 친구 관리 → 친구 추가]에 코드 입력해줘:\n👉 '+code+'\n\n(DAL이 처음이면 https://dal-moon.com 에서 시작)'
+    :'Let\'s be friends on DAL! 🌙\n\nOpen the app → [Social → Friends → Add] and enter this code:\n👉 '+code+'\n\n(New to DAL? Start at https://dal-moon.com)';
   if(method==='link'){navigator.clipboard.writeText(msg).then(function(){alert(lang==='ko'?'복사 완료!':'Copied!');}).catch(function(){alert(msg);});}
   else{alert(method+': '+msg);}
 }
@@ -4927,9 +4929,42 @@ async function doLogout(){
   onLogoutSuccess();
 }
 
+// ── 인앱 브라우저(카톡 등) 감지 + 외부 브라우저로 내보내기 ──
+// 구글/애플 OAuth는 인앱 WebView에서 차단됨(403 disallowed_useragent) → 기기 기본 브라우저로 유도
+function _isKakaoBrowser(){ return /KAKAOTALK/i.test(navigator.userAgent); }
+function _isInAppBrowser(){
+  return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|FB_IAB|Line\/|DaumApps|inapp/i.test(navigator.userAgent);
+}
+function _openExternalBrowser(){
+  var target=window.location.href; // 현재 URL(초대코드 등 파라미터 포함) 그대로 전달
+  if(_isKakaoBrowser()){
+    // 카카오톡: 자체 스킴으로 기기 기본 브라우저에서 열기 (Android/iOS 공통)
+    window.location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(target);
+    return true;
+  }
+  if(/android/i.test(navigator.userAgent)){
+    // 기타 안드로이드 인앱: Chrome intent로 열기
+    window.location.href='intent://'+target.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end';
+    return true;
+  }
+  return false; // iOS 기타 인앱(인스타 등): 자동 전환 불가 → 호출부에서 안내
+}
+
 async function doLogin(provider){
   var err=document.getElementById('loginErrMsg');
   if(err) err.textContent='연결 중...';
+  // 인앱 브라우저(카톡 등)에서는 구글/애플 OAuth가 차단됨 → 외부 브라우저로 유도
+  if((provider==='google'||provider==='apple') && _isInAppBrowser()){
+    if(_openExternalBrowser()){
+      if(err) err.textContent=(lang==='en'?'Continue in your default browser 🌙':'기본 브라우저에서 계속 진행해주세요 🌙');
+    } else {
+      alert(lang==='en'
+        ? 'In-app browsers block Google/Apple sign-in.\nTap the ··· menu (top-right) → "Open in Safari", then sign in there.'
+        : '인앱 브라우저에서는 구글/애플 로그인이 막혀요.\n우측 상단 ··· 메뉴 → "다른 브라우저로 열기(Safari로 열기)"를 눌러 기본 브라우저에서 로그인해주세요.');
+      if(err) err.textContent='';
+    }
+    return;
+  }
   try{
     // Supabase OAuth redirect
     var redirectTo=window.location.origin;
