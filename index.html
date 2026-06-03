@@ -1293,7 +1293,10 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div style="display:flex;gap:6px;">
       <button class="feed-filter-btn" data-f="all" onclick="setFeedFilter('all')" style="background:transparent;border:1px solid var(--gold);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--gold);cursor:pointer;" data-ko="친구" data-en="Friends">친구</button>
       <button class="feed-filter-btn" data-f="mine" onclick="setFeedFilter('mine')" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="내 글" data-en="Mine">내 글</button>
-      <button onclick="openFollowsModal()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🤝 친구 관리" data-en="🤝 Friends">🤝 친구 관리</button>
+      <span style="position:relative;display:inline-block;">
+        <button onclick="openFollowsModal()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🤝 친구 관리" data-en="🤝 Friends">🤝 친구 관리</button>
+        <span id="reqBadge" style="display:none;position:absolute;top:-5px;right:-5px;min-width:15px;height:15px;padding:0 3px;background:var(--red);color:#fff;border-radius:8px;font-size:8px;line-height:15px;text-align:center;font-weight:600;box-sizing:border-box;">0</span>
+      </span>
     </div>
     <button onclick="refreshFeed()" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:3px 10px;font-size:9px;color:var(--m);cursor:pointer;" data-ko="🔄" data-en="🔄">🔄</button>
   </div>
@@ -1411,9 +1414,14 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <div style="font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;" data-ko="⑦ 상세 메모 (선택)" data-en="⑦ Details (optional)">⑦ 상세 메모 (선택)</div>
           <textarea id="discNewDetail" rows="3" maxlength="500" placeholder="더 자세한 후기, 팁, 주의사항 등" style="width:100%;padding:10px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:12px;color:var(--w);font-family:inherit;box-sizing:border-box;resize:vertical;line-height:1.6;" data-ko-ph="더 자세한 후기, 팁, 주의사항 등" data-en-ph="Detailed review, tips, warnings, etc."></textarea>
         </div>
-        <!-- 8. 사진 (준비중) -->
-        <div style="margin-bottom:14px;background:var(--s2);border:1px dashed var(--b2);border-radius:8px;padding:14px;text-align:center;cursor:not-allowed;opacity:.6;">
-          <div style="font-size:10px;color:var(--m);" data-ko="📷 사진 첨부 (준비중)" data-en="📷 Photos (Coming soon)">📷 사진 첨부 (준비중)</div>
+        <!-- 8. 사진 (선택, 최대 3장) -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--m);letter-spacing:.5px;margin-bottom:6px;">
+            <span data-ko="⑧ 사진 (선택, 최대 3장)" data-en="⑧ Photos (optional, max 3)">⑧ 사진 (선택, 최대 3장)</span>
+            <span id="discPhotoCount">0/3</span>
+          </div>
+          <input type="file" id="discPhotoInput" accept="image/*" multiple style="display:none;" onchange="discAddPhotos(this)">
+          <div id="discPhotoPreview" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
         </div>
       </div>
       <!-- 하단 액션 -->
@@ -3042,7 +3050,11 @@ function goPage(id){
     if(bn) bn.classList.toggle('active',p===id);
   });
   if(id==='my') hideMyPage();
-  if(id==='social'&&_currentToken&&typeof loadPostsFromServer==='function') loadPostsFromServer();
+  if(id==='social'&&_currentToken){
+    var _doFeed=function(){ if(typeof loadPostsFromServer==='function') loadPostsFromServer(); };
+    if(typeof loadFollowsAll==='function'){ Promise.resolve(loadFollowsAll()).then(_doFeed,_doFeed); }
+    else { _doFeed(); }
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -3712,6 +3724,88 @@ function setDiscNewCategory(cat){
   });
 }
 
+// ── 발견 사진 업로드 (Storage discovery-photos 버킷) ──
+var _discNewPhotos=[];        // 업로드 완료된 public URL 배열 (최대 3)
+var _discPhotoUploading=false;
+
+function discRenderPhotoPreview(){
+  var box=document.getElementById('discPhotoPreview'); if(!box) return;
+  var cnt=document.getElementById('discPhotoCount'); if(cnt) cnt.textContent=_discNewPhotos.length+'/3';
+  var html='';
+  _discNewPhotos.forEach(function(u,i){
+    html+='<div style="position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--b2);">'
+      +'<img src="'+u+'" style="width:100%;height:100%;object-fit:cover;display:block;">'
+      +'<button onclick="discRemovePhoto('+i+')" style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(46,40,32,.7);border:none;color:#fff;font-size:12px;line-height:1;cursor:pointer;padding:0;">×</button>'
+      +'</div>';
+  });
+  if(_discPhotoUploading){
+    html+='<div style="width:72px;height:72px;border-radius:8px;border:1px dashed var(--b2);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--m);">⏳</div>';
+  } else if(_discNewPhotos.length<3){
+    html+='<div onclick="document.getElementById(\'discPhotoInput\').click()" style="width:72px;height:72px;border-radius:8px;border:1px dashed var(--b2);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--m);cursor:pointer;">+</div>';
+  }
+  box.innerHTML=html;
+}
+
+function discRemovePhoto(idx){
+  _discNewPhotos.splice(idx,1);
+  discRenderPhotoPreview();
+}
+
+// 한 장 처리: 리사이즈 800px + JPEG 0.7 → Storage 업로드 → public URL 반환
+function _discResizeUpload(file){
+  return new Promise(function(resolve,reject){
+    if(!file||!file.type||file.type.indexOf('image/')!==0){ reject(new Error(lang==='en'?'Not an image':'이미지 파일이 아니에요')); return; }
+    var reader=new FileReader();
+    reader.onerror=function(){ reject(new Error('read fail')); };
+    reader.onload=function(e){
+      var img=new Image();
+      img.onerror=function(){ reject(new Error('load fail')); };
+      img.onload=function(){
+        var max=800,w=img.width,h=img.height;
+        if(w>max||h>max){ if(w>h){h=Math.round(h*max/w);w=max;} else {w=Math.round(w*max/h);h=max;} }
+        var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+        cv.getContext('2d').drawImage(img,0,0,w,h);
+        cv.toBlob(function(blob){
+          if(!blob){ reject(new Error('compress fail')); return; }
+          var path=_currentUserId+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.jpg';
+          fetch(SUPA_URL+'/storage/v1/object/discovery-photos/'+path,{
+            method:'POST',
+            headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'image/jpeg'},
+            body:blob
+          }).then(function(res){
+            if(res.ok){ resolve(SUPA_URL+'/storage/v1/object/public/discovery-photos/'+path); }
+            else { res.text().then(function(t){ reject(new Error(t||('HTTP '+res.status))); }); }
+          }).catch(function(err){ reject(err); });
+        },'image/jpeg',0.7);
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function discAddPhotos(input){
+  if(!_currentToken||!_currentUserId){ alert(lang==='en'?'Please log in first 🌙':'로그인 후 이용할 수 있어요 🌙'); input.value=''; return; }
+  var files=Array.prototype.slice.call(input.files||[]);
+  input.value='';
+  if(files.length===0) return;
+  var room=3-_discNewPhotos.length;
+  if(room<=0){ alert(lang==='en'?'Up to 3 photos':'사진은 최대 3장까지예요'); return; }
+  if(files.length>room) files=files.slice(0,room);
+  _discPhotoUploading=true; discRenderPhotoPreview();
+  for(var i=0;i<files.length;i++){
+    try{
+      var url=await _discResizeUpload(files[i]);
+      _discNewPhotos.push(url);
+      discRenderPhotoPreview(); // 한 장씩 점진적 표시
+    }catch(e){
+      console.warn('[DiscPhoto] 업로드 실패:', e.message);
+      alert((lang==='en'?'Upload failed: ':'사진 업로드 실패: ')+e.message);
+    }
+  }
+  _discPhotoUploading=false; discRenderPhotoPreview();
+}
+
 function openNewDiscovery(){
   if(!_currentToken||!_currentUserId){
     alert(lang==='en'?'Please log in first 🌙':'로그인 후 이용할 수 있어요 🌙');
@@ -3725,6 +3819,7 @@ function openNewDiscovery(){
   });
   var sel=document.getElementById('discNewCountry'); if(sel) sel.value='';
   var cnt=document.getElementById('discReasonCount'); if(cnt) cnt.textContent='0';
+  _discNewPhotos=[]; _discPhotoUploading=false; discRenderPhotoPreview();
   document.getElementById('dalDiscoveryPopup').style.display='flex';
 }
 
@@ -3752,7 +3847,8 @@ async function saveDiscovery(){
     country:country,
     region:region||null,
     reason:reason,
-    detail:detail||null
+    detail:detail||null,
+    photos:(_discNewPhotos&&_discNewPhotos.length)?_discNewPhotos.slice(0,3):null
   };
   try{
     var r=await fetch(SUPA_URL+'/rest/v1/discoveries',{
@@ -3852,6 +3948,17 @@ function renderDiscoveryList(rows, profMap, voteMap){
     var nBtn='<button '+(canVote?'onclick="toggleVote(\''+r.id+'\',\'disagree\')"':'disabled')+' style="flex:1;padding:7px;background:'+(nActive?'rgba(208,69,69,.15)':'var(--s2)')+';border:1px solid '+(nActive?'var(--red)':'var(--b2)')+';border-radius:6px;font-size:11px;color:'+(nActive?'var(--red)':'var(--m)')+';cursor:'+(canVote?'pointer':'not-allowed')+';font-family:\'DM Sans\',sans-serif;font-weight:'+(nActive?'600':'400')+';">N · '+v.disagree+'</button>';
     var voteSection='<div style="display:flex;gap:6px;margin-top:10px;">'+aBtn+nBtn+'</div>';
     var voteHint=canVote?'':(isOwner?'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(own post)':'(내 글)')+'</div>':'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(login to vote)':'(로그인 후 투표 가능)')+'</div>');
+    // 사진 그리드 (이유 박스 위)
+    var photoGrid='';
+    if(Array.isArray(r.photos)&&r.photos.length){
+      var ph=r.photos.slice(0,3);
+      var cellH=(ph.length===1?'170px':'110px');
+      photoGrid='<div style="display:flex;gap:4px;margin-bottom:8px;border-radius:8px;overflow:hidden;">';
+      ph.forEach(function(u){
+        photoGrid+='<div style="flex:1;height:'+cellH+';background:var(--s2);"><img src="'+escHtml(u)+'" loading="lazy" onclick="window.open(this.src,\'_blank\')" style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;"></div>';
+      });
+      photoGrid+='</div>';
+    }
 
     html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
@@ -3860,6 +3967,7 @@ function renderDiscoveryList(rows, profMap, voteMap){
       +'</div>'
       +'<div style="font-size:14px;color:var(--w);font-weight:500;margin-bottom:4px;">'+catIcon+' '+escHtml(r.place_name)+'</div>'
       +'<div style="font-size:10px;color:var(--m);margin-bottom:8px;">'+flag+' '+(r.region?escHtml(r.region):'')+'</div>'
+      +photoGrid
       +'<div style="font-size:12px;color:var(--sb);line-height:1.6;background:var(--s2);padding:8px 10px;border-radius:6px;border-left:3px solid '+(isRec?'var(--ok)':'var(--red)')+';">'+escHtml(r.reason)+'</div>'
       +(r.detail?'<div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:8px;white-space:pre-wrap;">'+escHtml(r.detail)+'</div>':'')
       +voteSection
@@ -3981,6 +4089,8 @@ async function loadFollowsAll(){
     // 4) 카운트 표시
     var c1=document.getElementById('followsCntFriends'); if(c1) c1.textContent=friends.length;
     var c2=document.getElementById('followsCntReq'); if(c2) c2.textContent=requests.length;
+    var rb=document.getElementById('reqBadge');
+    if(rb){ if(requests.length>0){ rb.textContent=(requests.length>9?'9+':requests.length); rb.style.display='block'; } else { rb.style.display='none'; } }
     // 5) 상대 프로필 정보 로드 (닉네임)
     var otherIds=[];
     friends.forEach(function(r){ otherIds.push(r.requester===_currentUserId?r.recipient:r.requester); });
@@ -4480,13 +4590,34 @@ async function loadPostsFromServer(){
     // 7일 이내 데이터만 가져옴 (팔로우 기반 피드 — 친구 글이 적게 올라오므로)
     var cutoff=new Date(Date.now()-7*24*60*60*1000).toISOString();
     var url=SUPA_URL+'/rest/v1/posts?order=created_at.desc&limit=50&reported=neq.true&created_at=gt.'+cutoff+'&select=*';
-    if(_feedFilter==='mine'&&_currentUserId) url+='&user_id=eq.'+_currentUserId;
+    if(_feedFilter==='mine'&&_currentUserId){
+      url+='&user_id=eq.'+_currentUserId;
+    } else {
+      // 친구 피드: 친구 user_id + 본인 (본인 항상 포함 → 빈 in.() 에러 방지)
+      var feedIds=(_myFriendsCache||[]).slice();
+      if(_currentUserId && feedIds.indexOf(_currentUserId)===-1) feedIds.push(_currentUserId);
+      if(feedIds.length===0){
+        // 비로그인 등 — 친구도 본인도 없음
+        feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='en'?'Log in to see your friends\' feed 🌙':'로그인하면 친구 피드를 볼 수 있어요 🌙')+'</div>';
+        return;
+      }
+      var idsParam=feedIds.map(function(uid){return '"'+uid+'"';}).join(',');
+      url+='&user_id=in.('+idsParam+')';
+    }
     var r=await fetch(url,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
     }).then(function(res){return res.json();});
 
     if(!r||!Array.isArray(r)||r.length===0){
-      feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='en'?'No travel tips shared yet.<br>Be the first to share 🌙':'아직 공유된 여행 정보가 없어요.<br>첫 번째 여행 정보를 공유해보세요 🌙')+'</div>';
+      var emptyMsg;
+      if(_feedFilter==='mine'){
+        emptyMsg=(lang==='en'?'You haven\'t shared anything yet.<br>Share your first tip 🌙':'아직 작성한 글이 없어요.<br>첫 글을 공유해보세요 🌙');
+      } else if((_myFriendsCache||[]).length===0){
+        emptyMsg=(lang==='en'?'Add friends to see their posts here 🌙<br>(via 👥 Friends)':'친구를 추가하면 친구들의 글이<br>여기에 보여요 🌙');
+      } else {
+        emptyMsg=(lang==='en'?'No recent posts from friends.<br>Be the first to share 🌙':'최근 친구들의 글이 없어요.<br>먼저 공유해보세요 🌙');
+      }
+      feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+emptyMsg+'</div>';
       return;
     }
 
