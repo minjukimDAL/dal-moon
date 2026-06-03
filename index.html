@@ -7159,28 +7159,26 @@ function mytLoadList() {
       var status = end < today ? 'past' : (start <= today && end >= today ? 'ongoing' : 'upcoming');
       var badgeMap = {past:'완료된 여행',ongoing:'진행중',upcoming:'다가올 여행'};
       var borderMap = {past:'',ongoing:'ongoing',upcoming:'upcoming'};
+      var coverImg = t.cover_image;
+      var titleEsc = (typeof escHtml==='function') ? escHtml(t.title) : t.title;
+      var dateLine = t.start_date+' ~ '+t.end_date+' · '+(lang==='en'?(nights+'N '+(nights+1)+'D'):(nights+'박 '+(nights+1)+'일'));
+      var ovBadge = 'position:absolute;top:12px;left:12px;background:rgba(46,40,32,.42);color:#fff;font-size:8px;padding:3px 9px;border-radius:10px;letter-spacing:.3px;';
       html += '<div class="mytrip-card '+borderMap[status]+'" onclick="mytOpenTrip(\''+t.id+'\')" style="padding:0;overflow:hidden;">';
-      if (t.cover_image) {
-        html += '<div style="position:relative;height:120px;overflow:hidden;">';
-        html += '<img src="'+t.cover_image+'" style="width:100%;height:100%;object-fit:cover;">';
-        html += '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(40,35,28,.75),rgba(40,35,28,.05));"></div>';
-        html += '<div class="mytrip-badge '+status+'" style="position:absolute;top:10px;left:10px;">'+badgeMap[status]+'</div>';
-        html += '<div style="position:absolute;bottom:10px;left:12px;right:12px;">';
-        html += '<div style="font-size:14px;color:#fff;font-weight:500;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,.6);">'+t.title+'</div>';
-        html += '<div style="font-size:10px;color:rgba(255,255,255,.85);text-shadow:0 1px 3px rgba(0,0,0,.6);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
-        html += '</div></div>';
-        if (t.total_budget > 0) {
-          html += '<div style="padding:10px 14px;font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
-        }
+      // 히어로 (사진 or 그라데이션 — 통일된 150px)
+      html += '<div style="position:relative;height:150px;overflow:hidden;'+(coverImg?'':'background:linear-gradient(135deg,#cdb083 0%,#a8884e 52%,#6e5836 100%);')+'">';
+      if (coverImg) {
+        html += '<img src="'+((typeof escHtml==='function')?escHtml(coverImg):coverImg)+'" style="width:100%;height:100%;object-fit:cover;">';
       } else {
-        html += '<div style="padding:12px;">';
-        html += '<div class="mytrip-badge '+status+'">'+badgeMap[status]+'</div>';
-        html += '<div style="font-size:13px;color:var(--w);font-weight:500;margin-bottom:2px;">'+t.title+'</div>';
-        html += '<div style="font-size:10px;color:var(--m);">'+t.start_date+' ~ '+t.end_date+' · '+nights+'박 '+(nights+1)+'일</div>';
-        if (t.total_budget > 0) {
-          html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--b1);font-size:9px;color:var(--m);">예산 <span style="color:var(--gold);">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
-        }
-        html += '</div>';
+        html += '<div style="position:absolute;top:-14px;right:-2px;font-size:96px;opacity:.13;line-height:1;">🌙</div>';
+      }
+      html += '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(35,30,22,.72),rgba(35,30,22,0) 55%);"></div>';
+      html += '<div style="'+ovBadge+'">'+badgeMap[status]+'</div>';
+      html += '<div style="position:absolute;bottom:0;left:0;right:0;padding:14px;">';
+      html += '<div style="font-size:16px;color:#fff;font-weight:500;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.45);">'+titleEsc+'</div>';
+      html += '<div style="font-size:11px;color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.45);">'+dateLine+'</div>';
+      html += '</div></div>';
+      if (t.total_budget > 0) {
+        html += '<div style="padding:11px 14px;font-size:10px;color:var(--m);">'+(lang==='en'?'Budget ':'예산 ')+'<span style="color:var(--gold);font-weight:500;">'+t.total_budget.toLocaleString()+' '+t.currency+'</span></div>';
       }
       html += '</div>';
     });
