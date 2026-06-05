@@ -4173,8 +4173,13 @@ async function sendFollowRequest(){
   var code=inp.value.trim().toUpperCase();
   if(code.length!==6){ alert(lang==='en'?'Enter a 6-character code':'6자리 코드를 입력해주세요'); return; }
   try{
-    // 1) 코드로 상대 user_id 찾기
-    var r=await _sfGet('/rest/v1/profiles?invite_code=eq.'+encodeURIComponent(code)+'&select=id,nickname,email');
+    // 1) 코드로 상대 user_id 찾기 (RPC — id·nickname만 반환, 이메일 노출 없음)
+    var _rpc=await fetch(SUPA_URL+'/rest/v1/rpc/find_user_by_code',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json'},
+      body:JSON.stringify({p_code:code})
+    });
+    var r=_rpc.ok?await _rpc.json():[];
     if(!Array.isArray(r)||r.length===0){
       alert(lang==='en'?'No user found with this code':'해당 코드의 사용자를 찾을 수 없어요');
       return;
@@ -4200,7 +4205,7 @@ async function sendFollowRequest(){
       body:JSON.stringify({requester:_currentUserId,recipient:other.id,status:'pending'})
     });
     if(resp.ok){
-      var nick=other.nickname||other.email||'(unknown)';
+      var nick=other.nickname||'(unknown)';
       alert(lang==='en'?'Request sent to '+nick+' 🌙':nick+'님에게 요청을 보냈어요 🌙');
       inp.value='';
       loadFollowsAll();
@@ -4219,7 +4224,7 @@ async function acceptFollow(followId){
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
       body:JSON.stringify({status:'accepted',accepted_at:new Date().toISOString()})
     });
-    if(resp.ok){ loadFollowsAll(); }
+    if(resp.ok){ loadFollowsAll(); if(typeof switchFollowsTab==='function') switchFollowsTab('friends'); }
     else { alert(lang==='en'?'Failed to accept':'수락 실패'); }
   }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
 }
@@ -4595,12 +4600,15 @@ async function loadPostsFromServer(){
     if(_feedFilter==='mine'&&_currentUserId){
       url+='&user_id=eq.'+_currentUserId;
     } else {
-      // 친구 피드: 친구 user_id + 본인 (본인 항상 포함 → 빈 in.() 에러 방지)
+      // 친구 피드: 친구들 글만 (본인 제외 → '내 글' 탭과 명확히 구분)
       var feedIds=(_myFriendsCache||[]).slice();
-      if(_currentUserId && feedIds.indexOf(_currentUserId)===-1) feedIds.push(_currentUserId);
       if(feedIds.length===0){
-        // 비로그인 등 — 친구도 본인도 없음
-        feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(lang==='en'?'Log in to see your friends\' feed 🌙':'로그인하면 친구 피드를 볼 수 있어요 🌙')+'</div>';
+        // 친구 없음(로그인) 또는 비로그인
+        feedEl.innerHTML='<div style="text-align:center;padding:40px 0;font-size:11px;color:var(--m);line-height:2;">'+(
+          _currentUserId
+            ?(lang==='en'?'No friends yet 🌙<br>Add friends via 🤝 Friends, then their posts show here':'아직 친구가 없어요 🌙<br>🤝 친구 관리에서 친구를 추가하면<br>친구들의 글이 여기 보여요')
+            :(lang==='en'?'Log in to see your friends\' feed 🌙':'로그인하면 친구 피드를 볼 수 있어요 🌙')
+        )+'</div>';
         return;
       }
       var idsParam=feedIds.map(function(uid){return '"'+uid+'"';}).join(',');
