@@ -1255,7 +1255,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
   </div>
   <!-- 일정 상세/수정 팝업 -->
   <div id="myt-sched-popup" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:1000;align-items:flex-end;justify-content:center;" onclick="mytCloseSchedPopup()">
-    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px calc(var(--bottom-h) + 28px);" onclick="event.stopPropagation()">
       <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <div id="myt-popup-title" style="font-size:14px;color:var(--w);font-weight:500;"></div>
@@ -1271,7 +1271,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 
   <!-- 기록 상세 팝업 -->
   <div id="myt-rec-popup" style="display:none;position:fixed;inset:0;background:rgba(58,52,43,.5);z-index:1000;align-items:flex-end;justify-content:center;" onclick="mytCloseRecPopup()">
-    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px 32px;" onclick="event.stopPropagation()">
+    <div style="background:var(--s1);border-top:1px solid var(--b2);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:80vh;overflow-y:auto;padding:16px 16px calc(var(--bottom-h) + 28px);" onclick="event.stopPropagation()">
       <div style="width:32px;height:3px;background:var(--b2);border-radius:2px;margin:0 auto 14px;"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <div style="font-size:14px;color:var(--w);font-weight:500;">여행 기록</div>
