@@ -4105,8 +4105,13 @@ async function loadFollowsAll(){
     requests.forEach(function(r){ otherIds.push(r.requester); });
     var profilesMap={};
     if(otherIds.length>0){
-      var idsParam=otherIds.map(function(id){return '"'+id+'"';}).join(',');
-      var profs=await _sfGet('/rest/v1/profiles?id=in.('+idsParam+')&select=id,nickname,email');
+      // RLS로 남의 profiles 직접 조회 불가 → 관계있는 사람(친구/요청자) 닉네임만 돌려주는 RPC 사용
+      var _rp=await fetch(SUPA_URL+'/rest/v1/rpc/get_related_profiles',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json'},
+        body:JSON.stringify({})
+      });
+      var profs=_rp.ok?await _rp.json():[];
       if(Array.isArray(profs)) profs.forEach(function(p){ profilesMap[p.id]=p; });
     }
     // 6) 렌더링
