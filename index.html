@@ -4026,31 +4026,37 @@ function renderDiscoveryList(rows, profMap, voteMap){
     var nBtn='<button '+(canVote?'onclick="toggleVote(\''+r.id+'\',\'disagree\')"':'disabled')+' style="flex:1;padding:7px;background:'+(nActive?'rgba(208,69,69,.15)':'var(--s2)')+';border:1px solid '+(nActive?'var(--red)':'var(--b2)')+';border-radius:6px;font-size:11px;color:'+(nActive?'var(--red)':'var(--m)')+';cursor:'+(canVote?'pointer':'not-allowed')+';font-family:\'DM Sans\',sans-serif;font-weight:'+(nActive?'600':'400')+';">N · '+v.disagree+'</button>';
     var voteSection='<div style="display:flex;gap:6px;margin-top:10px;">'+aBtn+nBtn+'</div>';
     var voteHint=canVote?'':(isOwner?'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(own post)':'(내 글)')+'</div>':'<div style="font-size:8px;color:var(--m);text-align:center;margin-top:4px;">'+(lang==='en'?'(login to vote)':'(로그인 후 투표 가능)')+'</div>');
-    // 사진 그리드 (이유 박스 위)
-    var photoGrid='';
-    if(Array.isArray(r.photos)&&r.photos.length){
+    // 사진 히어로 (인스타식: 사진 있으면 카드 최상단 풀블리드 + 배지 오버레이)
+    var hasPhotos=(Array.isArray(r.photos)&&r.photos.length);
+    var photoHero='';
+    if(hasPhotos){
       var ph=r.photos.slice(0,3);
-      var cellH=(ph.length===1?'170px':'110px');
-      photoGrid='<div style="display:flex;gap:4px;margin-bottom:8px;border-radius:8px;overflow:hidden;">';
+      var cellH=(ph.length===1?'200px':'140px');
+      var cells='';
       ph.forEach(function(u){
-        photoGrid+='<div style="flex:1;height:'+cellH+';background:var(--s2);"><img src="'+escHtml(u)+'" loading="lazy" onclick="window.open(this.src,\'_blank\')" style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;"></div>';
+        cells+='<div style="flex:1;height:'+cellH+';background:var(--s2);"><img src="'+escHtml(u)+'" loading="lazy" onclick="event.stopPropagation();window.open(this.src,\'_blank\')" style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;"></div>';
       });
-      photoGrid+='</div>';
+      var overlayBadge=isRec
+        ?'<span style="position:absolute;top:10px;left:10px;background:rgba(42,157,111,.92);color:#fff;padding:3px 10px;border-radius:10px;font-size:9px;font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.25);">👍 '+(lang==='en'?'Recommend':'추천')+'</span>'
+        :'<span style="position:absolute;top:10px;left:10px;background:rgba(208,69,69,.92);color:#fff;padding:3px 10px;border-radius:10px;font-size:9px;font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.25);">👎 '+(lang==='en'?'Avoid':'비추천')+'</span>';
+      photoHero='<div style="position:relative;display:flex;gap:3px;">'+cells+overlayBadge+'</div>';
     }
 
-    html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:14px;margin-bottom:10px;">'
+    html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;margin-bottom:10px;overflow:hidden;">'
+      +photoHero
+      +'<div style="padding:14px;">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-      +  verdictBadge
+      +  (hasPhotos?'<div></div>':verdictBadge)
       +  '<div style="font-size:9px;color:var(--m);">'+escHtml(nick)+' · '+dateStr+'</div>'
       +'</div>'
       +'<div style="font-size:14px;color:var(--w);font-weight:500;margin-bottom:4px;">'+catIcon+' '+escHtml(r.place_name)+'</div>'
       +'<div style="font-size:10px;color:var(--m);margin-bottom:8px;">'+flag+' '+(r.region?escHtml(r.region):'')+'</div>'
-      +photoGrid
       +'<div style="font-size:12px;color:var(--sb);line-height:1.6;background:var(--s2);padding:8px 10px;border-radius:6px;border-left:3px solid '+(isRec?'var(--ok)':'var(--red)')+';">'+escHtml(r.reason)+'</div>'
       +(r.detail?'<div style="font-size:11px;color:var(--m);line-height:1.7;margin-top:8px;white-space:pre-wrap;">'+escHtml(r.detail)+'</div>':'')
       +voteSection
       +voteHint
       +(isOwner?'<div style="text-align:right;margin-top:6px;"><button onclick="deleteDiscovery(\''+r.id+'\')" style="background:transparent;border:none;font-size:9px;color:var(--red);cursor:pointer;font-family:\'DM Sans\',sans-serif;">'+(lang==='en'?'Delete':'삭제')+'</button></div>':'')
+      +'</div>'
       +'</div>';
   });
   el.innerHTML=html;
