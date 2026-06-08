@@ -3595,6 +3595,76 @@ function dalCloseDetail(){
   _detailPostId=null;
 }
 
+// ── 인라인 댓글 (본창에서 카드 아래로 펼침) ──
+function dalToggleInlineComments(postId){
+  var box=document.getElementById('cmts-'+postId);
+  if(!box) return;
+  if(!box.style.display||box.style.display==='none'){
+    box.style.display='block';
+    dalLoadCommentsInto(postId, box);
+  } else {
+    box.style.display='none';
+  }
+}
+
+async function dalLoadCommentsInto(postId, box){
+  box.innerHTML='<div style="font-size:10px;color:var(--m);padding:8px 0;">불러오는 중...</div>';
+  try{
+    var comments=await fetch(SUPA_URL+'/rest/v1/comments?post_id=eq.'+postId+'&order=created_at.asc&select=*',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+((_currentToken)||SUPA_KEY)}
+    }).then(function(r){return r.json();});
+    var listHtml='';
+    if(comments&&comments.length){
+      comments.forEach(function(c){
+        var isMe=(_currentUserId&&c.user_id===_currentUserId);
+        var cDate=new Date(c.created_at); var cDateStr=(cDate.getMonth()+1)+'.'+cDate.getDate();
+        listHtml+='<div style="padding:7px 0;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:flex-start;">'
+          +'<div style="flex:1;"><div style="font-size:10px;color:var(--w);font-weight:500;margin-bottom:2px;">'+escHtml(c.nickname||'DAL User')+'<span style="font-weight:400;color:var(--m);margin-left:6px;">'+cDateStr+'</span></div>'
+          +'<div style="font-size:11px;color:rgba(46,40,32,.85);line-height:1.6;">'+escHtml(c.content||'')+'</div></div>'
+          +(isMe?'<button onclick="event.stopPropagation();dalDeleteInlineComment(\''+c.id+'\',\''+postId+'\')" style="background:transparent;border:none;color:var(--m);font-size:11px;cursor:pointer;padding:0 4px;flex-shrink:0;">✕</button>':'')
+          +'</div>';
+      });
+    } else {
+      listHtml='<div style="font-size:10px;color:var(--m);text-align:center;padding:8px 0;">아직 댓글이 없어요</div>';
+    }
+    var inputHtml = _currentToken
+      ? '<div style="display:flex;gap:6px;align-items:flex-end;margin-top:8px;" onclick="event.stopPropagation()">'
+        +'<textarea id="cmtin-'+postId+'" placeholder="댓글을 입력하세요" style="flex:1;padding:7px 9px;background:var(--s2);border:1px solid var(--b2);border-radius:6px;font-size:11px;color:var(--w);font-family:\'DM Sans\',sans-serif;resize:none;height:38px;box-sizing:border-box;line-height:1.5;"></textarea>'
+        +'<button onclick="event.stopPropagation();dalSubmitInlineComment(\''+postId+'\')" style="padding:8px 12px;background:rgba(196,175,135,.12);border:1px solid rgba(196,175,135,.35);border-radius:6px;font-size:11px;color:var(--gold);cursor:pointer;white-space:nowrap;flex-shrink:0;">등록</button>'
+        +'</div>'
+      : '<div style="font-size:10px;color:var(--m);text-align:center;padding:6px 0;">댓글을 달려면 로그인이 필요해요</div>';
+    box.innerHTML='<div style="margin-top:6px;border-top:1px solid var(--b1);padding-top:8px;">'+listHtml+inputHtml+'</div>';
+  }catch(e){ box.innerHTML='<div style="font-size:10px;color:var(--m);padding:8px 0;">댓글 불러오기 실패</div>'; console.warn('[InlineComments]',e); }
+}
+
+async function dalSubmitInlineComment(postId){
+  var ta=document.getElementById('cmtin-'+postId);
+  var text=ta?ta.value:'';
+  if(!text||!text.trim()){ alert('댓글을 입력해주세요'); return; }
+  if(!_currentToken||!_currentUserId){ alert('로그인이 필요해요'); return; }
+  var myNick=document.getElementById('profileName')?document.getElementById('profileName').textContent:'DAL User';
+  try{
+    var r=await fetch(SUPA_URL+'/rest/v1/comments',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({post_id:postId,user_id:_currentUserId,nickname:myNick,content:text.trim()})
+    });
+    if(r.ok){ var box=document.getElementById('cmts-'+postId); if(box) dalLoadCommentsInto(postId, box); }
+    else { alert('댓글 등록에 실패했어요'); }
+  }catch(e){ alert('오류: '+e.message); }
+}
+
+async function dalDeleteInlineComment(commentId, postId){
+  if(!confirm('댓글을 삭제할까요?')) return;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/comments?id=eq.'+commentId,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken}
+    });
+    var box=document.getElementById('cmts-'+postId); if(box) dalLoadCommentsInto(postId, box);
+  }catch(e){ console.warn('[InlineComments] 삭제 실패:',e); }
+}
+
 async function likeFeedPost(btn, postId){
   if(!_currentToken){ alert('로그인이 필요해요'); return; }
   var liked=btn.dataset.liked==='true';
@@ -4696,15 +4766,16 @@ async function loadPostsFromServer(){
         // 하단 액션바
         +'<div style="display:flex;gap:6px;align-items:center;">'
         +'<button class="dal-like-btn" data-pid="'+p.id+'" data-liked="'+liked+'" style="background:transparent;border:1px solid '+(liked?'rgba(240,96,96,.5)':'var(--b2)')+';border-radius:10px;padding:4px 12px;font-size:10px;color:'+(liked?'var(--red)':'var(--m)')+';cursor:pointer;" onclick="event.stopPropagation()">❤️ '+(p.likes||0)+'</button>'
-        +'<button class="dal-comment-btn" data-pid="'+p.id+'" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;" onclick="event.stopPropagation();dalOpenDetail(this.dataset.pid)">💬 댓글</button>'
+        +'<button class="dal-comment-btn" data-pid="'+p.id+'" style="background:transparent;border:1px solid var(--b2);border-radius:10px;padding:4px 12px;font-size:10px;color:var(--m);cursor:pointer;" onclick="event.stopPropagation();dalToggleInlineComments(this.dataset.pid)">💬 댓글</button>'
         +(isMe
           ?'<button data-pid="'+p.id+'" onclick="event.stopPropagation();dalDeletePost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:rgba(240,96,96,.06);border:1px solid rgba(240,96,96,.2);border-radius:10px;font-size:9px;color:var(--red);cursor:pointer;">삭제</button>'
           :'<button data-pid="'+p.id+'" onclick="event.stopPropagation();reportPost(this.dataset.pid)" style="margin-left:auto;padding:4px 10px;background:transparent;border:1px solid var(--b2);border-radius:10px;font-size:9px;color:var(--m);cursor:pointer;">신고</button>'
         )
-        +'</div>';
+        +'</div>'
+        +'<div id="cmts-'+p.id+'" style="display:none;"></div>';
 
-      // 카드 클릭 → 상세 팝업
-      card.onclick=function(){ dalOpenDetail(p.id); };
+      // 카드 클릭 / 댓글 버튼 → 인라인 댓글 펼치기 (본창에서 바로)
+      card.onclick=function(){ dalToggleInlineComments(p.id); };
 
       // 좋아요 버튼 이벤트
       var likeBtn=card.querySelector('.dal-like-btn');
@@ -5765,6 +5836,7 @@ window.searchUsers=searchUsers; window.openNewPost=openNewPost; function dalDele
 }
 window.dalSubmitPost=dalSubmitPost; window.dalClosePostPopup=dalClosePostPopup; window.dalLoadPostPhotos=dalLoadPostPhotos; window.dalRemovePhoto=dalRemovePhoto; window.dalDeletePost=dalDeletePost; window.reportPost=reportPost;
 window.dalOpenDetail=dalOpenDetail; window.dalCloseDetail=dalCloseDetail; window.dalSubmitComment=dalSubmitComment; window.dalDeleteComment=dalDeleteComment; window.setFeedFilter=setFeedFilter;
+window.dalToggleInlineComments=dalToggleInlineComments; window.dalSubmitInlineComment=dalSubmitInlineComment; window.dalDeleteInlineComment=dalDeleteInlineComment;
 window.openShareFeed=openShareFeed; window.collapseHero=collapseHero;
 window.expandHero=expandHero; window.selectOption=selectOption;
 window.doBookTrip=doBookTrip; window.openShareModal=openShareModal;
