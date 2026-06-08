@@ -1559,7 +1559,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
     <div class="login-sub" id="t-login-sub">로그인하고 여행 기록과<br>코인을 관리하세요.</div>
     <div class="social-btns">
       <button class="social-btn" onclick="doLogin('google')"><span style="font-size:18px;width:22px;text-align:center;">🟡</span><span id="t-google">Google로 계속하기</span></button>
-      <button class="social-btn" onclick="doLogin('apple')"><span style="font-size:18px;width:22px;text-align:center;">🍎</span><span id="t-apple">Apple로 계속하기</span></button>
+      <!-- Apple 로그인: Supabase Apple 공급자 설정 후 아래 style="display:none;" 제거하면 노출됨 -->
+      <button class="social-btn" onclick="doLogin('apple')" style="display:none;"><span style="font-size:18px;width:22px;text-align:center;">🍎</span><span id="t-apple">Apple로 계속하기</span></button>
     </div>
     <div style="font-size:9px;color:var(--m);text-align:center;line-height:1.9;max-width:280px;" id="t-terms">계속하면 DAL <span style="color:var(--ac)">서비스 이용약관</span> 및<br><span style="color:var(--ac)">개인정보처리방침</span>에 동의합니다.</div>
 
@@ -1713,6 +1714,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
           <div class="menu-item" onclick="showMyPage('cs')"><span>💬 <span id="t-m-cs">고객센터</span></span><span style="color:var(--m)">›</span></div>
           <div class="menu-item" onclick="showMyPage('about')"><span>ℹ️ <span id="t-m-about">DAL 소개</span></span><span style="color:var(--m)">›</span></div>
           <div class="menu-item" onclick="showMyPage('terms')"><span>📋 <span id="t-m-terms">이용약관</span></span><span style="color:var(--m)">›</span></div>
+          <div class="menu-item" onclick="showMyPage('privacy-policy')"><span>🔒 <span data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</span></span><span style="color:var(--m)">›</span></div>
         </div>
         <div style="padding:20px 0;text-align:center;font-size:9px;color:var(--m);line-height:2;">DAL · Design AI Life · v2.2 Beta<br>© 2026 DAL AI · Powered by Gemini 2.5 Flash</div>
       </div>
@@ -1840,6 +1842,26 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
       </div>
     </div>
+    <!-- 개인정보처리방침 (AdSense 요건: 쿠키·광고 고지 포함) -->
+    <div id="mypage-privacy-policy" style="display:none;">
+      <div class="sub-header"><button class="back-btn" onclick="hideMyPage()">←</button><div class="sub-title" data-ko="개인정보처리방침" data-en="Privacy Policy">개인정보처리방침</div></div>
+      <div class="page-wrap" style="padding-top:10px;font-size:11px;color:var(--m);line-height:2;">
+        <div style="font-size:14px;color:var(--sb);margin-bottom:4px;">DAL 개인정보처리방침</div>
+        <div style="font-size:9px;color:var(--m);margin-bottom:16px;">버전 1.0 · 2026년 6월 시행</div>
+        <div style="margin-bottom:14px;">DAL(Design AI Life, 이하 "DAL")은 이용자의 개인정보를 중요하게 생각하며, 본 방침을 통해 수집·이용·보관·보호 방법을 안내합니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">1. 수집하는 정보</strong><br>① 계정: 구글/애플 로그인 시 제공되는 이메일·프로필 정보, 닉네임<br>② 이용자 생성 콘텐츠: 게시물·사진·댓글·추천/비추천·여행 일정<br>③ 자동 수집: 기기·브라우저 정보, 접속 로그, 쿠키<br>④ 여권 정보는 기기 내에만 저장되며 서버로 전송하지 않습니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">2. 이용 목적</strong><br>① 서비스 제공(여행 플래닝·기록·소셜 기능)<br>② AI 여행 플래닝 처리<br>③ 코인 적립·교환<br>④ 서비스 개선 및 통계 분석<br>⑤ 동의 시 마케팅 정보 안내</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">3. 처리 위탁 및 제3자 제공</strong><br>DAL은 서비스 제공을 위해 아래 업체에 처리를 위탁합니다.<br>① Supabase: 데이터 저장·인증<br>② Google(Gemini AI): 여행 플래닝 텍스트 처리<br>③ Netlify: 서비스 호스팅<br>④ Google AdSense: 광고 게재<br>⑤ 제휴사(Travelpayouts, Booking.com, Agoda 등): 예약 링크 연결</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">4. 쿠키 및 광고</strong><br>① DAL은 서비스 운영 및 광고를 위해 쿠키를 사용합니다.<br>② Google을 포함한 제3자 광고 공급업체는 쿠키를 사용하여 이용자의 이전 방문 기록에 기반한 맞춤 광고를 게재할 수 있습니다.<br>③ Google의 광고 쿠키(DART 쿠키 등)로 인해, 이용자는 본 사이트 및 다른 사이트 방문 기록에 기반한 광고를 받을 수 있습니다.<br>④ 이용자는 <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener" style="color:var(--ac);">Google 광고 설정</a>에서 맞춤 광고를 비활성화할 수 있으며, <a href="https://www.aboutads.info" target="_blank" rel="noopener" style="color:var(--ac);">aboutads.info</a>에서 제3자 광고 쿠키를 거부할 수 있습니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">5. 보관 및 파기</strong><br>① 회원 탈퇴 또는 수집 목적 달성 시 지체 없이 파기합니다.<br>② 삭제한 게시물·계정 관련 데이터는 30일 내 파기합니다.<br>③ 관련 법령에 따라 보관이 필요한 경우 해당 기간 동안 분리 보관합니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">6. 이용자 권리</strong><br>① 이용자는 언제든 본인 정보의 열람·정정·삭제·처리정지를 요청할 수 있습니다.<br>② 마이 → 개인정보 설정에서 공개 범위·동의 항목을 직접 변경할 수 있습니다.<br>③ 동의는 언제든 철회할 수 있습니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">7. 보안</strong><br>① 전송 구간은 HTTPS로 암호화됩니다.<br>② 접근 권한을 최소화하며, 민감정보(여권 등)는 서버에 저장하지 않습니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">8. 아동의 개인정보</strong><br>DAL은 만 14세 미만 아동의 개인정보를 수집하지 않으며, 확인 시 즉시 삭제합니다.</div>
+        <div style="margin-bottom:14px;"><strong style="color:var(--sb);font-size:12px;">9. 방침 변경</strong><br>본 방침이 변경되는 경우 시행일과 변경 내용을 앱 내 공지합니다.</div>
+        <div><strong style="color:var(--sb);font-size:12px;">10. 문의</strong><br>개인정보 관련 문의: dal.support@gmail.com · 평일 10:00-18:00</div>
+      </div>
+    </div>
+
     <!-- 이용약관 R2-10 상세 -->
     <div id="mypage-terms" style="display:none;">
       <div class="sub-header"><button class="back-btn" onclick="hideMyPage()">←</button><div class="sub-title" id="t-terms-title">이용약관</div></div>
@@ -3068,7 +3090,7 @@ function goPage(id){
 // ══════════════════════════════════════════════
 // My Page 서브
 // ══════════════════════════════════════════════
-var mySubPages=['notify','privacy','more-menu','cs','about','terms'];
+var mySubPages=['notify','privacy','more-menu','cs','about','terms','privacy-policy'];
 function showMyPage(name){
   document.getElementById('profileView').querySelector('.page-wrap').style.display='none';
   mySubPages.forEach(function(p){
