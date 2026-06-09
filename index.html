@@ -1481,16 +1481,20 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
         </div>
         <!-- 친구 추가 -->
         <div id="followsPane-add" style="display:none;">
-          <!-- 내 초대코드 -->
+          <!-- 내 초대코드 (버튼 눌러 생성, 10분 유효) -->
           <div style="background:rgba(196,175,135,.08);border:1px solid var(--b2);border-radius:10px;padding:14px;margin-bottom:14px;text-align:center;">
-            <div style="font-size:10px;color:var(--m);margin-bottom:6px;" data-ko="내 초대 코드 (친구에게 공유하세요)" data-en="My invite code (share with friends)">내 초대 코드 (친구에게 공유하세요)</div>
-            <div id="myInviteCode" style="font-size:24px;font-weight:600;color:var(--gold);letter-spacing:4px;font-family:'DM Sans',sans-serif;margin-bottom:10px;">------</div>
-            <button onclick="copyInviteCode()" style="background:var(--gold);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="📋 복사하기" data-en="📋 Copy">📋 복사하기</button>
+            <div style="font-size:10px;color:var(--m);margin-bottom:6px;" data-ko="내 초대 코드 (생성 후 10분간 유효)" data-en="My invite code (valid 10 min after creating)">내 초대 코드 (생성 후 10분간 유효)</div>
+            <div id="myInviteCode" style="font-size:24px;font-weight:600;color:var(--gold);letter-spacing:3px;font-family:'DM Sans',sans-serif;margin-bottom:10px;">--------</div>
+            <div style="display:flex;gap:6px;justify-content:center;">
+              <button onclick="rotateInviteCode()" id="genCodeBtn" style="background:var(--gold);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="🔄 코드 생성" data-en="🔄 Create code">🔄 코드 생성</button>
+              <button onclick="copyInviteCode()" style="background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:8px 16px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;" data-ko="📋 복사" data-en="📋 Copy">📋 복사</button>
+            </div>
+            <div style="font-size:9px;color:var(--m);margin-top:8px;line-height:1.5;" data-ko="버튼을 눌러 코드를 만들고 친구에게 공유하세요. 만료되면 다시 생성하면 돼요." data-en="Tap to create a code and share it. Just create a new one if it expires.">버튼을 눌러 코드를 만들고 친구에게 공유하세요. 만료되면 다시 생성하면 돼요.</div>
           </div>
           <!-- 코드 입력 -->
           <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;">
             <div style="font-size:10px;color:var(--m);margin-bottom:8px;" data-ko="친구의 초대 코드 입력" data-en="Enter friend's code">친구의 초대 코드 입력</div>
-            <input id="inviteInput" type="text" maxlength="6" placeholder="ABC123" style="width:100%;padding:10px;background:var(--s1);border:1px solid var(--b2);border-radius:6px;font-size:16px;color:var(--w);letter-spacing:3px;text-align:center;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:8px;box-sizing:border-box;" oninput="this.value=this.value.toUpperCase();">
+            <input id="inviteInput" type="text" maxlength="12" placeholder="XXXX-XXXX" style="width:100%;padding:10px;background:var(--s1);border:1px solid var(--b2);border-radius:6px;font-size:16px;color:var(--w);letter-spacing:3px;text-align:center;font-family:'DM Sans',sans-serif;text-transform:uppercase;margin-bottom:8px;box-sizing:border-box;" oninput="this.value=this.value.toUpperCase();">
             <button onclick="sendFollowRequest()" style="width:100%;padding:10px;background:rgba(196,175,135,.1);border:1px solid var(--gold);border-radius:6px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;" data-ko="🤝 친구 요청 보내기" data-en="🤝 Send request">🤝 친구 요청 보내기</button>
           </div>
           <div style="font-size:9px;color:var(--m);text-align:center;margin-top:12px;line-height:1.6;" data-ko="상대방이 수락하면 서로의 피드를 볼 수 있어요" data-en="When accepted, you can see each other's feeds">상대방이 수락하면 서로의 피드를 볼 수 있어요</div>
@@ -4156,14 +4160,8 @@ async function openFollowsModal(){
     return;
   }
   document.getElementById('followsModal').style.display='flex';
-  // 내 초대코드 로드
-  try{
-    var r=await _sfGet('/rest/v1/profiles?id=eq.'+_currentUserId+'&select=invite_code');
-    if(r&&r[0]&&r[0].invite_code){
-      var el=document.getElementById('myInviteCode');
-      if(el) el.textContent=r[0].invite_code;
-    }
-  }catch(e){ console.warn('[Follows] 초대코드 로드 실패:', e.message); }
+  // 내 초대코드: 버튼 눌러 생성하는 방식 (자동 표시 안 함)
+  var _ic=document.getElementById('myInviteCode'); if(_ic) _ic.textContent='--------';
   switchFollowsTab('friends');
   loadFollowsAll();
 }
@@ -4270,11 +4268,33 @@ function renderRequestsList(requests, profMap){
   el.innerHTML=html;
 }
 
+function _fmtInvite(c){ c=(c||'').replace(/[^A-Z0-9]/gi,'').toUpperCase(); return c.length===8?(c.slice(0,4)+'-'+c.slice(4)):c; }
+
+async function rotateInviteCode(){
+  if(!_currentToken||!_currentUserId){ alert(lang==='en'?'Please log in 🌙':'로그인이 필요해요 🌙'); return; }
+  var btn=document.getElementById('genCodeBtn'); if(btn) btn.disabled=true;
+  try{
+    var resp=await fetch(SUPA_URL+'/rest/v1/rpc/rotate_invite_code',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+_currentToken,'Content-Type':'application/json'},
+      body:JSON.stringify({})
+    });
+    if(resp.ok){
+      var code=await resp.json(); // RPC가 text 반환
+      var el=document.getElementById('myInviteCode');
+      if(el&&typeof code==='string') el.textContent=_fmtInvite(code);
+    } else {
+      alert(lang==='en'?'Failed to create code':'코드 생성에 실패했어요');
+    }
+  }catch(e){ alert((lang==='en'?'Error: ':'오류: ')+e.message); }
+  finally{ if(btn) btn.disabled=false; }
+}
+
 async function copyInviteCode(){
   var el=document.getElementById('myInviteCode');
   if(!el) return;
   var code=el.textContent.trim();
-  if(code==='------'){ alert(lang==='en'?'Code loading...':'코드 불러오는 중...'); return; }
+  if(!/[A-Z0-9]/i.test(code)){ alert(lang==='en'?'Create a code first 🌙':'먼저 "코드 생성"을 눌러주세요 🌙'); return; }
   var shareText=(lang==='en'
     ?'Let\'s be friends on DAL! 🌙\n\nAlready on DAL? Open the app → [Social → Friends → Add] and enter this code:\n👉 '+code+'\n\n(New to DAL? Start at https://dal-moon.com)'
     :'DAL에서 친구하자! 🌙\n\n이미 DAL 쓰고 있으면 → 앱 열고 [소셜 → 친구 관리 → 친구 추가]에 코드 입력해줘:\n👉 '+code+'\n\n(DAL이 처음이면 https://dal-moon.com 에서 시작)');
@@ -4293,8 +4313,8 @@ async function sendFollowRequest(){
   if(!_currentToken||!_currentUserId) return;
   var inp=document.getElementById('inviteInput');
   if(!inp) return;
-  var code=inp.value.trim().toUpperCase();
-  if(code.length!==6){ alert(lang==='en'?'Enter a 6-character code':'6자리 코드를 입력해주세요'); return; }
+  var code=inp.value.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(code.length!==8){ alert(lang==='en'?'Enter the 8-character code':'8자리 코드를 입력해주세요'); return; }
   try{
     // 1) 코드로 상대 user_id 찾기 (RPC — id·nickname만 반환, 이메일 노출 없음)
     var _rpc=await fetch(SUPA_URL+'/rest/v1/rpc/find_user_by_code',{
@@ -4374,6 +4394,7 @@ window.closeFollowsModal=closeFollowsModal;
 window.switchFollowsTab=switchFollowsTab;
 window.copyInviteCode=copyInviteCode;
 window.sendFollowRequest=sendFollowRequest;
+window.rotateInviteCode=rotateInviteCode;
 window.acceptFollow=acceptFollow;
 window.rejectFollow=rejectFollow;
 window.unfollow=unfollow;
