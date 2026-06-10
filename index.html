@@ -416,6 +416,8 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
 .trc-insight span{color:var(--ac);}
 .upg-btn-small{width:100%;padding:8px;background:rgba(196,175,135,.08);border:1px solid rgba(196,175,135,.2);border-radius:2px;font-size:9px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:6px;}
 .link-btn{padding:6px 4px;background:rgba(91,143,255,.06);border:1px solid rgba(91,143,255,.15);border-radius:2px;font-size:9px;color:var(--ac);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;}
+/* [출시 임시] AdSense 승인 전 광고 배너 숨김 — 승인 후 이 줄 삭제하면 배너 4개 다시 노출. 상세=DAL_AdSense_승인후_복구_20260610.md */
+.dal-ad-banner{display:none !important;}
 </style>
 <!-- Travelpayouts Drive (제휴 추적/검증 스크립트) -->
 <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
@@ -866,7 +868,7 @@ body{background:var(--bg);color:var(--w);font-family:'DM Sans',sans-serif;font-w
                   data-ad-client="ca-pub-XXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
              그리고 dalShowAd() 안에서 (adsbygoogle=window.adsbygoogle||[]).push({}); 호출
              ▲▲▲ -->
-        <div style="text-align:center;color:var(--m);font-size:11px;line-height:1.8;">📺<br>광고 영역<br><span style="font-size:9px;">(AdSense 연동 예정)</span></div>
+        <div style="text-align:center;color:var(--m);font-size:11px;line-height:1.8;">🌙<br><span style="font-size:14px;color:var(--gold);font-weight:600;">DAL</span><br><span style="font-size:9px;">잠시만 기다려 주세요</span></div>
       </div>
       <div id="dalAdTimer" style="font-size:12px;color:var(--gold);margin-bottom:12px;">15초 후 계속하기</div>
       <button id="dalAdSkipBtn" onclick="dalAdComplete()" disabled style="padding:10px 24px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;font-size:11px;color:var(--m);cursor:not-allowed;font-family:'DM Sans',sans-serif;">건너뛰기</button>
