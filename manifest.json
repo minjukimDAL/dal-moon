@@ -1,3 +1,4 @@
+st · JSON
 {
   "name": "DAL · Design AI Life",
   "short_name": "DAL",
@@ -11,78 +12,88 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icons/icon-72.png",
+      "src": "/Icons/icon-72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-96.png",
+      "src": "/Icons/icon-96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-128.png",
+      "src": "/Icons/icon-128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-144.png",
+      "src": "/Icons/icon-144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-152.png",
+      "src": "/Icons/icon-152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-192.png",
+      "src": "/Icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-384.png",
-      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/Icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
+      "purpose": "any"
+    },
     {
-      "src": "/screenshots/screen1.png",
-      "sizes": "390x844",
+      "src": "/Icons/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "DAL AI 여행 플래닝"
+      "purpose": "maskable"
     }
   ],
-  "categories": ["travel", "lifestyle"],
+  "categories": [
+    "travel",
+    "lifestyle"
+  ],
   "shortcuts": [
     {
       "name": "AI 플래닝",
       "short_name": "플래닝",
       "description": "AI로 여행 계획 세우기",
       "url": "/?tab=home",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/Icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
       "name": "소셜 피드",
       "short_name": "피드",
       "description": "여행 정보 공유",
       "url": "/?tab=social",
-      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+      "icons": [
+        {
+          "src": "/Icons/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ]
 }
